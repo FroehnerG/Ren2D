@@ -17,6 +17,11 @@ void Engine::GameLoop()
 
 	while (is_running) {
 		Input();
+
+        if (!is_running) {
+            return;
+        }
+
 		Update();
 		Render();
 	}
