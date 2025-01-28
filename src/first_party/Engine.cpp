@@ -14,7 +14,6 @@ void Engine::GameLoop()
 	cout << game_start_message << '\n';
 
 	Render();
-    ShowScoreAndHealth();
 
 	while (is_running) {
 		Input();
