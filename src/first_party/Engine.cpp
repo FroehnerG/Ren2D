@@ -14,6 +14,7 @@ void Engine::GameLoop()
 	cout << game_start_message << '\n';
 
 	Render();
+    ShowScoreAndHealth();
 
 	while (is_running) {
 		Input();
@@ -29,6 +30,7 @@ void Engine::GameLoop()
 
 void Engine::Input()
 {
+    ShowScoreAndHealth();
     cout << prompt << options;
 
 	cin >> user_input;
@@ -36,21 +38,25 @@ void Engine::Input()
 	if (user_input == "quit") {
 		cout << game_over_bad_message;
 		is_running = false;
+        return;
 	}
 	else if (user_input == "n") {
-		hardcoded_actors.back().position += ivec2(0, -1);
+        new_position = hardcoded_actors.back().position + ivec2(0, -1);
 	}
 	else if (user_input == "e") {
-		hardcoded_actors.back().position += ivec2(1, 0);
+		new_position = hardcoded_actors.back().position + ivec2(1, 0);
 	}
 	else if (user_input == "s") {
-		hardcoded_actors.back().position += ivec2(0, 1);
+		new_position = hardcoded_actors.back().position + ivec2(0, 1);
 	}
-	else if (user_input == "w") {
-		hardcoded_actors.back().position += ivec2(-1, 0);
-	}
+    else if (user_input == "w") {
+        new_position = hardcoded_actors.back().position + ivec2(-1, 0);
+    }
 
-    player_position = hardcoded_actors.back().position;
+    if (IsPositionValid(new_position)) {
+        hardcoded_actors.back().position = new_position;
+        player_position = hardcoded_actors.back().position;
+    }
 }
 
 void Engine::Update()
@@ -60,7 +66,6 @@ void Engine::Update()
 void Engine::Render()
 {
     cout << RenderMap();
-    ShowScoreAndHealth();
 }
 
 void Engine::ShowScoreAndHealth()
@@ -68,10 +73,13 @@ void Engine::ShowScoreAndHealth()
 	cout << "health : " << player_health << ", score : " << score << '\n';
 }
 
-bool Engine::IsPositionValid()
+bool Engine::IsPositionValid(ivec2 position)
 {
+    if (hardcoded_map[position.y][position.x] == 'b') {
+        return false;
+    }
 
-    return false;
+    return true;
 }
 
 string Engine::RenderMap()

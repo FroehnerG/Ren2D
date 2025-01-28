@@ -13,7 +13,7 @@ public:
 	void Update();
 	void Render();
 	void ShowScoreAndHealth();
-	bool IsPositionValid();
+	bool IsPositionValid(ivec2 position);
 	string RenderMap();
 private:
 	bool is_running = true;
@@ -21,4 +21,5 @@ private:
 	int score = 0;
 	string user_input = "";
 	ivec2 player_position = ivec2(19, 15);
+	ivec2 new_position = ivec2(0, 0);
 };
