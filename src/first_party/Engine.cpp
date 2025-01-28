@@ -5,7 +5,7 @@
 using std::string, std::cin, std::cout;
 
 const string prompt = "Please make a decision...\n";
-const string options = "Your options are \"n\", \"e\", \"s\", and \"w\", \"quit\"\n";
+const string options = "Your options are \"n\", \"e\", \"s\", \"w\", \"quit\"\n";
 const int CAMERA_WIDTH = 13;
 const int CAMERA_HEIGHT = 9;
 
@@ -61,6 +61,12 @@ void Engine::Render()
 void Engine::ShowScoreAndHealth()
 {
 	cout << "health : " << player_health << ", score : " << score << '\n';
+}
+
+bool Engine::IsPositionValid()
+{
+
+    return false;
 }
 
 string Engine::RenderMap()

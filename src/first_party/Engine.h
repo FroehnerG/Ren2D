@@ -13,6 +13,7 @@ public:
 	void Update();
 	void Render();
 	void ShowScoreAndHealth();
+	bool IsPositionValid();
 	string RenderMap();
 private:
 	bool is_running = true;
