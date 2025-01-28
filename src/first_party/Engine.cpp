@@ -35,7 +35,6 @@ void Engine::GameLoop()
 
 		Update();
 		Render();
-        ShowNPCDialogue();
 	}
 }
 
@@ -77,6 +76,7 @@ void Engine::Update()
 void Engine::Render()
 {
     cout << RenderMap();
+    ShowNPCDialogue();
 }
 
 void Engine::ShowScoreAndHealth()
@@ -103,6 +103,8 @@ bool Engine::IsNPCAdjacent(ivec2 NPC_position)
             return true; // Found an adjacent actor
         }
     }
+
+    return false;
 }
 
 bool Engine::IsNPCInSameCell(ivec2 NPC_position)
