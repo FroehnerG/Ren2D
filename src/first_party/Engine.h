@@ -12,12 +12,12 @@ public:
 	void Input();
 	void Update();
 	void Render();
-	void FirstRender();
 	void ShowScoreAndHealth();
+	string RenderMap();
 private:
 	bool is_running = true;
 	int player_health = 3;
 	int score = 0;
 	string user_input = "";
-	ivec2 player_position = ivec2(0, 0);
+	ivec2 player_position = ivec2(19, 15);
 };
