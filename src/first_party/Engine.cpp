@@ -9,6 +9,17 @@ const string options = "Your options are \"n\", \"e\", \"s\", \"w\", \"quit\"\n"
 const int CAMERA_WIDTH = 13;
 const int CAMERA_HEIGHT = 9;
 
+const ivec2 ADJACENT_OFFSETS[8] = {
+    ivec2(0, -1), 
+    ivec2(0, 1), 
+    ivec2(-1, 0), 
+    ivec2(1, 0), // Cardinal directions
+    ivec2(-1, -1), 
+    ivec2(-1, 1), 
+    ivec2(1, -1), 
+    ivec2(1, 1) // Diagonal directions
+};
+
 void Engine::GameLoop()
 {
 	cout << game_start_message << '\n';
@@ -24,6 +35,7 @@ void Engine::GameLoop()
 
 		Update();
 		Render();
+        ShowNPCDialogue();
 	}
 }
 
@@ -79,6 +91,39 @@ bool Engine::IsPositionValid(ivec2 position)
     }
 
     return true;
+}
+
+bool Engine::IsNPCAdjacent(ivec2 NPC_position)
+{
+    // Check all neighbors
+    for (const auto& offset : ADJACENT_OFFSETS) {
+        ivec2 neighbor_position = player_position + offset;
+
+        if (NPC_position == neighbor_position) {
+            return true; // Found an adjacent actor
+        }
+    }
+}
+
+bool Engine::IsNPCInSameCell(ivec2 NPC_position)
+{
+    if (NPC_position == player_position) {
+        return true;
+    }
+
+    return false;
+}
+
+void Engine::ShowNPCDialogue()
+{
+    for (const Actor& actor : hardcoded_actors) {
+        if (IsNPCAdjacent(actor.position) && actor.nearby_dialogue != "") {
+            cout << actor.nearby_dialogue << '\n';
+        }
+        else if (IsNPCInSameCell(actor.position) && actor.contact_dialogue != "") {
+            cout << actor.contact_dialogue << '\n';
+        }
+    }
 }
 
 string Engine::RenderMap()

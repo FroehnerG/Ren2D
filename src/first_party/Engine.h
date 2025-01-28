@@ -14,6 +14,9 @@ public:
 	void Render();
 	void ShowScoreAndHealth();
 	bool IsPositionValid(ivec2 position);
+	bool IsNPCAdjacent(ivec2 NPC_position);
+	bool IsNPCInSameCell(ivec2 NPC_position);
+	void ShowNPCDialogue();
 	string RenderMap();
 private:
 	bool is_running = true;
