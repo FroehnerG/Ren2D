@@ -73,6 +73,9 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <IncludePath>$(ProjectDir)src\third_party\glm_0.9.9.8\glm\test\;$(ProjectDir)src\third_party\glm-0.9.9.8\glm\;$(ProjectDir)src\third_party\;$(ProjectDir)src\first_party\;$(IncludePath)</IncludePath>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <IncludePath>$(ProjectDir)src\third_party\;$(ProjectDir)src\first_party\;$(ProjectDir)src\third_party\glm-0.9.9.8\glm\;$(IncludePath)</IncludePath>
+  </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>

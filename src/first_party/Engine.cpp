@@ -9,7 +9,7 @@ const string options = "Your options are \"n\", \"e\", \"s\", and \"w\", \"quit\
 
 void Engine::GameLoop()
 {
-	cout << MapHelper::game_start_message << '\n';
+	cout << game_start_message << '\n';
 
 	FirstRender();
 
