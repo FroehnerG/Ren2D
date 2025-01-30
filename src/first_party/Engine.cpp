@@ -86,7 +86,7 @@ void Engine::ShowScoreAndHealth()
 
 bool Engine::IsPositionValid(ivec2 position)
 {
-    if (hardcoded_map[position.y][position.x] == 'b') {
+    if (hardcoded_map[position.y][position.x] == 'b' || IsBlockingActorAtPosition(position)) {
         return false;
     }
 
@@ -111,6 +111,17 @@ bool Engine::IsNPCInSameCell(ivec2 NPC_position)
 {
     if (NPC_position == player_position) {
         return true;
+    }
+
+    return false;
+}
+
+bool Engine::IsBlockingActorAtPosition(ivec2 position)
+{
+    for (const Actor& actor : hardcoded_actors) {
+        if (actor.position == position && actor.blocking) {
+            return true;
+        }
     }
 
     return false;

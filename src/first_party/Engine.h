@@ -16,6 +16,7 @@ public:
 	bool IsPositionValid(ivec2 position);
 	bool IsNPCAdjacent(ivec2 NPC_position);
 	bool IsNPCInSameCell(ivec2 NPC_position);
+	bool IsBlockingActorAtPosition(ivec2 position);
 	void ShowNPCDialogue();
 	string RenderMap();
 private:
