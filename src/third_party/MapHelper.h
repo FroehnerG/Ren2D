@@ -43,7 +43,7 @@ G A M E - S T A R T";
 
 const std::string game_over_bad_message = "Exhausted by the chase, the darkness begins to swirl around you.\n\
 \n\
-Suddenly the floor greets you, followed by pure silence. You've fallen asleep.It is 3am after all, and your physiology has made an executive decision.\n\
+Suddenly the floor greets you, followed by pure silence. You've fallen asleep. It is 3am after all, and your physiology has made an executive decision.\n\
 \n\
 You wake up to bright lights- the Duderstadt Center is now lively and back-to-business. People keep looking at you funny however, as if the Spartans from last night have written something on your forehead. You're too afraid to ask or even check for yourself. What's worse, you notice the autograder is no longer in your possession.\n\
 \n\
