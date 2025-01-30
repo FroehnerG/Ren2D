@@ -53,7 +53,7 @@ Upon arriving home, you find an email from the Professor sitting ominously in yo
 \n\
 I want to apologize- I messed up and left my only raspberry pi in the VisStudio last night. You know- the one with the autograder on it. Unfortunately, I made an even greater error in forgetting to use proper version control, so I'm afraid the autograder software is toast. I know this is all devastating to you, but I'll have to give extensions to everyone, and make the homework much easier.\"\n\
 \n\
-What a bitter-sweet win for the spartans. While you end up enjoying your extension, you aren't able to learn as much given the tight class schedule and cut course content. You feel a bit cheated, and live in the most mild state terror, contemplating how the spartans could disrupt your other courses, EECS 494 and EECS 480 (XR).\n\
+What a bitter-sweet win for the spartans. While you end up enjoying your extension, you aren't able to learn as much given the tight class schedule and cut course content. You feel a bit cheated, and live in the most mild state terror, contemplating how the spartans could disrupt your other courses, EECS 494, EECS 440, and EECS 298.\n\
 \n\
 Y O U L O S E\n\
 G A M E O V E R";
