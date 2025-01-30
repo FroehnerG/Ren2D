@@ -1,5 +1,6 @@
 #pragma once
 #include <string>
+#include <unordered_set>
 #include "glm/glm.hpp"
 #include "MapHelper.h"
 
@@ -18,6 +19,7 @@ public:
 	bool IsNPCInSameCell(ivec2 NPC_position);
 	bool IsBlockingActorAtPosition(ivec2 position);
 	void ShowNPCDialogue();
+	void CheckNPCDialogue(string dialogue, string NPC_name);
 	void MoveNPCs();
 	ivec2 InvertVelocity(ivec2 velocity);
 	string RenderMap();
@@ -28,4 +30,5 @@ private:
 	string user_input = "";
 	ivec2 player_position = ivec2(19, 15);
 	ivec2 new_position = ivec2(0, 0);
+	std::unordered_set<string> score_actors;
 };

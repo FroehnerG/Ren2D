@@ -1,5 +1,6 @@
 #include <iostream>
 #include <string>
+#include <unordered_set>
 #include "Engine.h"
 
 using std::string, std::cin, std::cout;
@@ -133,10 +134,48 @@ void Engine::ShowNPCDialogue()
     for (const Actor& actor : hardcoded_actors) {
         if (IsNPCAdjacent(actor.position) && actor.nearby_dialogue != "") {
             cout << actor.nearby_dialogue << '\n';
+            CheckNPCDialogue(actor.nearby_dialogue, actor.actor_name);
         }
         else if (IsNPCInSameCell(actor.position) && actor.contact_dialogue != "") {
             cout << actor.contact_dialogue << '\n';
+            CheckNPCDialogue(actor.contact_dialogue, actor.actor_name);
         }
+
+        if (!is_running) {
+            return;
+        }
+    }
+}
+
+void Engine::CheckNPCDialogue(string dialogue, string NPC_name)
+{
+    string health_down = "health down";
+    string score_up = "score up";
+    string you_win = "you win";
+    string game_over = "game over";
+
+    if (dialogue.find(health_down) != string::npos) {
+        player_health--;
+
+        if (player_health <= 0) {
+            ShowScoreAndHealth();
+            cout << game_over_bad_message;
+            is_running = false;
+        }
+    }
+    else if (dialogue.find(score_up) != string::npos && score_actors.find(NPC_name) == score_actors.end()) {
+        score++;
+        score_actors.insert(NPC_name);
+    }
+    else if (dialogue.find(you_win)) {
+        ShowScoreAndHealth();
+        cout << game_over_good_message;
+        is_running = false;
+    }
+    else if (dialogue.find(game_over)) {
+        ShowScoreAndHealth();
+        cout << game_over_bad_message;
+        is_running = false;
     }
 }
 
