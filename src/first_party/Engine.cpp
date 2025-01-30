@@ -167,12 +167,12 @@ void Engine::CheckNPCDialogue(string dialogue, string NPC_name)
         score++;
         score_actors.insert(NPC_name);
     }
-    else if (dialogue.find(you_win)) {
+    else if (dialogue.find(you_win) != string::npos) {
         ShowScoreAndHealth();
         cout << game_over_good_message;
         is_running = false;
     }
-    else if (dialogue.find(game_over)) {
+    else if (dialogue.find(game_over) != string::npos) {
         ShowScoreAndHealth();
         cout << game_over_bad_message;
         is_running = false;
