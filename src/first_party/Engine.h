@@ -18,6 +18,8 @@ public:
 	bool IsNPCInSameCell(ivec2 NPC_position);
 	bool IsBlockingActorAtPosition(ivec2 position);
 	void ShowNPCDialogue();
+	void MoveNPCs();
+	ivec2 InvertVelocity(ivec2 velocity);
 	string RenderMap();
 private:
 	bool is_running = true;

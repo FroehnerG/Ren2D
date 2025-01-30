@@ -71,6 +71,7 @@ void Engine::Input()
 
 void Engine::Update()
 {
+    MoveNPCs();
 }
 
 void Engine::Render()
@@ -137,6 +138,27 @@ void Engine::ShowNPCDialogue()
             cout << actor.contact_dialogue << '\n';
         }
     }
+}
+
+void Engine::MoveNPCs()
+{
+    for (Actor& actor : hardcoded_actors) {
+        if (actor.velocity != ivec2(0, 0)) {
+            ivec2 new_npc_position = actor.position + actor.velocity;
+
+            if (IsPositionValid(new_npc_position)) {
+                actor.position = new_npc_position;
+            }
+            else {
+                actor.velocity = InvertVelocity(actor.velocity);
+            }
+        }
+    }
+}
+
+ivec2 Engine::InvertVelocity(ivec2 velocity)
+{
+    return ivec2(velocity.x * -1, velocity.y * -1);
 }
 
 string Engine::RenderMap()
