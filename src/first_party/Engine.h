@@ -18,7 +18,7 @@ public:
 	bool IsNPCAdjacent(ivec2 NPC_position);
 	bool IsNPCInSameCell(ivec2 NPC_position);
 	bool IsBlockingActorAtPosition(ivec2 position);
-	void ShowNPCDialogue(string dialogue_type);
+	void ShowNPCDialogue();
 	void CheckNPCDialogue(string dialogue, string NPC_name);
 	void MoveNPCs();
 	ivec2 InvertVelocity(ivec2 velocity);
