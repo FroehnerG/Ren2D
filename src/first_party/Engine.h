@@ -25,6 +25,8 @@ public:
 	string RenderMap();
 private:
 	bool is_running = true;
+	bool game_over_bad = false;
+	bool game_over_good = false;
 	int player_health = 3;
 	int score = 0;
 	string user_input = "";

@@ -74,7 +74,6 @@ void Engine::Render()
 {
     cout << RenderMap();
     ShowNPCDialogue();
-    ShowNPCDialogue();
 }
 
 void Engine::ShowScoreAndHealth()
@@ -157,6 +156,7 @@ void Engine::CheckNPCDialogue(string dialogue, string NPC_name)
             ShowScoreAndHealth();
             cout << game_over_bad_message;
             is_running = false;
+            //game_over_bad = true;
         }
     }
     else if (dialogue.find(score_up) != string::npos && score_actors.find(NPC_name) == score_actors.end()) {
@@ -167,11 +167,13 @@ void Engine::CheckNPCDialogue(string dialogue, string NPC_name)
         ShowScoreAndHealth();
         cout << game_over_good_message;
         is_running = false;
+        //game_over_good = true;
     }
     else if (dialogue.find(game_over) != string::npos) {
         ShowScoreAndHealth();
         cout << game_over_bad_message;
         is_running = false;
+        //game_over_bad = true;
     }
 }
 
