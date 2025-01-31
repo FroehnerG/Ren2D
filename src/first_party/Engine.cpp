@@ -52,21 +52,16 @@ void Engine::Input()
         return;
 	}
 	else if (user_input == "n") {
-        new_position = hardcoded_actors.back().position + ivec2(0, -1);
+        hardcoded_actors.back().velocity = ivec2(0, -1);
 	}
 	else if (user_input == "e") {
-		new_position = hardcoded_actors.back().position + ivec2(1, 0);
+        hardcoded_actors.back().velocity = ivec2(1, 0);
 	}
 	else if (user_input == "s") {
-		new_position = hardcoded_actors.back().position + ivec2(0, 1);
+        hardcoded_actors.back().velocity = ivec2(0, 1);
 	}
     else if (user_input == "w") {
-        new_position = hardcoded_actors.back().position + ivec2(-1, 0);
-    }
-
-    if (IsPositionValid(new_position)) {
-        hardcoded_actors.back().position = new_position;
-        player_position = hardcoded_actors.back().position;
+        hardcoded_actors.back().velocity = ivec2(-1, 0);
     }
 }
 
@@ -188,7 +183,7 @@ void Engine::MoveNPCs()
             if (IsPositionValid(new_npc_position)) {
                 actor.position = new_npc_position;
             }
-            else {
+            else if (actor.actor_name != "player") {
                 actor.velocity = InvertVelocity(actor.velocity);
             }
         }
