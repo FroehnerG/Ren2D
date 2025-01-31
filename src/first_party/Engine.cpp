@@ -73,7 +73,8 @@ void Engine::Update()
 void Engine::Render()
 {
     cout << RenderMap();
-    ShowNPCDialogue();
+    ShowNPCDialogue("nearby");
+    ShowNPCDialogue("contact");
 }
 
 void Engine::ShowScoreAndHealth()
@@ -124,21 +125,30 @@ bool Engine::IsBlockingActorAtPosition(ivec2 position)
     return false;
 }
 
-void Engine::ShowNPCDialogue()
+void Engine::ShowNPCDialogue(string dialogue_type)
 {
-    for (const Actor& actor : hardcoded_actors) {
-        if (IsNPCAdjacent(actor.position) && actor.nearby_dialogue != "") {
-            cout << actor.nearby_dialogue << '\n';
-            CheckNPCDialogue(actor.nearby_dialogue, actor.actor_name);
-        }
-        else if (IsNPCInSameCell(actor.position) && actor.contact_dialogue != "") {
-            cout << actor.contact_dialogue << '\n';
-            CheckNPCDialogue(actor.contact_dialogue, actor.actor_name);
+    if (dialogue_type == "nearby") {
+        for (const Actor& actor : hardcoded_actors) {
+            if (IsNPCAdjacent(actor.position) && actor.nearby_dialogue != "") {
+                cout << actor.nearby_dialogue << '\n';
+                CheckNPCDialogue(actor.nearby_dialogue, actor.actor_name);
+            }
         }
 
         if (!is_running) {
             return;
         }
+    }
+
+    for (const Actor& actor : hardcoded_actors) {
+        if (IsNPCInSameCell(actor.position) && actor.contact_dialogue != "") {
+            cout << actor.contact_dialogue << '\n';
+            CheckNPCDialogue(actor.contact_dialogue, actor.actor_name);
+        }
+    }
+
+    if (!is_running) {
+        return;
     }
 }
 
