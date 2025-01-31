@@ -182,6 +182,10 @@ void Engine::MoveNPCs()
 
             if (IsPositionValid(new_npc_position)) {
                 actor.position = new_npc_position;
+
+                if (actor.actor_name == "player") {
+                    player_position = new_npc_position;
+                }
             }
             else if (actor.actor_name != "player") {
                 actor.velocity = InvertVelocity(actor.velocity);
