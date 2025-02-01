@@ -138,6 +138,7 @@ void Engine::ShowNPCDialogue()
     }
 
     if (!is_running) {
+        ShowScoreAndHealth();
         if (game_over_good) {
             cout << game_over_good_message;
             return;
@@ -158,7 +159,6 @@ void Engine::CheckNPCDialogue(string dialogue, string NPC_name)
         player_health--;
 
         if (player_health <= 0) {
-            ShowScoreAndHealth();
             is_running = false;
             game_over_bad = true;
         }
@@ -168,13 +168,10 @@ void Engine::CheckNPCDialogue(string dialogue, string NPC_name)
         score_actors.insert(NPC_name);
     }
     else if (dialogue.find(you_win) != string::npos) {
-        ShowScoreAndHealth();
         is_running = false;
         game_over_good = true;
     }
     else if (dialogue.find(game_over) != string::npos) {
-        ShowScoreAndHealth();
-        cout << game_over_bad_message;
         is_running = false;
         game_over_bad = true;
     }
