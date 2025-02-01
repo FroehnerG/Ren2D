@@ -30,7 +30,6 @@ private:
 	int player_health = 3;
 	int score = 0;
 	string user_input = "";
-	ivec2 player_position = ivec2(19, 15);
 	ivec2 new_position = ivec2(0, 0);
 	std::unordered_set<string> score_actors;
 };

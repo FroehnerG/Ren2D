@@ -65,16 +65,6 @@ void Engine::Input()
     }
 }
 
-bool Engine::IsPositionValid(ivec2 position)
-{
-    // If tile is a wall or if there is a blocking player at that location, return false
-    if (hardcoded_map[position.y][position.x] == 'b' || IsBlockingActorAtPosition(position)) {
-        return false;
-    }
-
-    return true;
-}
-
 bool Engine::IsBlockingActorAtPosition(ivec2 position)
 {
     for (const auto& actor : hardcoded_actors) {
@@ -86,10 +76,21 @@ bool Engine::IsBlockingActorAtPosition(ivec2 position)
     return false;
 }
 
+bool Engine::IsPositionValid(ivec2 position)
+{
+    // If tile is a wall or if there is a blocking player at that location, return false
+    if (hardcoded_map[position.y][position.x] == 'b' || IsBlockingActorAtPosition(position)) {
+        return false;
+    }
+
+    return true;
+}
+
 void Engine::MoveNPCs()
 {
+    // Go through each actor in actor vector and move them
     for (auto& actor : hardcoded_actors) {
-        if (actor.velocity != ivec2(0, 0) || actor.actor_name == "player") {
+        if (actor.velocity != ivec2(0, 0)) {
             ivec2 new_npc_position = actor.position + actor.velocity;
 
             // If actor can move to new location, move them
@@ -97,7 +98,7 @@ void Engine::MoveNPCs()
                 actor.position = new_npc_position;
 
                 if (actor.actor_name == "player") {
-                    player_position = new_npc_position;
+                    hardcoded_actors.back().position = new_npc_position;
                 }
             }
             // If actor cannot move to new location and is not the player, invert velocity
@@ -133,7 +134,7 @@ bool Engine::IsNPCAdjacent(ivec2 NPC_position)
 {
     // Check all neighbors
     for (const auto& offset : ADJACENT_OFFSETS) {
-        ivec2 neighbor_position = player_position + offset;
+        ivec2 neighbor_position = hardcoded_actors.back().position + offset;
 
         if (NPC_position == neighbor_position) {
             return true; // Found an adjacent actor
@@ -145,7 +146,7 @@ bool Engine::IsNPCAdjacent(ivec2 NPC_position)
 
 bool Engine::IsNPCInSameCell(ivec2 NPC_position)
 {
-    if (NPC_position == player_position) {
+    if (NPC_position == hardcoded_actors.back().position) {
         return true;
     }
 
@@ -208,8 +209,8 @@ void Engine::CheckNPCDialogue(string dialogue, string NPC_name)
 string Engine::RenderMap()
 {
     // Compute camera bounds directly without clamping
-    int camera_x = player_position.x - CAMERA_WIDTH / 2;
-    int camera_y = player_position.y - CAMERA_HEIGHT / 2;
+    int camera_x = hardcoded_actors.back().position.x - CAMERA_WIDTH / 2;
+    int camera_y = hardcoded_actors.back().position.y - CAMERA_HEIGHT / 2;
 
     // Create a 2D array for the visible map
     char visible[CAMERA_HEIGHT][CAMERA_WIDTH + 1];
