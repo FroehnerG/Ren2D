@@ -65,6 +65,54 @@ void Engine::Input()
     }
 }
 
+bool Engine::IsPositionValid(ivec2 position)
+{
+    // If tile is a wall or if there is a blocking player at that location, return false
+    if (hardcoded_map[position.y][position.x] == 'b' || IsBlockingActorAtPosition(position)) {
+        return false;
+    }
+
+    return true;
+}
+
+bool Engine::IsBlockingActorAtPosition(ivec2 position)
+{
+    for (const auto& actor : hardcoded_actors) {
+        if (actor.position == position && actor.blocking) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+void Engine::MoveNPCs()
+{
+    for (auto& actor : hardcoded_actors) {
+        if (actor.velocity != ivec2(0, 0) || actor.actor_name == "player") {
+            ivec2 new_npc_position = actor.position + actor.velocity;
+
+            // If actor can move to new location, move them
+            if (IsPositionValid(new_npc_position)) {
+                actor.position = new_npc_position;
+
+                if (actor.actor_name == "player") {
+                    player_position = new_npc_position;
+                }
+            }
+            // If actor cannot move to new location and is not the player, invert velocity
+            else if (actor.actor_name != "player") {
+                actor.velocity = InvertVelocity(actor.velocity);
+            }
+        }
+    }
+}
+
+ivec2 Engine::InvertVelocity(ivec2 velocity)
+{
+    return ivec2(velocity.x * -1, velocity.y * -1);
+}
+
 void Engine::Update()
 {
     MoveNPCs();
@@ -79,15 +127,6 @@ void Engine::Render()
 void Engine::ShowScoreAndHealth()
 {
 	cout << "health : " << player_health << ", score : " << score << '\n';
-}
-
-bool Engine::IsPositionValid(ivec2 position)
-{
-    if (hardcoded_map[position.y][position.x] == 'b' || IsBlockingActorAtPosition(position)) {
-        return false;
-    }
-
-    return true;
 }
 
 bool Engine::IsNPCAdjacent(ivec2 NPC_position)
@@ -113,20 +152,9 @@ bool Engine::IsNPCInSameCell(ivec2 NPC_position)
     return false;
 }
 
-bool Engine::IsBlockingActorAtPosition(ivec2 position)
-{
-    for (const Actor& actor : hardcoded_actors) {
-        if (actor.position == position && actor.blocking) {
-            return true;
-        }
-    }
-
-    return false;
-}
-
 void Engine::ShowNPCDialogue()
 {
-    for (const Actor& actor : hardcoded_actors) {
+    for (const auto& actor : hardcoded_actors) {
         if (IsNPCAdjacent(actor.position) && actor.nearby_dialogue != "") {
             cout << actor.nearby_dialogue << '\n';
             CheckNPCDialogue(actor.nearby_dialogue, actor.actor_name);
@@ -175,31 +203,6 @@ void Engine::CheckNPCDialogue(string dialogue, string NPC_name)
         is_running = false;
         game_over_bad = true;
     }
-}
-
-void Engine::MoveNPCs()
-{
-    for (Actor& actor : hardcoded_actors) {
-        if (actor.velocity != ivec2(0, 0)) {
-            ivec2 new_npc_position = actor.position + actor.velocity;
-
-            if (IsPositionValid(new_npc_position)) {
-                actor.position = new_npc_position;
-
-                if (actor.actor_name == "player") {
-                    player_position = new_npc_position;
-                }
-            }
-            else if (actor.actor_name != "player") {
-                actor.velocity = InvertVelocity(actor.velocity);
-            }
-        }
-    }
-}
-
-ivec2 Engine::InvertVelocity(ivec2 velocity)
-{
-    return ivec2(velocity.x * -1, velocity.y * -1);
 }
 
 string Engine::RenderMap()
