@@ -63,6 +63,9 @@ void Engine::Input()
     else if (user_input == "w") {
         hardcoded_actors.back().velocity = ivec2(-1, 0);
     }
+    else {
+        hardcoded_actors.back().velocity = ivec2(0, 0);
+    }
 }
 
 bool Engine::IsBlockingActorAtPosition(ivec2 position)
