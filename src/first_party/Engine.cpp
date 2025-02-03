@@ -1,6 +1,7 @@
 #include <iostream>
 #include <string>
 #include <unordered_set>
+#include "rapidjson/document.h"
 #include "Engine.h"
 
 using std::string, std::cin, std::cout;
@@ -20,6 +21,13 @@ const ivec2 ADJACENT_OFFSETS[8] = {
     ivec2(1, -1), 
     ivec2(1, 1) // Diagonal directions
 };
+
+Engine::Engine(rapidjson::Document& config)
+{
+    game_start_message = config["game_start_message"].GetString();
+    game_over_good_message = config["game_over_good_message"].GetString();
+    game_over_bad_message = config["game_over_bad_message"].GetString();
+}
 
 void Engine::GameLoop()
 {

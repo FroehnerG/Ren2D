@@ -867,6 +867,9 @@
     <ClInclude Include="src\first_party\Engine.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\third_party\EngineUtils.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="src\third_party\glm-0.9.9.8\glm\doc\api\search\all_0.html" />

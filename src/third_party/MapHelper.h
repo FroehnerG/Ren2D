@@ -28,47 +28,6 @@ public:
 	Actor() {}
 };
 
-const std::string game_start_message = "January 2024- East Lansing, MI.\n\
-The nation's #1 game development program grows anxious.\n\
-\n\
-Despite their exceptional performance and rankings (seriously, you should consider their graduate school), the Spartans of Michigan State University can't help but feel a storm brewing in Ann Arbor. \"The Wolverines are putting together quite a program, aren't they?\" \"Those UMich students - their programming abilities are exceptional, and they're stealing all the gamedev internships!\", \"if their scene continues this momentum, we may be in trouble...\"\n\
-\n\
-Having stormed the University of Michigan campus twice before - and having been repelled twice before (check out the Crisis Wolverine games)--the Spartans were eager to make their third try a lucky one...\n\
-\n\
-The struggle began one Sunday at 3am. With most students and faculty sleeping, the Spartans struck, taking over the Duderstadt Center with Spartan speed - their goal ? To destroy the 498 autograder and ruin the new game engine course.\n\
-\n\
-Fortunately, you (p) were working on homework late into the night in the VisStudio.When the spartans (s) burst through the lab door, you quickly grabbed the autograder (a raspberry pie 4) from the front desk and hid beneath a table as the lights went out. Despite your late - night fatigue, you begin feeling your way past the walls (b) and through the halls. Can you escape, or will Michigan gamedev's newest course crash and burn?\n\
-\n\
-G A M E - S T A R T";
-
-const std::string game_over_bad_message = "Exhausted by the chase, the darkness begins to swirl around you.\n\
-\n\
-Suddenly the floor greets you, followed by pure silence. You've fallen asleep. It is 3am after all, and your physiology has made an executive decision.\n\
-\n\
-You wake up to bright lights- the Duderstadt Center is now lively and back-to-business. People keep looking at you funny however, as if the Spartans from last night have written something on your forehead. You're too afraid to ask or even check for yourself. What's worse, you notice the autograder is no longer in your possession.\n\
-\n\
-Upon arriving home, you find an email from the Professor sitting ominously in your inbox.\n\
-\n\
-\"Hi Class,\n\
-\n\
-I want to apologize- I messed up and left my only raspberry pi in the VisStudio last night. You know- the one with the autograder on it. Unfortunately, I made an even greater error in forgetting to use proper version control, so I'm afraid the autograder software is toast. I know this is all devastating to you, but I'll have to give extensions to everyone, and make the homework much easier.\"\n\
-\n\
-What a bitter-sweet win for the spartans. While you end up enjoying your extension, you aren't able to learn as much given the tight class schedule and cut course content. You feel a bit cheated, and live in the most mild state terror, contemplating how the spartans could disrupt your other courses, EECS 494, EECS 440, and EECS 298.\n\
-\n\
-Y O U L O S E\n\
-G A M E O V E R";
-
-const std::string game_over_good_message = "As you near the door, the air itself flickers to life with angry voices.\n\
-\n\
-\"Hey! They've got the autograder! Get em!\", \"Aww shucks they totes beat us.\", \"Go green baby! Johnny Foreshadow sucks!\", \"Heeeey what's an autograder anywaysss??\"\n\
-\n\
-You're a bit confused by what they're saying, and make a mental note to play the Crisis Wolverine games later. You decide to leave, and burst through the door with the might of a late-night EECS student.\n\
-\n\
-The crisp cool January air greets you in force-- you are free, and the course is saved! You briefly consider applying some of those EECS 388 skills to the autograder before returning it to Professor Yarger... But nah. Game Engine Architecture is tough, but you've got this!\n\
-\n\
-Y O U W I N\n\
-G A M E O V E R";
-
 const std::string initial_render = "\
        s     \n\
 bbbb    s    \n\

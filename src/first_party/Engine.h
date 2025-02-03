@@ -3,12 +3,15 @@
 #include <unordered_set>
 #include "glm/glm.hpp"
 #include "MapHelper.h"
+#include "rapidjson/document.h"
 
 using std::string, glm::ivec2;
 
 class Engine
 {
 public:
+	Engine(rapidjson::Document& config);
+
 	void GameLoop();
 	void Input();
 	void Update();
@@ -30,6 +33,9 @@ private:
 	int player_health = 3;
 	int score = 0;
 	string user_input = "";
+	string game_start_message = "";
+	string game_over_bad_message = "";
+	string game_over_good_message = "";
 	ivec2 new_position = ivec2(0, 0);
 	std::unordered_set<string> score_actors;
 };
