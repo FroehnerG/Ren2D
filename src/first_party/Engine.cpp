@@ -37,7 +37,8 @@ Engine::Engine(rapidjson::Document& game_config)
 
 void Engine::GameLoop()
 {
-	cout << game_start_message << '\n';
+    if (game_start_message != "")
+	    cout << game_start_message << '\n';
 
 	Render();
 
@@ -61,7 +62,9 @@ void Engine::Input()
 	cin >> user_input;
 
 	if (user_input == "quit") {
-		cout << game_over_bad_message;
+        if (game_over_bad_message != "")
+		    cout << game_over_bad_message;
+
 		is_running = false;
         return;
 	}
@@ -192,11 +195,13 @@ void Engine::ShowNPCDialogue()
     if (!is_running) {
         ShowScoreAndHealth();
         if (game_over_good) {
-            cout << game_over_good_message;
+            if (game_over_good_message != "")
+                cout << game_over_good_message;
             return;
         }
 
-        cout << game_over_bad_message;
+        if (game_over_bad_message != "")
+            cout << game_over_bad_message;
     }
 }
 
