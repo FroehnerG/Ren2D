@@ -147,8 +147,11 @@ void Engine::Render()
 
 void Engine::InitResolution(rapidjson::Document& rendering_config)
 {
-    camera_width = rendering_config["x_resolution"].GetInt();
-    camera_height = rendering_config["y_resolution"].GetInt();
+    if (rendering_config.HasMember("x_resolution"))
+        camera_width = rendering_config["x_resolution"].GetInt();
+
+    if (rendering_config.HasMember("y_resolution"))
+        camera_height = rendering_config["y_resolution"].GetInt();
 }
 
 void Engine::ShowScoreAndHealth()
