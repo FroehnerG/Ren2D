@@ -17,11 +17,18 @@ int main() {
 		exit(0);  // Exit immediately with code 0
 	}
 
-	rapidjson::Document config;
+	rapidjson::Document game_config;
 
-	EngineUtils::ReadJsonFile("resources/game.config", config);
+	EngineUtils::ReadJsonFile("resources/game.config", game_config);
 
-	Engine engine(config);
+	Engine engine(game_config);
+
+	if (fs::exists("resources/rendering.config")) {
+		rapidjson::Document rendering_config;
+		EngineUtils::ReadJsonFile("resources/rendering.config", rendering_config);
+
+		engine.InitResolution(rendering_config);
+	}
 
 	engine.GameLoop();
 

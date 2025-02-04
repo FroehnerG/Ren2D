@@ -10,12 +10,13 @@ using std::string, glm::ivec2;
 class Engine
 {
 public:
-	Engine(rapidjson::Document& config);
+	Engine(rapidjson::Document& game_config);
 
 	void GameLoop();
 	void Input();
 	void Update();
 	void Render();
+	void InitResolution(rapidjson::Document& rendering_config);
 	void ShowScoreAndHealth();
 	bool IsPositionValid(ivec2 position);
 	bool IsNPCAdjacent(ivec2 NPC_position);
@@ -32,6 +33,8 @@ private:
 	bool game_over_good = false;
 	int player_health = 3;
 	int score = 0;
+	int camera_width = 13;
+	int camera_height = 9;
 	string user_input = "";
 	string game_start_message = "";
 	string game_over_bad_message = "";

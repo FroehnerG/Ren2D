@@ -8,8 +8,6 @@ using std::string, std::cin, std::cout;
 
 const string prompt = "Please make a decision...\n";
 const string options = "Your options are \"n\", \"e\", \"s\", \"w\", \"quit\"\n";
-const int CAMERA_WIDTH = 13;
-const int CAMERA_HEIGHT = 9;
 
 const ivec2 ADJACENT_OFFSETS[8] = {
     ivec2(0, -1), 
@@ -22,11 +20,11 @@ const ivec2 ADJACENT_OFFSETS[8] = {
     ivec2(1, 1) // Diagonal directions
 };
 
-Engine::Engine(rapidjson::Document& config)
+Engine::Engine(rapidjson::Document& game_config)
 {
-    game_start_message = config["game_start_message"].GetString();
-    game_over_good_message = config["game_over_good_message"].GetString();
-    game_over_bad_message = config["game_over_bad_message"].GetString();
+    game_start_message = game_config["game_start_message"].GetString();
+    game_over_good_message = game_config["game_over_good_message"].GetString();
+    game_over_bad_message = game_config["game_over_bad_message"].GetString();
 }
 
 void Engine::GameLoop()
@@ -136,6 +134,12 @@ void Engine::Render()
     ShowNPCDialogue();
 }
 
+void Engine::InitResolution(rapidjson::Document& rendering_config)
+{
+    camera_width = rendering_config["x_resolution"].GetInt();
+    camera_height = rendering_config["y_resolution"].GetInt();
+}
+
 void Engine::ShowScoreAndHealth()
 {
 	cout << "health : " << player_health << ", score : " << score << '\n';
@@ -217,30 +221,28 @@ void Engine::CheckNPCDialogue(string dialogue, string NPC_name)
     }
 }
 
-string Engine::RenderMap()
+std::string Engine::RenderMap()
 {
     // Compute camera bounds directly without clamping
-    int camera_x = hardcoded_actors.back().position.x - CAMERA_WIDTH / 2;
-    int camera_y = hardcoded_actors.back().position.y - CAMERA_HEIGHT / 2;
+    int camera_x = hardcoded_actors.back().position.x - camera_width / 2;
+    int camera_y = hardcoded_actors.back().position.y - camera_height / 2;
 
-    // Create a 2D array for the visible map
-    char visible[CAMERA_HEIGHT][CAMERA_WIDTH + 1];
-    for (int y = 0; y < CAMERA_HEIGHT; ++y) {
-        for (int x = 0; x < CAMERA_WIDTH; ++x) {
+    // Create a dynamically sized 2D vector for the visible map
+    std::vector<std::string> visible(camera_height, std::string(camera_width, ' '));
+
+    // Populate the visible map with the corresponding map section
+    for (int y = 0; y < camera_height; ++y) {
+        for (int x = 0; x < camera_width; ++x) {
             // Calculate the corresponding map position
             int map_x = camera_x + x;
             int map_y = camera_y + y;
 
-            // If the position is within the map, use the map character; otherwise, use a blank space
+            // If the position is within the map, use the map character; otherwise, keep it as ' '
             if (map_y >= 0 && map_y < HARDCODED_MAP_HEIGHT &&
                 map_x >= 0 && map_x < HARDCODED_MAP_WIDTH) {
                 visible[y][x] = hardcoded_map[map_y][map_x];
             }
-            else {
-                visible[y][x] = ' '; // Out-of-bounds areas are empty
-            }
         }
-        visible[y][CAMERA_WIDTH] = '\0'; // Null-terminate each row
     }
 
     // Overlay actors onto the visible map
@@ -249,8 +251,8 @@ string Engine::RenderMap()
         int ay = actor.position.y;
 
         // Check if the actor is within the camera's view
-        if (ax >= camera_x && ax < camera_x + CAMERA_WIDTH &&
-            ay >= camera_y && ay < camera_y + CAMERA_HEIGHT) {
+        if (ax >= camera_x && ax < camera_x + camera_width &&
+            ay >= camera_y && ay < camera_y + camera_height) {
             int vx = ax - camera_x; // Actor's x position in the visible map
             int vy = ay - camera_y; // Actor's y position in the visible map
             visible[vy][vx] = actor.view;
@@ -259,10 +261,10 @@ string Engine::RenderMap()
 
     // Convert the visible map to a string
     std::string rendered_map;
-    for (int y = 0; y < CAMERA_HEIGHT; ++y) {
-        rendered_map += visible[y];
-        rendered_map += '\n';
+    for (const std::string& row : visible) {
+        rendered_map += row + '\n';
     }
 
     return rendered_map;
 }
+
