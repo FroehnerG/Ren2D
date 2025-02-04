@@ -8,12 +8,12 @@ namespace fs = std::filesystem;
 
 int main() {
 	if (!fs::exists("resources")) {
-		std::cout << "resources/ missing";
+		std::cout << "error: resources/ missing";
 		exit(0);  // Exit immediately with code 0
 	}
 
 	if (!fs::exists("resources/game.config")) {
-		std::cout << "resources/game.config missing";
+		std::cout << "error: resources/game.config missing";
 		exit(0);  // Exit immediately with code 0
 	}
 

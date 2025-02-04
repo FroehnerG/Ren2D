@@ -22,9 +22,17 @@ const ivec2 ADJACENT_OFFSETS[8] = {
 
 Engine::Engine(rapidjson::Document& game_config)
 {
-    game_start_message = game_config["game_start_message"].GetString();
-    game_over_good_message = game_config["game_over_good_message"].GetString();
-    game_over_bad_message = game_config["game_over_bad_message"].GetString();
+    if (game_config.HasMember("game_start_message")) {
+        game_start_message = game_config["game_start_message"].GetString();
+    }
+
+    if (game_config.HasMember("game_over_good_message")) {
+        game_over_good_message = game_config["game_over_good_message"].GetString();
+    }
+
+    if (game_config.HasMember("game_over_bad_message")) {
+        game_over_bad_message = game_config["game_over_bad_message"].GetString();
+    }
 }
 
 void Engine::GameLoop()
