@@ -7,6 +7,8 @@
 
 void SceneDB::LoadActors(rapidjson::Document& scene_json)
 {
+	actors.reserve(9999);
+
 	for (const auto& actor_json : scene_json["actors"].GetArray()) {
 		Actor actor;
 
@@ -59,6 +61,7 @@ void SceneDB::LoadActors(rapidjson::Document& scene_json)
 		if (actors.back().actor_name == "player") {
 			player = std::shared_ptr<Actor>(actors.data() + (actors.size() - 1), [](Actor*) {});
 		}
+
 	}
 }
 
