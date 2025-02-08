@@ -117,8 +117,9 @@ bool Engine::IsPositionValid(ivec2 position)
 
     auto* blocking_map = GetBlockingPositionsToNum(); // Store pointer in a local variable
 
-    if (blocking_map->find(composite_position) == blocking_map->end() ||
-        blocking_map->at(composite_position) > 0) {
+    auto it = blocking_map->find(composite_position);
+
+    if (it != blocking_map->end() && it->second > 0) {
         return false;
     }
 
