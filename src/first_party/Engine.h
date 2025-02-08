@@ -2,10 +2,10 @@
 #include <string>
 #include <unordered_set>
 #include "glm/glm.hpp"
-#include "MapHelper.h"
 #include "rapidjson/document.h"
+#include "SceneDB.h"
 
-using std::string, glm::ivec2;
+using std::string, glm::ivec2, std::pair;
 
 class Engine
 {
@@ -21,12 +21,15 @@ public:
 	bool IsPositionValid(ivec2 position);
 	bool IsNPCAdjacent(ivec2 NPC_position);
 	bool IsNPCInSameCell(ivec2 NPC_position);
-	bool IsBlockingActorAtPosition(ivec2 position);
 	void ShowNPCDialogue();
-	void CheckNPCDialogue(string dialogue, string NPC_name);
+	void CheckNPCDialogue(string dialogue, int actor_id);
 	void MoveNPCs();
 	ivec2 InvertVelocity(ivec2 velocity);
 	string RenderMap();
+	Actor* GetPlayer();
+	std::vector<Actor>* GetActors();
+	std::unordered_set<int>* GetScoreActors();
+	std::unordered_map<uint64_t, int>* GetBlockingPositionsToNum();
 private:
 	bool is_running = true;
 	bool game_over_bad = false;
@@ -40,5 +43,5 @@ private:
 	string game_over_bad_message = "";
 	string game_over_good_message = "";
 	ivec2 new_position = ivec2(0, 0);
-	std::unordered_set<string> score_actors;
+	SceneDB scene;
 };

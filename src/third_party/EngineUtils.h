@@ -3,35 +3,14 @@
 #define ENGINEUTILS_H
 
 #include <string>
-#include <fstream>
-#include <iostream>
-#include <stdio.h>
-
-#include "rapidjson/filereadstream.h"
 #include "rapidjson/document.h"
+#include "glm/glm.hpp"
 
 class EngineUtils {
 public:
-    static void ReadJsonFile(const std::string& path, rapidjson::Document& out_document) {
-        FILE* file_pointer = nullptr;
-
-#ifdef _WIN32
-        fopen_s(&file_pointer, path.c_str(), "rb");
-#else
-        file_pointer = fopen(path.c_str(), "rb");
-#endif
-
-        char buffer[65536];
-        rapidjson::FileReadStream stream(file_pointer, buffer, sizeof(buffer));
-        out_document.ParseStream(stream);
-        std::fclose(file_pointer);
-
-        if (out_document.HasParseError()) {
-            rapidjson::ParseErrorCode errorCode = out_document.GetParseError();
-            std::cout << "error parsing json at [" << path << "]" << std::endl;
-            exit(0);
-        }
-    }
+    static void ReadJsonFile(const std::string& path, rapidjson::Document& out_document);
+    static uint64_t CreateCompositeKey(glm::ivec2 position);
+    static std::pair<int, int> ParseCompositeKey(uint64_t composite_position);
 };
 
 #endif // ENGINEUTILS_H
