@@ -7,7 +7,7 @@
 
 void SceneDB::LoadActors(rapidjson::Document& scene_json)
 {
-	actors.reserve(15000);
+	actors.reserve(10000);
 
 	for (const auto& actor_json : scene_json["actors"].GetArray()) {
 		Actor actor;
