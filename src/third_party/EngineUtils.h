@@ -10,7 +10,7 @@ class EngineUtils {
 public:
     static void ReadJsonFile(const std::string& path, rapidjson::Document& out_document);
     static uint64_t CreateCompositeKey(glm::ivec2 position);
-    static std::pair<int, int> ParseCompositeKey(uint64_t composite_position);
+    static glm::ivec2 ParseCompositeKey(uint64_t composite_position);
 };
 
 #endif // ENGINEUTILS_H

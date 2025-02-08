@@ -32,21 +32,25 @@ void EngineUtils::ReadJsonFile(const std::string& path, rapidjson::Document& out
 
 uint64_t EngineUtils::CreateCompositeKey(glm::ivec2 position)
 {
-    uint32_t ux = static_cast<uint32_t>(position.x);
-    uint32_t uy = static_cast<uint32_t>(position.y);
+    // Use offsets to ensure negative values are correctly mapped
+    uint32_t ux = static_cast<uint32_t>(position.x + INT32_MAX + 1);
+    uint32_t uy = static_cast<uint32_t>(position.y + INT32_MAX + 1);
 
     uint64_t result = static_cast<uint64_t>(ux);
-
-    result = result << 32;
-    result = result | static_cast<uint64_t>(uy);
+    result = (result << 32) | static_cast<uint64_t>(uy);
 
     return result;
 }
 
-std::pair<int, int> EngineUtils::ParseCompositeKey(uint64_t composite_position)
+glm::ivec2 EngineUtils::ParseCompositeKey(uint64_t composite_position)
 {
     uint32_t uy = static_cast<uint32_t>(composite_position & 0xFFFFFFFF); // Extract lower 32 bits
     uint32_t ux = static_cast<uint32_t>(composite_position >> 32);        // Extract upper 32 bits
 
-    return { static_cast<int>(ux), static_cast<int>(uy) };
+    // Reverse the offset added in CreateCompositeKey
+    int x = static_cast<int>(ux) - (INT32_MAX + 1);
+    int y = static_cast<int>(uy) - (INT32_MAX + 1);
+
+    return glm::ivec2(x, y);
 }
+
