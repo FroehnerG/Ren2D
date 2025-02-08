@@ -136,7 +136,9 @@ void Engine::MoveNPCs()
             // If actor can move to new location, move them
             if (IsPositionValid(new_actor_position)) {
                 uint64_t composite_position = EngineUtils::CreateCompositeKey(new_actor_position);
+                uint64_t old_composite_position = EngineUtils::CreateCompositeKey(actor.position);
                 (*GetBlockingPositionsToNum())[composite_position]++;
+                (*GetBlockingPositionsToNum())[old_composite_position]--;
 
                 actor.position = new_actor_position;
 
