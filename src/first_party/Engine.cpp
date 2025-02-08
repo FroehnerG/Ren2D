@@ -141,10 +141,6 @@ void Engine::MoveNPCs()
                 (*GetBlockingPositionsToNum())[old_composite_position]--;
 
                 actor.position = new_actor_position;
-
-                if (actor.actor_name == "player") {
-                    GetPlayer()->position = new_actor_position;
-                }
             }
             // If actor cannot move to new location and is not the player, invert velocity
             else if (actor.actor_name != "player") {

@@ -57,7 +57,7 @@ void SceneDB::LoadActors(rapidjson::Document& scene_json)
 		actors.push_back(std::move(actor));
 
 		if (actors.back().actor_name == "player") {
-			player = std::make_shared<Actor>(actors.back());
+			player = std::shared_ptr<Actor>(actors.data() + (actors.size() - 1), [](Actor*) {});
 		}
 	}
 }
