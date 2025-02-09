@@ -1,11 +1,8 @@
 #include <iostream>
-#include <string>
-#include <unordered_set>
 #include <filesystem>
 #include "rapidjson/document.h"
 #include "EngineUtils.h"
 #include "Engine.h"
-#include "SceneDB.h"
 
 using std::string, std::cin, std::cout;
 namespace fs = std::filesystem;

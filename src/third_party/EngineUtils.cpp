@@ -1,8 +1,8 @@
-#include "EngineUtils.h"
 #include <iostream>
 #include <fstream>
 #include <stdio.h>
 
+#include "EngineUtils.h"
 #include "rapidjson/filereadstream.h"
 
 void EngineUtils::ReadJsonFile(const std::string& path, rapidjson::Document& out_document) {

@@ -2,8 +2,10 @@
 #include <filesystem>
 #include <cstdlib> // For exit(0)
 #include "SceneDB.h"
-#include "rapidjson/document.h"
 #include "EngineUtils.h"
+
+using std::cout;
+namespace fs = std::filesystem;
 
 void SceneDB::LoadActors(rapidjson::Document& scene_json)
 {
@@ -11,6 +13,13 @@ void SceneDB::LoadActors(rapidjson::Document& scene_json)
 
 	for (const auto& actor_json : scene_json["actors"].GetArray()) {
 		Actor actor;
+
+		if (actor_json.HasMember("template")) {
+			LoadTemplate(actor_json);
+
+			string template_name = actor_json["template"].GetString();
+			actor = templateDB.UseTemplate(template_name);
+		}
 
 		if (actor_json.HasMember("name")) {
 			actor.actor_name = actor_json["name"].GetString();
@@ -63,6 +72,23 @@ void SceneDB::LoadActors(rapidjson::Document& scene_json)
 		}
 
 	}
+}
+
+void SceneDB::LoadTemplate(const rapidjson::Value& actor_json)
+{
+	string template_name = actor_json["template"].GetString();
+
+	string template_path = "resources/actor_templates/" + template_name + ".template";
+
+	if (!fs::exists(template_path)) {
+		cout << "error: template " + template_name + " is missing";
+		exit(0);
+	}
+
+	rapidjson::Document template_json;
+	EngineUtils::ReadJsonFile(template_path, template_json);
+
+	templateDB.LoadTemplate(template_name, template_json);
 }
 
 std::unordered_set<int>& SceneDB::GetScoreActors()
