@@ -6,8 +6,6 @@
 #include "EngineUtils.h"
 #include "Actor.h"
 
-class SceneDB;  // Forward declare SceneDB
-
 using std::string;
 
 class TemplateDB {

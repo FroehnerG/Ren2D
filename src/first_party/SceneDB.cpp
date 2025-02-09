@@ -16,8 +16,10 @@ void SceneDB::LoadActors(rapidjson::Document& scene_json)
 		Actor actor;
 
 		if (actor_json.HasMember("template")) {
+			// Will exit program if template file does not exist
 			LoadTemplate(actor_json);
 
+			// If template exists, use template and assign values to actor
 			string template_name = actor_json["template"].GetString();
 			actor = templateDB->UseTemplate(template_name);
 		}

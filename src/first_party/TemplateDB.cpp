@@ -3,7 +3,6 @@
 
 void TemplateDB::LoadTemplate(std::string template_name, rapidjson::Document& template_json)
 {
-
 	uint64_t actor_template_hash = HashTemplateName(template_name);
 
 	// If template already exists, return
