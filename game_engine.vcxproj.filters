@@ -876,6 +876,9 @@
     <ClInclude Include="src\first_party\TemplateDB.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\first_party\Actor.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="src\third_party\glm-0.9.9.8\glm\doc\api\search\all_0.html" />

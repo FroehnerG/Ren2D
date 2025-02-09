@@ -1,9 +1,14 @@
 #pragma once
+
 #include <unordered_map>
 #include <string>
 #include "rapidjson/document.h"
 #include "EngineUtils.h"
-#include "SceneDB.h"
+#include "Actor.h"
+
+class SceneDB;  // Forward declare SceneDB
+
+using std::string;
 
 class TemplateDB {
 public:

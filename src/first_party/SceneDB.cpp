@@ -2,6 +2,7 @@
 #include <filesystem>
 #include <cstdlib> // For exit(0)
 #include "SceneDB.h"
+#include "TemplateDB.h"
 #include "EngineUtils.h"
 
 using std::cout;
@@ -18,7 +19,7 @@ void SceneDB::LoadActors(rapidjson::Document& scene_json)
 			LoadTemplate(actor_json);
 
 			string template_name = actor_json["template"].GetString();
-			actor = templateDB.UseTemplate(template_name);
+			actor = templateDB->UseTemplate(template_name);
 		}
 
 		if (actor_json.HasMember("name")) {
@@ -88,7 +89,7 @@ void SceneDB::LoadTemplate(const rapidjson::Value& actor_json)
 	rapidjson::Document template_json;
 	EngineUtils::ReadJsonFile(template_path, template_json);
 
-	templateDB.LoadTemplate(template_name, template_json);
+	templateDB->LoadTemplate(template_name, template_json);
 }
 
 std::unordered_set<int>& SceneDB::GetScoreActors()

@@ -135,6 +135,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="src\first_party\Actor.h" />
     <ClInclude Include="src\first_party\Engine.h" />
     <ClInclude Include="src\first_party\SceneDB.h" />
     <ClInclude Include="src\first_party\TemplateDB.h" />
