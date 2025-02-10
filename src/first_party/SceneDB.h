@@ -21,7 +21,7 @@ public:
 	std::vector<Actor>& GetActors();
 	std::shared_ptr<Actor> GetPlayer();
 private:
-	std::unique_ptr<TemplateDB> templateDB;  // Use a pointer instead of an object
+	TemplateDB templateDB;  // Use a pointer instead of an object
 	std::unordered_map<uint64_t, Actor> position_to_actor;
 	std::unordered_map<uint64_t, int> blocking_positions_to_num;
 	std::unordered_set<int> score_actors;
