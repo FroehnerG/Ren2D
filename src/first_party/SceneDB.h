@@ -21,7 +21,6 @@ public:
 	std::vector<Actor>& GetActors();
 	std::shared_ptr<Actor> GetPlayer();
 private:
-	TemplateDB templateDB;
 	std::unordered_map<uint64_t, Actor> position_to_actor;
 	std::unordered_map<uint64_t, int> blocking_positions_to_num;
 	std::unordered_set<int> score_actors;

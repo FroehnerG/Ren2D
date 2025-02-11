@@ -10,6 +10,7 @@ namespace fs = std::filesystem;
 
 void SceneDB::LoadActors(rapidjson::Document& scene_json)
 {
+	TemplateDB& templateDB = TemplateDB::GetInstance();
 	actors.reserve(10000);
 
 	for (const auto& actor_json : scene_json["actors"].GetArray()) {
@@ -25,7 +26,7 @@ void SceneDB::LoadActors(rapidjson::Document& scene_json)
 			actor = templateDB.UseTemplate(template_name);
 		}
 
-		// If values are specified after template, overwrites template's values
+		// If values are specified after template, overwrite template's values
 		if (actor_json.HasMember("name")) {
 			actor.actor_name = actor_json["name"].GetString();
 		}
@@ -81,6 +82,7 @@ void SceneDB::LoadActors(rapidjson::Document& scene_json)
 
 void SceneDB::LoadTemplate(string template_name)
 {
+	TemplateDB& templateDB = TemplateDB::GetInstance();
 	string template_path = "resources/actor_templates/" + template_name + ".template";
 
 	if (!fs::exists(template_path)) {
