@@ -1,4 +1,5 @@
 #include <functional>  // For std::hash
+#include <iostream>
 #include "TemplateDB.h"
 
 void TemplateDB::LoadTemplate(std::string template_name, rapidjson::Document& template_json)
@@ -64,5 +65,12 @@ Actor TemplateDB::UseTemplate(std::string template_name)
 {
 	uint64_t actor_template_hash = HashTemplateName(template_name);
 
-	return actor_templates[actor_template_hash];
+	auto it = actor_templates.find(actor_template_hash);
+	if (it == actor_templates.end()) {
+		std::cout << "template " << template_name << " is missing";
+		std::exit(0);
+	}
+
+	// Return a copy of the template
+	return it->second;
 }

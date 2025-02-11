@@ -16,14 +16,16 @@ void SceneDB::LoadActors(rapidjson::Document& scene_json)
 		Actor actor;
 
 		if (actor_json.HasMember("template")) {
-			// Will exit program if template file does not exist
-			LoadTemplate(actor_json);
-
 			// If template exists, use template and assign values to actor
 			string template_name = actor_json["template"].GetString();
+
+			// Will exit program if template file does not exist
+			LoadTemplate(template_name);
+
 			actor = templateDB.UseTemplate(template_name);
 		}
 
+		// If values are specified after template, overwrites template's values
 		if (actor_json.HasMember("name")) {
 			actor.actor_name = actor_json["name"].GetString();
 		}
@@ -77,10 +79,8 @@ void SceneDB::LoadActors(rapidjson::Document& scene_json)
 	}
 }
 
-void SceneDB::LoadTemplate(const rapidjson::Value& actor_json)
+void SceneDB::LoadTemplate(string template_name)
 {
-	string template_name = actor_json["template"].GetString();
-
 	string template_path = "resources/actor_templates/" + template_name + ".template";
 
 	if (!fs::exists(template_path)) {
