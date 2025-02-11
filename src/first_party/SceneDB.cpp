@@ -53,11 +53,6 @@ void SceneDB::LoadActors(rapidjson::Document& scene_json)
 
 		if (actor_json.HasMember("blocking")) {
 			actor.blocking = actor_json["blocking"].GetBool();
-
-			if (actor.blocking) {
-				uint64_t composite_position = EngineUtils::CreateCompositeKey(actor.position);
-				blocking_positions_to_num[composite_position]++;
-			}
 		}
 
 		if (actor_json.HasMember("nearby_dialogue")) {
@@ -66,6 +61,11 @@ void SceneDB::LoadActors(rapidjson::Document& scene_json)
 
 		if (actor_json.HasMember("contact_dialogue")) {
 			actor.contact_dialogue = actor_json["contact_dialogue"].GetString();
+		}
+
+		if (actor.blocking) {
+			uint64_t composite_position = EngineUtils::CreateCompositeKey(actor.position);
+			blocking_positions_to_num[composite_position]++;
 		}
 
 		actor.id = current_actor_id;
