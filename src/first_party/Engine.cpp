@@ -255,6 +255,7 @@ void Engine::ShowNPCDialogue()
         next_scene = false;
         ShowScoreAndHealth();
         LoadScene(next_scene_name);
+        Render();
     }
 }
 
