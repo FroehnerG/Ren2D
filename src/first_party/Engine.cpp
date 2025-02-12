@@ -289,7 +289,7 @@ void Engine::CheckNPCDialogue(string dialogue, int actor_id)
     }
     else if (dialogue.find(proceed_to) != string::npos) {
         next_scene = true;
-        next_scene_name = EngineUtils::ObtainWordAfterPhrase(dialogue, "to");
+        next_scene_name = EngineUtils::ObtainWordAfterPhrase(dialogue, proceed_to);
     }
 }
 
