@@ -152,6 +152,23 @@ void Engine::MoveNPCs()
     }
 }
 
+void Engine::LoadScene(string scene_name)
+{
+    string scene_path = "resources/scenes/" + scene_name + ".scene";
+
+    if (!fs::exists(scene_path)) {
+        cout << "error: scene " + scene_name + " is missing";
+        exit(0);
+    }
+
+    rapidjson::Document scene_json;
+    EngineUtils::ReadJsonFile(scene_path, scene_json);
+
+    scene.Reset();
+
+    scene.LoadActors(scene_json);
+}
+
 ivec2 Engine::InvertVelocity(ivec2 velocity)
 {
     return ivec2(velocity.x * -1, velocity.y * -1);
@@ -233,6 +250,11 @@ void Engine::ShowNPCDialogue()
         if (game_over_bad_message != "")
             cout << game_over_bad_message;
     }
+
+    if (next_scene) {
+        next_scene = false;
+        LoadScene(next_scene_name);
+    }
 }
 
 void Engine::CheckNPCDialogue(string dialogue, int actor_id)
@@ -243,6 +265,7 @@ void Engine::CheckNPCDialogue(string dialogue, int actor_id)
     string score_up = "score up";
     string you_win = "you win";
     string game_over = "game over";
+    string proceed_to = "proceed to";
 
     if (dialogue.find(health_down) != string::npos) {
         player_health--;
@@ -263,6 +286,10 @@ void Engine::CheckNPCDialogue(string dialogue, int actor_id)
     else if (dialogue.find(game_over) != string::npos) {
         is_running = false;
         game_over_bad = true;
+    }
+    else if (dialogue.find(proceed_to) != string::npos) {
+        next_scene = true;
+        next_scene_name = EngineUtils::ObtainWordAfterPhrase(dialogue, "to");
     }
 }
 

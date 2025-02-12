@@ -96,6 +96,16 @@ void SceneDB::LoadTemplate(string template_name)
 	templateDB.LoadTemplate(template_name, template_json);
 }
 
+void SceneDB::Reset()
+{
+	position_to_actor.clear();
+	blocking_positions_to_num.clear();
+	score_actors.clear();
+	actors.clear();
+	player.reset();  // Reset shared pointer
+	current_actor_id = 0;
+}
+
 std::unordered_set<int>& SceneDB::GetScoreActors()
 {
 	return score_actors;

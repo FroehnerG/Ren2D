@@ -54,3 +54,32 @@ glm::ivec2 EngineUtils::ParseCompositeKey(uint64_t composite_position)
     return glm::ivec2(x, y);
 }
 
+std::string EngineUtils::ObtainWordAfterPhrase(const std::string& input, const std::string& phrase)
+{
+    // Find the position of the phrase in the string
+    size_t pos = input.find(phrase);
+
+    // If phrase is not found, return an empty string
+    if (pos == std::string::npos) return "";
+
+    // Find the starting position of the next word (skip spaces after the phrase)
+    pos += phrase.length();
+    while (pos < input.size() && std::isspace(input[pos])) {
+        ++pos;
+    }
+
+    // If we're at the end of the string, return an empty string
+    if (pos == input.size()) return "";
+
+    // Find the end position of the word (until a space or the end of the string)
+    size_t endPos = pos;
+    while (endPos < input.size() && !std::isspace(input[endPos])) {
+        ++endPos;
+    }
+
+    // Extract and return the word
+    return input.substr(pos, endPos - pos);
+}
+
+
+

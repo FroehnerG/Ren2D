@@ -24,6 +24,7 @@ public:
 	void ShowNPCDialogue();
 	void CheckNPCDialogue(string dialogue, int actor_id);
 	void MoveNPCs();
+	void LoadScene(string scene_name);
 	ivec2 InvertVelocity(ivec2 velocity);
 	string RenderMap();
 	Actor* GetPlayer();
@@ -34,6 +35,7 @@ private:
 	bool is_running = true;
 	bool game_over_bad = false;
 	bool game_over_good = false;
+	bool next_scene = false;
 	int player_health = 3;
 	int score = 0;
 	int camera_width = 13;
@@ -42,6 +44,7 @@ private:
 	string game_start_message = "";
 	string game_over_bad_message = "";
 	string game_over_good_message = "";
+	string next_scene_name = "";
 	ivec2 new_position = ivec2(0, 0);
 	SceneDB scene;
 };

@@ -16,6 +16,7 @@ class SceneDB {
 public:
 	void LoadActors(rapidjson::Document& scene_json);
 	void LoadTemplate(string template_name);
+	void Reset();
 	std::unordered_set<int>& GetScoreActors();
 	std::unordered_map<uint64_t, int>& GetBlockingPositionsToNum();
 	std::vector<Actor>& GetActors();
