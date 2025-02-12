@@ -253,6 +253,7 @@ void Engine::ShowNPCDialogue()
 
     if (next_scene) {
         next_scene = false;
+        ShowScoreAndHealth();
         LoadScene(next_scene_name);
     }
 }
