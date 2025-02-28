@@ -15,6 +15,7 @@ public:
 	Engine(rapidjson::Document& game_config);
 
 	void GameLoop();
+	void PlayIntro();
 	void Input();
 	void Update();
 	void Render();

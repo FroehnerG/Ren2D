@@ -63,12 +63,12 @@ Engine::Engine(rapidjson::Document& game_config)
 	renderer.SetRenderer(window);
 	SDL_SetRenderDrawColor(renderer.GetRenderer(), renderer.GetColor("red"), renderer.GetColor("green"), renderer.GetColor("blue"), 255);
 	SDL_RenderClear(renderer.GetRenderer());
-	//images.LoadImages(game_config, renderer.GetRenderer(), "intro_image");
+	images.LoadImages(game_config, renderer.GetRenderer(), "intro_image");
 }
 
 void Engine::GameLoop()
 {
-	//images.RenderIntroImage(renderer.GetRenderer());
+	PlayIntro();
 
 	if (game_start_message != "")
 		cout << game_start_message << '\n';
@@ -80,28 +80,40 @@ void Engine::GameLoop()
 				Helper::SDL_RenderPresent(renderer.GetRenderer());
 				exit(0);
 			}
+
+			// Only process input if intro images are still being shown
+			if (images.IsIntroPlaying()) {
+				if (e.type == SDL_KEYDOWN) {
+					if (e.key.keysym.scancode == SDL_SCANCODE_SPACE ||
+						e.key.keysym.scancode == SDL_SCANCODE_RETURN) {
+						images.AdvanceIntro();
+					}
+				}
+
+				if (e.type == SDL_MOUSEBUTTONDOWN && e.button.button == SDL_BUTTON_LEFT) {
+					images.AdvanceIntro();
+				}
+			}
 		}
 
 		Input();
 		Update();
 		renderer.Render();
+		Render();
 	}
 }
 
-void Engine::Input()
+void Engine::PlayIntro()
 {
-	Actor* player = GetPlayer();
+	// **Intro Sequence Loop**
+	while (images.IsIntroPlaying()) {
+		SDL_Event e;
+		while (SDL_PollEvent(&e)) {
+			if (e.type == SDL_QUIT) {
+				exit(0);
+			}
 
-	/*
-	SDL_Event e;
-
-	while (Helper::SDL_PollEvent(&e)) {
-		if (e.type == SDL_QUIT) {
-			exit(0);
-		}
-
-		// Only process input if intro images are still being shown
-		if (images.IsIntroPlaying()) {
+			// Handle advancing intro images
 			if (e.type == SDL_KEYDOWN) {
 				if (e.key.keysym.scancode == SDL_SCANCODE_SPACE ||
 					e.key.keysym.scancode == SDL_SCANCODE_RETURN) {
@@ -113,8 +125,17 @@ void Engine::Input()
 				images.AdvanceIntro();
 			}
 		}
+
+		// **Render only intro image**
+		SDL_RenderClear(renderer.GetRenderer());
+		images.RenderIntroImage(renderer.GetRenderer());
+		SDL_RenderPresent(renderer.GetRenderer());
 	}
-	*/
+}
+
+void Engine::Input()
+{
+	Actor* player = GetPlayer();
 
 	if (player != nullptr) {
 		ShowScoreAndHealth();
@@ -358,9 +379,14 @@ std::string Engine::RenderMap()
 {
 	// Compute camera bounds directly based on the player's position
 	Actor* player = GetPlayer();
+	
+	int camera_x = 0;
+	int camera_y = 0;
 
-	int camera_x = player->position.x - x_resolution / 2;
-	int camera_y = player->position.y - y_resolution / 2;
+	if (player != nullptr) {
+		int camera_x = player->position.x - x_resolution / 2;
+		int camera_y = player->position.y - y_resolution / 2;
+	}
 
 	// Create an empty visible map filled with spaces
 	std::vector<std::string> visible(y_resolution, std::string(x_resolution, ' '));
