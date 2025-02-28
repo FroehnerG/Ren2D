@@ -61,6 +61,7 @@ Engine::Engine(rapidjson::Document& game_config)
 
 	window = CreateWindow();
 	renderer.SetRenderer(window);
+	SDL_SetRenderDrawColor(renderer.GetRenderer(), renderer.GetColor("red"), renderer.GetColor("green"), renderer.GetColor("blue"), 255);
 	SDL_RenderClear(renderer.GetRenderer());
 	//images.LoadImages(game_config, renderer.GetRenderer(), "intro_image");
 }

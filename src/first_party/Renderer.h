@@ -11,6 +11,7 @@ public:
     Renderer() {}
 
     SDL_Renderer* GetRenderer();
+    int GetColor(std::string color);
 	void SetRenderer(SDL_Window* window);
     void SetClearColor(int r, int g, int b);
 	void Render();

@@ -19,6 +19,19 @@ SDL_Renderer* Renderer::GetRenderer()
     return sdl_renderer;
 }
 
+int Renderer::GetColor(std::string color)
+{
+    if (color == "red") {
+        return clear_color_r;
+    }
+    else if (color == "green") {
+        return clear_color_g;
+    }
+    else {
+        return clear_color_b;
+    }
+}
+
 void Renderer::SetRenderer(SDL_Window* window)
 {
 	sdl_renderer = Helper::SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
