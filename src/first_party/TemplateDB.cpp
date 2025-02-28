@@ -4,7 +4,7 @@
 
 void TemplateDB::LoadTemplate(std::string template_name, rapidjson::Document& template_json)
 {
-	uint64_t actor_template_hash = HashTemplateName(template_name);
+	uint64_t actor_template_hash = EngineUtils::HashString(template_name);
 
 	// If template already exists, return
 	if (actor_templates.find(actor_template_hash) != actor_templates.end()) {
@@ -52,18 +52,9 @@ void TemplateDB::LoadTemplate(std::string template_name, rapidjson::Document& te
 	actor_templates[actor_template_hash] = actor_template;
 }
 
-uint64_t TemplateDB::HashTemplateName(string template_name)
-{
-	// Hash the string before inserting it
-	std::hash<std::string> hasher;
-	uint64_t key = hasher(template_name);
-
-	return key;
-}
-
 Actor TemplateDB::UseTemplate(std::string template_name)
 {
-	uint64_t actor_template_hash = HashTemplateName(template_name);
+	uint64_t actor_template_hash = EngineUtils::HashString(template_name);
 
 	auto it = actor_templates.find(actor_template_hash);
 	if (it == actor_templates.end()) {

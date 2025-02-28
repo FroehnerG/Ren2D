@@ -74,7 +74,8 @@
     <IncludePath>$(ProjectDir)src\third_party\glm_0.9.9.8\glm\test\;$(ProjectDir)src\third_party\glm-0.9.9.8\glm\;$(ProjectDir)src\third_party\;$(ProjectDir)src\first_party\;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <IncludePath>$(ProjectDir)src\third_party\;$(ProjectDir)src\first_party\;$(ProjectDir)src\third_party\rapidjson-1.1.0\rapidjson-1.1.0\include\;$(ProjectDir)src\third_party\glm-0.9.9.8\glm\;$(IncludePath)</IncludePath>
+    <IncludePath>$(ProjectDir)src\third_party\SDL2_image\;$(ProjectDir)src\third_party\SDL2\;$(ProjectDir)src\third_party\;$(ProjectDir)src\first_party\;$(ProjectDir)src\third_party\rapidjson-1.1.0\rapidjson-1.1.0\include\;$(ProjectDir)src\third_party\glm-0.9.9.8\glm\;$(IncludePath)</IncludePath>
+    <LibraryPath>$(ProjectDir)src\third_party\SDL2_ttf\lib\;$(ProjectDir)src\third_party\SDL2_mixer\lib\;$(ProjectDir)src\third_party\SDL2_image\lib\;$(ProjectDir)src\third_party\SDL2\lib\;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -132,13 +133,21 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>SDL2.lib;SDL2_image.lib;SDL2_mixer.lib;SDL2_ttf.lib;SDL2main.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
+    <PostBuildEvent>
+      <Command>copy $(ProjectDir)src\third_party\dll\* $(OutDir)
+</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="src\first_party\Actor.h" />
     <ClInclude Include="src\first_party\Engine.h" />
+    <ClInclude Include="src\first_party\ImageDB.h" />
+    <ClInclude Include="src\first_party\Renderer.h" />
     <ClInclude Include="src\first_party\SceneDB.h" />
     <ClInclude Include="src\first_party\TemplateDB.h" />
+    <ClInclude Include="src\third_party\AudioHelper.h" />
     <ClInclude Include="src\third_party\EngineUtils.h" />
     <ClInclude Include="src\third_party\glm-0.9.9.8\glm\glm\common.hpp" />
     <ClInclude Include="src\third_party\glm-0.9.9.8\glm\glm\detail\compute_common.hpp" />
@@ -422,6 +431,7 @@
     <ClInclude Include="src\third_party\glm-0.9.9.8\glm\glm\vec3.hpp" />
     <ClInclude Include="src\third_party\glm-0.9.9.8\glm\glm\vec4.hpp" />
     <ClInclude Include="src\third_party\glm-0.9.9.8\glm\glm\vector_relational.hpp" />
+    <ClInclude Include="src\third_party\Helper.h" />
     <ClInclude Include="src\third_party\MapHelper.h" />
   </ItemGroup>
   <ItemGroup>
@@ -1260,7 +1270,9 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\first_party\Engine.cpp" />
+    <ClCompile Include="src\first_party\ImageDB.cpp" />
     <ClCompile Include="src\first_party\main.cpp" />
+    <ClCompile Include="src\first_party\Renderer.cpp" />
     <ClCompile Include="src\first_party\SceneDB.cpp" />
     <ClCompile Include="src\first_party\TemplateDB.cpp" />
     <ClCompile Include="src\third_party\EngineUtils.cpp" />

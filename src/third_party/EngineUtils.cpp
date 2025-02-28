@@ -42,6 +42,15 @@ uint64_t EngineUtils::CreateCompositeKey(glm::ivec2 position)
     return result;
 }
 
+uint64_t EngineUtils::HashString(std::string name)
+{
+    // Hash the string before inserting it
+    std::hash<std::string> hasher;
+    uint64_t key = hasher(name);
+
+    return key;
+}
+
 glm::ivec2 EngineUtils::ParseCompositeKey(uint64_t composite_position)
 {
     uint32_t uy = static_cast<uint32_t>(composite_position & 0xFFFFFFFF); // Extract lower 32 bits

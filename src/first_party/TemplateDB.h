@@ -19,7 +19,6 @@ public:
     }
 
     void LoadTemplate(std::string template_name, rapidjson::Document& template_json);
-    uint64_t HashTemplateName(string template_name);
     Actor UseTemplate(std::string template_name);
 
 private:

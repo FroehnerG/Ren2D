@@ -4,6 +4,8 @@
 #include "glm/glm.hpp"
 #include "rapidjson/document.h"
 #include "SceneDB.h"
+#include "Renderer.h"
+#include "ImageDB.h"
 
 using std::string, glm::ivec2, std::pair;
 
@@ -25,6 +27,7 @@ public:
 	void CheckNPCDialogue(string dialogue, int actor_id);
 	void MoveNPCs();
 	void LoadScene(string scene_name);
+	SDL_Window* CreateWindow();
 	ivec2 InvertVelocity(ivec2 velocity);
 	string RenderMap();
 	Actor* GetPlayer();
@@ -38,8 +41,9 @@ private:
 	bool next_scene = false;
 	int player_health = 3;
 	int score = 0;
-	int camera_width = 13;
-	int camera_height = 9;
+	int x_resolution = 640;
+	int y_resolution = 360;
+	string game_title = "";
 	string user_input = "";
 	string game_start_message = "";
 	string game_over_bad_message = "";
@@ -47,4 +51,7 @@ private:
 	string next_scene_name = "";
 	ivec2 new_position = ivec2(0, 0);
 	SceneDB scene;
+	SDL_Window* window = nullptr;
+	Renderer renderer;
+	ImageDB images;
 };

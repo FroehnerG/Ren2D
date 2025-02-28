@@ -879,6 +879,18 @@
     <ClInclude Include="src\first_party\Actor.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\first_party\Renderer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\third_party\Helper.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\third_party\AudioHelper.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\first_party\ImageDB.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="src\third_party\glm-0.9.9.8\glm\doc\api\search\all_0.html" />
@@ -2003,6 +2015,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\first_party\TemplateDB.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\first_party\Renderer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\first_party\ImageDB.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
