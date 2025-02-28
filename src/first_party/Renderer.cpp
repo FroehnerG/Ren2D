@@ -33,22 +33,10 @@ void Renderer::SetClearColor(int r, int g, int b)
 
 void Renderer::Render()
 {
-    bool is_running = true;  // Flag to control game loop
+    // Set background color
+    SDL_SetRenderDrawColor(sdl_renderer, clear_color_r, clear_color_g, clear_color_b, 255);
+    SDL_RenderClear(sdl_renderer);
 
-    while (is_running) {
-        // Set the background color
-        SDL_SetRenderDrawColor(sdl_renderer, clear_color_r, clear_color_g, clear_color_b, 255);
-        SDL_RenderClear(sdl_renderer);
-
-        // Process events
-        SDL_Event e;
-        while (Helper::SDL_PollEvent(&e)) {
-            if (e.type == SDL_QUIT) {
-                is_running = false; // Instead of exit(0), set the flag to false
-            }
-        }
-
-        // Present the frame (finish rendering)
-        Helper::SDL_RenderPresent(sdl_renderer);
-    }
+    // Present the frame (finish rendering)
+    Helper::SDL_RenderPresent(sdl_renderer);
 }

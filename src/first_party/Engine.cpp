@@ -66,18 +66,21 @@ Engine::Engine(rapidjson::Document& game_config)
 
 void Engine::GameLoop()
 {
-	images.RenderIntroImage(renderer.GetRenderer());
+	//images.RenderIntroImage(renderer.GetRenderer());
 
 	if (game_start_message != "")
 		cout << game_start_message << '\n';
 
-	while (is_running) {
-		Input();
-
-		if (!is_running) {
-			return;
+	while (true) {
+		SDL_Event e;
+		while (Helper::SDL_PollEvent(&e)) {
+			if (e.type == SDL_QUIT) {
+				Helper::SDL_RenderPresent(renderer.GetRenderer());
+				break;
+			}
 		}
 
+		Input();
 		Update();
 		renderer.Render();
 	}
@@ -87,6 +90,7 @@ void Engine::Input()
 {
 	Actor* player = GetPlayer();
 
+	/*
 	SDL_Event e;
 
 	while (Helper::SDL_PollEvent(&e)) {
@@ -108,6 +112,7 @@ void Engine::Input()
 			}
 		}
 	}
+	*/
 
 	if (player != nullptr) {
 		ShowScoreAndHealth();
