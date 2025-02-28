@@ -108,7 +108,7 @@ void Engine::PlayIntro()
 	// **Intro Sequence Loop**
 	while (images.IsIntroPlaying()) {
 		SDL_Event e;
-		while (SDL_PollEvent(&e)) {
+		while (Helper::SDL_PollEvent(&e)) {
 			if (e.type == SDL_QUIT) {
 				exit(0);
 			}
@@ -129,7 +129,7 @@ void Engine::PlayIntro()
 		// **Render only intro image**
 		SDL_RenderClear(renderer.GetRenderer());
 		images.RenderIntroImage(renderer.GetRenderer());
-		SDL_RenderPresent(renderer.GetRenderer());
+		Helper::SDL_RenderPresent(renderer.GetRenderer());
 	}
 }
 
