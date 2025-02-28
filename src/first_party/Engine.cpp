@@ -61,7 +61,7 @@ Engine::Engine(rapidjson::Document& game_config)
 
 	window = CreateWindow();
 	renderer.SetRenderer(window);
-	images.LoadImages(game_config, renderer.GetRenderer(), "intro_image");
+	//images.LoadImages(game_config, renderer.GetRenderer(), "intro_image");
 }
 
 void Engine::GameLoop()
@@ -71,7 +71,7 @@ void Engine::GameLoop()
 	if (game_start_message != "")
 		cout << game_start_message << '\n';
 
-	while (true) {
+	while (is_running) {
 		SDL_Event e;
 		while (Helper::SDL_PollEvent(&e)) {
 			if (e.type == SDL_QUIT) {
