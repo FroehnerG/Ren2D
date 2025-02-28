@@ -99,7 +99,6 @@ void Engine::GameLoop()
 		Input();
 		Update();
 		renderer.Render();
-		Render();
 	}
 }
 
