@@ -61,6 +61,7 @@ Engine::Engine(rapidjson::Document& game_config)
 
 	window = CreateWindow();
 	renderer.SetRenderer(window);
+	SDL_RenderClear(renderer.GetRenderer());
 	//images.LoadImages(game_config, renderer.GetRenderer(), "intro_image");
 }
 
@@ -76,7 +77,7 @@ void Engine::GameLoop()
 		while (Helper::SDL_PollEvent(&e)) {
 			if (e.type == SDL_QUIT) {
 				Helper::SDL_RenderPresent(renderer.GetRenderer());
-				break;
+				exit(0);
 			}
 		}
 
@@ -211,7 +212,7 @@ SDL_Window* Engine::CreateWindow()
 	std::vector<char> game_title_cstr(game_title.begin(), game_title.end());
 	game_title_cstr.push_back('\0'); // Ensure null termination
 
-	return Helper::SDL_CreateWindow(game_title_cstr.data(), 0, 0, x_resolution, y_resolution, SDL_WINDOW_SHOWN);
+	return Helper::SDL_CreateWindow(game_title_cstr.data(), 500, 500, x_resolution, y_resolution, SDL_WINDOW_SHOWN);
 }
 
 ivec2 Engine::InvertVelocity(ivec2 velocity)

@@ -21,7 +21,7 @@ SDL_Renderer* Renderer::GetRenderer()
 
 void Renderer::SetRenderer(SDL_Window* window)
 {
-	sdl_renderer = Helper::SDL_CreateRenderer(window, -1, SDL_RENDERER_PRESENTVSYNC);
+	sdl_renderer = Helper::SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
 }
 
 void Renderer::SetClearColor(int r, int g, int b)
