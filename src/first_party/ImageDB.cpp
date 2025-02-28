@@ -3,6 +3,7 @@
 #include <cstdlib> // For exit(0)
 #include "ImageDB.h"
 #include "EngineUtils.h"
+#include "Helper.h"
 
 namespace fs = std::filesystem;
 
@@ -35,7 +36,7 @@ void ImageDB::LoadImages(rapidjson::Document& game_config, SDL_Renderer* rendere
 void ImageDB::RenderIntroImage(SDL_Renderer* renderer)
 {
     if (IsIntroPlaying() && intro_images[current_intro_index]) {
-        SDL_RenderCopy(renderer, intro_images[current_intro_index], nullptr, nullptr);
+        Helper::SDL_RenderCopy(renderer, intro_images[current_intro_index], nullptr, nullptr);
     }
 }
 
