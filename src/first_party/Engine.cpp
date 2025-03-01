@@ -68,8 +68,6 @@ Engine::Engine(rapidjson::Document& game_config)
 
 void Engine::GameLoop()
 {
-	PlayIntro();
-
 	if (game_start_message != "")
 		cout << game_start_message << '\n';
 
@@ -80,6 +78,8 @@ void Engine::GameLoop()
 				Helper::SDL_RenderPresent(renderer.GetRenderer());
 				exit(0);
 			}
+
+			PlayIntro();
 
 			// Only process input if intro images are still being shown
 			if (images.IsIntroPlaying()) {
