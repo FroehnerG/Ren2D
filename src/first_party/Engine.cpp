@@ -68,8 +68,6 @@ Engine::Engine(rapidjson::Document& game_config)
 
 void Engine::GameLoop()
 {
-	PlayIntro();
-
 	if (game_start_message != "")
 		cout << game_start_message << '\n';
 
@@ -81,19 +79,7 @@ void Engine::GameLoop()
 				exit(0);
 			}
 
-			// Only process input if intro images are still being shown
-			if (images.IsIntroPlaying()) {
-				if (e.type == SDL_KEYDOWN) {
-					if (e.key.keysym.scancode == SDL_SCANCODE_SPACE ||
-						e.key.keysym.scancode == SDL_SCANCODE_RETURN) {
-						images.AdvanceIntro();
-					}
-				}
-
-				if (e.type == SDL_MOUSEBUTTONDOWN && e.button.button == SDL_BUTTON_LEFT) {
-					images.AdvanceIntro();
-				}
-			}
+			PlayIntro();
 		}
 
 		Input();
@@ -383,8 +369,8 @@ std::string Engine::RenderMap()
 	int camera_y = 0;
 
 	if (player != nullptr) {
-		int camera_x = player->position.x - x_resolution / 2;
-		int camera_y = player->position.y - y_resolution / 2;
+		camera_x = player->position.x - x_resolution / 2;
+		camera_y = player->position.y - y_resolution / 2;
 	}
 
 	// Create an empty visible map filled with spaces
