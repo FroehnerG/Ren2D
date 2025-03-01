@@ -68,6 +68,8 @@ Engine::Engine(rapidjson::Document& game_config)
 
 void Engine::GameLoop()
 {
+	PlayIntro();
+
 	if (game_start_message != "")
 		cout << game_start_message << '\n';
 
@@ -78,8 +80,6 @@ void Engine::GameLoop()
 				Helper::SDL_RenderPresent(renderer.GetRenderer());
 				exit(0);
 			}
-
-			PlayIntro();
 
 			// Only process input if intro images are still being shown
 			if (images.IsIntroPlaying()) {
@@ -128,13 +128,6 @@ void Engine::PlayIntro()
 		// **Render only intro image**
 		SDL_RenderClear(renderer.GetRenderer());
 		images.RenderIntroImage(renderer.GetRenderer());
-		Helper::SDL_RenderPresent(renderer.GetRenderer());
-	}
-
-	// **Render the final frame if needed**
-	if (!images.IsIntroPlaying()) {
-		SDL_RenderClear(renderer.GetRenderer());
-		images.RenderLastIntroImage(renderer.GetRenderer());
 		Helper::SDL_RenderPresent(renderer.GetRenderer());
 	}
 }
