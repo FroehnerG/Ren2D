@@ -130,6 +130,13 @@ void Engine::PlayIntro()
 		images.RenderIntroImage(renderer.GetRenderer());
 		Helper::SDL_RenderPresent(renderer.GetRenderer());
 	}
+
+	// **Render the final frame if needed**
+	if (!images.IsIntroPlaying()) {
+		SDL_RenderClear(renderer.GetRenderer());
+		images.RenderLastIntroImage(renderer.GetRenderer());
+		Helper::SDL_RenderPresent(renderer.GetRenderer());
+	}
 }
 
 void Engine::Input()

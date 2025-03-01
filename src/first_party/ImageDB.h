@@ -10,6 +10,7 @@ class ImageDB {
 public:
 	void LoadImages(rapidjson::Document& game_config, SDL_Renderer* renderer, std::string image_name);
 	void RenderIntroImage(SDL_Renderer* renderer);
+	void RenderLastIntroImage(SDL_Renderer* renderer);
 	void AdvanceIntro();
 	void CacheImage(SDL_Texture* texture, std::string image_name);
 
