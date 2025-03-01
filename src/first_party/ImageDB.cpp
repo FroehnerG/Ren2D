@@ -45,6 +45,7 @@ void ImageDB::RenderLastIntroImage(SDL_Renderer* renderer)
     if (current_intro_index >= intro_images.size() && !intro_images.empty()) {
         SDL_RenderCopy(renderer, intro_images.back(), nullptr, nullptr); // Render the last image
     }
+
 }
 
 void ImageDB::AdvanceIntro()
