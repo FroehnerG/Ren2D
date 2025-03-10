@@ -33,18 +33,13 @@ void ImageDB::LoadImages(rapidjson::Document& game_config, SDL_Renderer* rendere
 	}
 }
 
-void ImageDB::RenderIntroImage(SDL_Renderer* renderer)
-{
-    if (IsIntroPlaying() && intro_images[current_intro_index]) {
-        Helper::SDL_RenderCopy(renderer, intro_images[current_intro_index], nullptr, nullptr);
-    }
+SDL_Texture* ImageDB::GetCurrentIntroImage() {
+    return intro_images[current_intro_index];
 }
 
-void ImageDB::RenderLastIntroImage(SDL_Renderer* renderer)
+size_t* ImageDB::GetCurrentIntroIndex()
 {
-    if (current_intro_index >= intro_images.size() && !intro_images.empty()) {
-        Helper::SDL_RenderCopy(renderer, intro_images.back(), nullptr, nullptr); // Render the last image
-    }
+    return &current_intro_index;
 }
 
 void ImageDB::AdvanceIntro()
@@ -53,8 +48,6 @@ void ImageDB::AdvanceIntro()
         current_intro_index++; // Move to the next image
     }
 }
-
-
 
 void ImageDB::CacheImage(SDL_Texture* texture, std::string image_name)
 {

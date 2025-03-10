@@ -147,6 +147,7 @@
     <ClInclude Include="src\first_party\Renderer.h" />
     <ClInclude Include="src\first_party\SceneDB.h" />
     <ClInclude Include="src\first_party\TemplateDB.h" />
+    <ClInclude Include="src\first_party\TextDB.h" />
     <ClInclude Include="src\third_party\AudioHelper.h" />
     <ClInclude Include="src\third_party\EngineUtils.h" />
     <ClInclude Include="src\third_party\glm-0.9.9.8\glm\glm\common.hpp" />
@@ -1275,6 +1276,7 @@
     <ClCompile Include="src\first_party\Renderer.cpp" />
     <ClCompile Include="src\first_party\SceneDB.cpp" />
     <ClCompile Include="src\first_party\TemplateDB.cpp" />
+    <ClCompile Include="src\first_party\TextDB.cpp" />
     <ClCompile Include="src\third_party\EngineUtils.cpp" />
     <ClCompile Include="src\third_party\glm-0.9.9.8\glm\glm\detail\glm.cpp" />
   </ItemGroup>

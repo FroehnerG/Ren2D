@@ -64,6 +64,8 @@ Engine::Engine(rapidjson::Document& game_config)
 	SDL_SetRenderDrawColor(renderer.GetRenderer(), renderer.GetColor("red"), renderer.GetColor("green"), renderer.GetColor("blue"), 255);
 	SDL_RenderClear(renderer.GetRenderer());
 	images.LoadImages(game_config, renderer.GetRenderer(), "intro_image");
+	text.LoadText(game_config, &images, true);
+	renderer.SetFont(&text);
 }
 
 void Engine::GameLoop()
@@ -114,7 +116,7 @@ void Engine::PlayIntro()
 		// **Render only intro image**
 		SDL_SetRenderDrawColor(renderer.GetRenderer(), renderer.GetColor("red"), renderer.GetColor("green"), renderer.GetColor("blue"), 255);
 		SDL_RenderClear(renderer.GetRenderer());
-		images.RenderIntroImage(renderer.GetRenderer());
+		renderer.RenderIntro(&images, &text, y_resolution);
 		Helper::SDL_RenderPresent(renderer.GetRenderer());
 	}
 }

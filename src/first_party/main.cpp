@@ -6,6 +6,7 @@
 #include "Renderer.h"
 #include "EngineUtils.h"
 #include "SDL2/SDL.h"
+#include "SDL2_ttf/SDL_ttf.h"
 
 namespace fs = std::filesystem;
 
@@ -32,6 +33,8 @@ int main(int argc, char* argv[]) {
 
 		engine.InitResolution(rendering_config);
 	}
+
+	TTF_Init();
 
 	engine.GameLoop();
 

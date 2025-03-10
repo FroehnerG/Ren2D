@@ -6,13 +6,9 @@
 #include "SceneDB.h"
 #include "Renderer.h"
 #include "ImageDB.h"
+#include "TextDB.h"
 
 using std::string, glm::ivec2, std::pair;
-
-enum class GameState {
-	INTRO,
-	GAME
-};
 
 class Engine
 {
@@ -20,7 +16,6 @@ public:
 	Engine(rapidjson::Document& game_config);
 
 	void GameLoop();
-	void HandleEvents();
 	void PlayIntro();
 	void Input();
 	void Update();
@@ -56,10 +51,10 @@ private:
 	string game_over_bad_message = "";
 	string game_over_good_message = "";
 	string next_scene_name = "";
-	GameState game_state = GameState::INTRO; // Start with intro
 	ivec2 new_position = ivec2(0, 0);
 	SceneDB scene;
 	SDL_Window* window = nullptr;
 	Renderer renderer;
 	ImageDB images;
+	TextDB text;
 };
