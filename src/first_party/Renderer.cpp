@@ -76,8 +76,8 @@ void Renderer::DrawText(const std::string& text_content, int font_size, SDL_Colo
     SDL_Texture* textTexture = SDL_CreateTextureFromSurface(sdl_renderer, textSurface);
     SDL_FreeSurface(textSurface);
 
-    int text_width = 0, text_height = font_size * 2;  // Fixed height of 16
-    TTF_SizeText(text_font, text_content.c_str(), &text_width, nullptr);  // Get dynamic width
+    int text_width = 0, text_height = 0;  // Get both width and height dynamically
+    TTF_SizeText(text_font, text_content.c_str(), &text_width, &text_height);  // Get dynamic width and height
 
     SDL_FRect renderQuad = { x, y, static_cast<float>(text_width), static_cast<float>(text_height) };
 
