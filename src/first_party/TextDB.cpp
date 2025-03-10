@@ -7,8 +7,6 @@ namespace fs = std::filesystem;
 
 void TextDB::LoadText(rapidjson::Document& game_config, ImageDB* images, bool is_intro_text)
 {
-	current_text_intro_index = images->GetCurrentIntroIndex();
-
 	if (is_intro_text) {
 		if (!game_config.HasMember("intro_image")) {
 			return;
@@ -38,11 +36,18 @@ void TextDB::LoadText(rapidjson::Document& game_config, ImageDB* images, bool is
 	for (const auto& text : game_config["intro_text"].GetArray()) {
 		intro_text.push_back(text.GetString());
 	}
+
+	current_text_intro_index = images->GetCurrentIntroIndex();
 }
 
 TTF_Font* TextDB::GetTextFont()
 {
 	return text_font;
+}
+
+size_t* TextDB::GetCurrentTextIntroIndex()
+{
+	return current_text_intro_index;
 }
 
 std::string TextDB::GetCurrentIntroText() {
