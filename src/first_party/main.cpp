@@ -25,6 +25,8 @@ int main(int argc, char* argv[]) {
 
 	EngineUtils::ReadJsonFile("resources/game.config", game_config);
 
+	TTF_Init();
+
 	Engine engine(game_config);
 
 	if (fs::exists("resources/rendering.config")) {
@@ -33,8 +35,6 @@ int main(int argc, char* argv[]) {
 
 		engine.InitResolution(rendering_config);
 	}
-
-	TTF_Init();
 
 	engine.GameLoop();
 

@@ -33,6 +33,10 @@ void TextDB::LoadText(rapidjson::Document& game_config, ImageDB* images, bool is
 
 	text_font = TTF_OpenFont(font_path.c_str(), 16);
 
+	if (!text_font) {
+		exit(0);
+	}
+
 	for (const auto& text : game_config["intro_text"].GetArray()) {
 		intro_text.push_back(text.GetString());
 	}
