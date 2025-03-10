@@ -13,6 +13,7 @@ void TextDB::LoadText(rapidjson::Document& game_config, ImageDB* images, bool is
 		}
 
 		if (!game_config.HasMember("intro_text")) {
+			has_intro_text = false;
 			return;
 		}
 	}
@@ -39,6 +40,10 @@ void TextDB::LoadText(rapidjson::Document& game_config, ImageDB* images, bool is
 
 	for (const auto& text : game_config["intro_text"].GetArray()) {
 		intro_text.push_back(text.GetString());
+	}
+	
+	if (intro_text.size() == 0) {
+		has_intro_text = false;
 	}
 }
 

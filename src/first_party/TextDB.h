@@ -15,8 +15,10 @@ public:
 	std::string GetLastIntroText();
 
 	bool IsIntroPlaying() const { return current_text_intro_index < intro_text.size(); }
+	bool GetHasIntroText() const { return has_intro_text; };
 private:
 	size_t current_text_intro_index = 0;
 	std::vector<std::string> intro_text;
 	TTF_Font* text_font = nullptr;
+	bool has_intro_text = true;
 };
