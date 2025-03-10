@@ -37,9 +37,9 @@ SDL_Texture* ImageDB::GetCurrentIntroImage() {
     return intro_images[current_intro_index];
 }
 
-size_t* ImageDB::GetCurrentIntroIndex()
+SDL_Texture* ImageDB::GetLastIntroImage()
 {
-    return &current_intro_index;
+    return intro_images.back();
 }
 
 void ImageDB::AdvanceIntro()

@@ -9,11 +9,14 @@
 class TextDB {
 public:
 	void LoadText(rapidjson::Document& game_config, ImageDB* images, bool is_intro_text);
+	void AdvanceIntroText();
 	TTF_Font* GetTextFont();
-	size_t* GetCurrentTextIntroIndex();
 	std::string GetCurrentIntroText();
+	std::string GetLastIntroText();
+
+	bool IsIntroPlaying() const { return current_text_intro_index < intro_text.size(); }
 private:
-	size_t* current_text_intro_index = nullptr;
+	size_t current_text_intro_index = 0;
 	std::vector<std::string> intro_text;
 	TTF_Font* text_font = nullptr;
 };

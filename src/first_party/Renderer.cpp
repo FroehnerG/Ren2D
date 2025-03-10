@@ -60,12 +60,17 @@ void Renderer::Render()
 
 void Renderer::RenderIntro(ImageDB* imageDB, TextDB* textDB, int y_resolution)
 {
-    if (imageDB->IsIntroPlaying()) {
+    if (imageDB->IsIntroPlaying() && textDB->IsIntroPlaying()) {
         Helper::SDL_RenderCopy(sdl_renderer, imageDB->GetCurrentIntroImage(), nullptr, nullptr);
-
-        if (textDB->GetCurrentTextIntroIndex() != nullptr) {
-            DrawText(textDB->GetCurrentIntroText(), 16, { 255, 255, 255, 255 }, 25, (y_resolution - 50));
-        }
+        DrawText(textDB->GetCurrentIntroText(), 16, { 255, 255, 255, 255 }, 25, (y_resolution - 50));
+    }
+    else if (!imageDB->IsIntroPlaying() && textDB->IsIntroPlaying()) {
+        Helper::SDL_RenderCopy(sdl_renderer, imageDB->GetLastIntroImage(), nullptr, nullptr);
+        DrawText(textDB->GetCurrentIntroText(), 16, { 255, 255, 255, 255 }, 25, (y_resolution - 50));
+    }
+    else if (imageDB->IsIntroPlaying() && !textDB->IsIntroPlaying()) {
+        Helper::SDL_RenderCopy(sdl_renderer, imageDB->GetCurrentIntroImage(), nullptr, nullptr);
+        DrawText(textDB->GetLastIntroText(), 16, { 255, 255, 255, 255 }, 25, (y_resolution - 50));
     }
 }
 

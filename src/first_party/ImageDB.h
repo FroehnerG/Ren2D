@@ -12,7 +12,7 @@ public:
 	void AdvanceIntro();
 	void CacheImage(SDL_Texture* texture, std::string image_name);
 	SDL_Texture* GetCurrentIntroImage();
-	size_t* GetCurrentIntroIndex();
+	SDL_Texture* GetLastIntroImage();
 
 	bool IsIntroPlaying() const { return current_intro_index < intro_images.size(); }
 private:

@@ -93,7 +93,7 @@ void Engine::GameLoop()
 void Engine::PlayIntro()
 {
 	// **Intro Sequence Loop**
-	while (images.IsIntroPlaying()) {
+	while (images.IsIntroPlaying() || text.IsIntroPlaying()) {
 		SDL_Event e;
 		while (Helper::SDL_PollEvent(&e)) {
 			if (e.type == SDL_QUIT) {
@@ -105,11 +105,13 @@ void Engine::PlayIntro()
 				if (e.key.keysym.scancode == SDL_SCANCODE_SPACE ||
 					e.key.keysym.scancode == SDL_SCANCODE_RETURN) {
 					images.AdvanceIntro();
+					text.AdvanceIntroText();
 				}
 			}
 
 			if (e.type == SDL_MOUSEBUTTONDOWN && e.button.button == SDL_BUTTON_LEFT) {
 				images.AdvanceIntro();
+				text.AdvanceIntroText();
 			}
 		}
 
