@@ -74,10 +74,10 @@ void Renderer::DrawText(const std::string& text_content, int font_size, SDL_Colo
     SDL_FreeSurface(textSurface);
 
     // Define the area to draw the text with a fixed height of 16
-    SDL_Rect renderQuad = { x, y, 0, font_size };
+    SDL_FRect renderQuad = { x, y, 0, font_size };
 
     // Render the text
-    SDL_RenderCopy(sdl_renderer, textTexture, nullptr, &renderQuad);
+    Helper::SDL_RenderCopy(sdl_renderer, textTexture, nullptr, &renderQuad);
 
     // Clean up the texture
     SDL_DestroyTexture(textTexture);
