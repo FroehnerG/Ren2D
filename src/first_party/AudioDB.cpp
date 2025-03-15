@@ -54,6 +54,10 @@ void AudioDB::LoadAudio(rapidjson::Document& game_config, std::string audio_type
 
 void AudioDB::PlayMusic(bool is_intro)
 {
+	if (!CheckIfHasMusic(is_intro)) {
+		return;
+	}
+
 	if (is_intro && AudioHelper::Mix_PlayChannel(0, intro_music, true) < 0) {
 		exit(0);
 	}
@@ -66,8 +70,26 @@ void AudioDB::PlayMusic(bool is_intro)
 	}
 }
 
+bool AudioDB::CheckIfHasMusic(bool is_intro) {
+	if (!has_intro_music && !has_gameplay_music) {
+		return false;
+	}
+
+	if (is_intro && !has_intro_music) {
+		return false;
+	}
+
+	if (!is_intro && !has_gameplay_music) {
+		return false;
+	}
+}
+
 void AudioDB::HaltMusic()
 {
+	if (!CheckIfHasMusic(true || false)) {
+		return;
+	}
+
 	if (AudioHelper::Mix_HaltChannel(0) < 0) {
 		exit(0);
 	}

@@ -8,6 +8,7 @@ class AudioDB {
 public:
 	void LoadAudio(rapidjson::Document& game_config, std::string audio_name, bool is_intro);
 	void PlayMusic(bool is_intro);
+	bool CheckIfHasMusic(bool is_intro);
 	void HaltMusic();
 	bool HasIntroMusic();
 	bool HasGameplayMusic();
