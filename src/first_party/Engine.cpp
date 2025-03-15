@@ -105,26 +105,35 @@ void Engine::PlayIntro()
 				exit(0);
 			}
 
+			SDL_SetRenderDrawColor(renderer.GetRenderer(), renderer.GetColor("red"), renderer.GetColor("green"), renderer.GetColor("blue"), 255);
+			SDL_RenderClear(renderer.GetRenderer());
+			renderer.RenderIntro(&images, &text, y_resolution);
+			Helper::SDL_RenderPresent(renderer.GetRenderer());
+
 			// Handle advancing intro images
 			if (e.type == SDL_KEYDOWN) {
 				if (e.key.keysym.scancode == SDL_SCANCODE_SPACE ||
 					e.key.keysym.scancode == SDL_SCANCODE_RETURN) {
 					images.AdvanceIntro();
 					text.AdvanceIntroText();
+					// **Render only intro image**
+					SDL_SetRenderDrawColor(renderer.GetRenderer(), renderer.GetColor("red"), renderer.GetColor("green"), renderer.GetColor("blue"), 255);
+					SDL_RenderClear(renderer.GetRenderer());
+					renderer.RenderIntro(&images, &text, y_resolution);
+					Helper::SDL_RenderPresent(renderer.GetRenderer());
 				}
 			}
 
 			if (e.type == SDL_MOUSEBUTTONDOWN && e.button.button == SDL_BUTTON_LEFT) {
 				images.AdvanceIntro();
 				text.AdvanceIntroText();
+				// **Render only intro image**
+				SDL_SetRenderDrawColor(renderer.GetRenderer(), renderer.GetColor("red"), renderer.GetColor("green"), renderer.GetColor("blue"), 255);
+				SDL_RenderClear(renderer.GetRenderer());
+				renderer.RenderIntro(&images, &text, y_resolution);
+				Helper::SDL_RenderPresent(renderer.GetRenderer());
 			}
 		}
-
-		// **Render only intro image**
-		SDL_SetRenderDrawColor(renderer.GetRenderer(), renderer.GetColor("red"), renderer.GetColor("green"), renderer.GetColor("blue"), 255);
-		SDL_RenderClear(renderer.GetRenderer());
-		renderer.RenderIntro(&images, &text, y_resolution);
-		Helper::SDL_RenderPresent(renderer.GetRenderer());
 	}
 
 	if (!images.IsIntroPlaying() && !text.IsIntroPlaying()) {

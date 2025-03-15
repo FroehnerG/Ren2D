@@ -58,14 +58,14 @@ void AudioDB::PlayMusic(bool is_intro)
 		return;
 	}
 
-	if (is_intro && AudioHelper::Mix_PlayChannel(0, intro_music, true) < 0) {
+	if (is_intro && AudioHelper::Mix_PlayChannel(0, intro_music, -1) < 0) {
 		exit(0);
 	}
 	else if (is_intro) {
 		return;
 	}
 
-	if (AudioHelper::Mix_PlayChannel(0, gameplay_music, true) < 0) {
+	if (AudioHelper::Mix_PlayChannel(0, gameplay_music, -1) < 0) {
 		exit(0);
 	}
 }
