@@ -83,7 +83,7 @@ void Engine::GameLoop()
 		while (Helper::SDL_PollEvent(&e)) {
 			if (e.type == SDL_QUIT) {
 				Helper::SDL_RenderPresent(renderer.GetRenderer());
-				is_running = false;
+				exit(0);
 			}
 
 			PlayIntro();
