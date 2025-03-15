@@ -2,7 +2,7 @@
 #include <iostream>
 #include "TemplateDB.h"
 
-void TemplateDB::LoadTemplate(std::string template_name, rapidjson::Document& template_json)
+void TemplateDB::LoadTemplate(std::string template_name, SDL_Renderer* renderer, ImageDB* imageDB, rapidjson::Document& template_json, int current_actor_id)
 {
 	uint64_t actor_template_hash = EngineUtils::HashString(template_name);
 
@@ -13,41 +13,7 @@ void TemplateDB::LoadTemplate(std::string template_name, rapidjson::Document& te
 
 	Actor actor_template;
 
-	if (template_json.HasMember("name")) {
-		actor_template.actor_name = template_json["name"].GetString();
-	}
-
-	if (template_json.HasMember("view")) {
-		actor_template.view = template_json["view"].GetString()[0];
-	}
-
-	if (template_json.HasMember("x")) {
-		actor_template.position.x = template_json["x"].GetInt();
-	}
-
-	if (template_json.HasMember("y")) {
-		actor_template.position.y = template_json["y"].GetInt();
-	}
-
-	if (template_json.HasMember("vel_x")) {
-		actor_template.velocity.x = template_json["vel_x"].GetInt();
-	}
-
-	if (template_json.HasMember("vel_y")) {
-		actor_template.velocity.y = template_json["vel_y"].GetInt();
-	}
-
-	if (template_json.HasMember("blocking")) {
-		actor_template.blocking = template_json["blocking"].GetBool();
-	}
-
-	if (template_json.HasMember("nearby_dialogue")) {
-		actor_template.nearby_dialogue = template_json["nearby_dialogue"].GetString();
-	}
-
-	if (template_json.HasMember("contact_dialogue")) {
-		actor_template.contact_dialogue = template_json["contact_dialogue"].GetString();
-	}
+	actor_template.ParseActorFromJson(renderer, imageDB, template_json, current_actor_id);
 
 	actor_templates[actor_template_hash] = actor_template;
 }

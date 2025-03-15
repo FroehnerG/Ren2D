@@ -3,6 +3,7 @@
 #include "Actor.h"
 #include "rapidjson/document.h"
 #include "EngineUtils.h"
+#include "ImageDB.h"
 
 using std::string;
 
@@ -18,7 +19,7 @@ public:
         return instance;
     }
 
-    void LoadTemplate(std::string template_name, rapidjson::Document& template_json);
+    void LoadTemplate(std::string template_name, SDL_Renderer* renderer, ImageDB* imageDB, rapidjson::Document& template_json, int current_actor_id);
     Actor UseTemplate(std::string template_name);
 
 private:

@@ -9,13 +9,14 @@
 #include "Actor.h"
 #include "rapidjson/document.h"
 #include "TemplateDB.h"
+#include "ImageDB.h"
 
 using std::vector, glm::ivec2, std::string;
 
 class SceneDB {
 public:
-	void LoadActors(rapidjson::Document& scene_json);
-	void LoadTemplate(string template_name);
+	void LoadActors(rapidjson::Document& scene_json, SDL_Renderer* renderer, ImageDB* imageDB);
+	void LoadTemplate(string template_name, SDL_Renderer* renderer, ImageDB* imageDB, int current_actor_id);
 	void Reset();
 	std::unordered_set<int>& GetScoreActors();
 	std::unordered_map<uint64_t, int>& GetBlockingPositionsToNum();

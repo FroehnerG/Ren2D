@@ -23,6 +23,8 @@ const ivec2 ADJACENT_OFFSETS[8] = {
 
 Engine::Engine(rapidjson::Document& game_config)
 {
+	rapidjson::Document scene_json;
+
 	if (game_config.HasMember("game_start_message")) {
 		game_start_message = game_config["game_start_message"].GetString();
 	}
@@ -49,10 +51,7 @@ Engine::Engine(rapidjson::Document& game_config)
 			exit(0);
 		}
 
-		rapidjson::Document scene_json;
 		EngineUtils::ReadJsonFile(scene_path, scene_json);
-
-		scene.LoadActors(scene_json);
 	}
 	else {
 		cout << "error: initial_scene unspecified";
@@ -63,9 +62,13 @@ Engine::Engine(rapidjson::Document& game_config)
 	renderer.SetRenderer(window);
 	SDL_SetRenderDrawColor(renderer.GetRenderer(), renderer.GetColor("red"), renderer.GetColor("green"), renderer.GetColor("blue"), 255);
 	SDL_RenderClear(renderer.GetRenderer());
-	images.LoadImages(game_config, renderer.GetRenderer(), "intro_image");
+	images.LoadImages(game_config, renderer.GetRenderer(), true, "", - 1);
 	text.LoadText(game_config, &images, true);
 	renderer.SetFont(&text);
+	audio.LoadAudio(game_config, "intro_bgm", true);
+	audio.LoadAudio(game_config, "gameplay_audio", false);
+
+	scene.LoadActors(scene_json, renderer.GetRenderer(), &images);
 }
 
 void Engine::GameLoop()
@@ -73,12 +76,14 @@ void Engine::GameLoop()
 	if (game_start_message != "")
 		cout << game_start_message << '\n';
 
+	audio.PlayMusic(true);
+
 	while (is_running) {
 		SDL_Event e;
 		while (Helper::SDL_PollEvent(&e)) {
 			if (e.type == SDL_QUIT) {
 				Helper::SDL_RenderPresent(renderer.GetRenderer());
-				exit(0);
+				is_running = false;
 			}
 
 			PlayIntro();
@@ -86,7 +91,7 @@ void Engine::GameLoop()
 
 		Input();
 		Update();
-		renderer.Render();
+		renderer.Render(GetActors());
 	}
 }
 
@@ -120,6 +125,13 @@ void Engine::PlayIntro()
 		SDL_RenderClear(renderer.GetRenderer());
 		renderer.RenderIntro(&images, &text, y_resolution);
 		Helper::SDL_RenderPresent(renderer.GetRenderer());
+	}
+
+	if (!images.IsIntroPlaying() && !text.IsIntroPlaying()) {
+		if (audio.HasIntroMusic()) {
+			audio.HaltMusic();
+		}
+		audio.PlayMusic(false);
 	}
 }
 
@@ -216,7 +228,7 @@ void Engine::LoadScene(string scene_name)
 
 	scene.Reset();
 
-	scene.LoadActors(scene_json);
+	scene.LoadActors(scene_json, renderer.GetRenderer(), &images);
 }
 
 SDL_Window* Engine::CreateWindow()
@@ -239,7 +251,7 @@ void Engine::Update()
 
 void Engine::Render()
 {
-	cout << RenderMap();
+	//cout << RenderMap();
 	ShowNPCDialogue();
 }
 
@@ -365,6 +377,7 @@ void Engine::CheckNPCDialogue(string dialogue, int actor_id)
 	}
 }
 
+/*
 std::string Engine::RenderMap()
 {
 	// Compute camera bounds directly based on the player's position
@@ -410,6 +423,7 @@ std::string Engine::RenderMap()
 
 	return rendered_map;
 }
+*/
 
 
 Actor* Engine::GetPlayer() { 

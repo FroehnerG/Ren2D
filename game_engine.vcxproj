@@ -74,7 +74,7 @@
     <IncludePath>$(ProjectDir)src\third_party\glm_0.9.9.8\glm\test\;$(ProjectDir)src\third_party\glm-0.9.9.8\glm\;$(ProjectDir)src\third_party\;$(ProjectDir)src\first_party\;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <IncludePath>$(ProjectDir)src\third_party\SDL2_image\;$(ProjectDir)src\third_party\SDL2\;$(ProjectDir)src\third_party\;$(ProjectDir)src\first_party\;$(ProjectDir)src\third_party\rapidjson-1.1.0\rapidjson-1.1.0\include\;$(ProjectDir)src\third_party\glm-0.9.9.8\glm\;$(IncludePath)</IncludePath>
+    <IncludePath>$(ProjectDir)src\third_party\SDL2_mixer\;$(ProjectDir)src\third_party\SDL2_image\;$(ProjectDir)src\third_party\SDL2\;$(ProjectDir)src\third_party\;$(ProjectDir)src\first_party\;$(ProjectDir)src\third_party\rapidjson-1.1.0\rapidjson-1.1.0\include\;$(ProjectDir)src\third_party\glm-0.9.9.8\glm\;$(IncludePath)</IncludePath>
     <LibraryPath>$(ProjectDir)src\third_party\SDL2_ttf\lib\;$(ProjectDir)src\third_party\SDL2_mixer\lib\;$(ProjectDir)src\third_party\SDL2_image\lib\;$(ProjectDir)src\third_party\SDL2\lib\;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -142,6 +142,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="src\first_party\Actor.h" />
+    <ClInclude Include="src\first_party\AudioDB.h" />
     <ClInclude Include="src\first_party\Engine.h" />
     <ClInclude Include="src\first_party\ImageDB.h" />
     <ClInclude Include="src\first_party\Renderer.h" />
@@ -1270,6 +1271,8 @@
     <None Include="src\third_party\glm-0.9.9.8\glm\glm\gtx\wrap.inl" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\first_party\Actor.cpp" />
+    <ClCompile Include="src\first_party\AudioDB.cpp" />
     <ClCompile Include="src\first_party\Engine.cpp" />
     <ClCompile Include="src\first_party\ImageDB.cpp" />
     <ClCompile Include="src\first_party\main.cpp" />

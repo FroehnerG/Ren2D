@@ -8,67 +8,32 @@
 using std::cout;
 namespace fs = std::filesystem;
 
-void SceneDB::LoadActors(rapidjson::Document& scene_json)
+void SceneDB::LoadActors(rapidjson::Document& scene_json, SDL_Renderer* renderer, ImageDB* imageDB)
 {
 	TemplateDB& templateDB = TemplateDB::GetInstance();
 	actors.reserve(10000);
 
-	for (const auto& actor_json : scene_json["actors"].GetArray()) {
+	for (auto& actor_json : scene_json["actors"].GetArray()) {
 		Actor actor;
+		actor.id = current_actor_id;
 
 		if (actor_json.HasMember("template")) {
 			// If template exists, use template and assign values to actor
 			string template_name = actor_json["template"].GetString();
 
 			// Will exit program if template file does not exist
-			LoadTemplate(template_name);
+			LoadTemplate(template_name, renderer, imageDB, current_actor_id);
 
 			actor = templateDB.UseTemplate(template_name);
 		}
 
-		// If values are specified after template, overwrite template's values
-		if (actor_json.HasMember("name")) {
-			actor.actor_name = actor_json["name"].GetString();
-		}
-
-		if (actor_json.HasMember("view")) {
-			actor.view = actor_json["view"].GetString()[0];
-		}
-
-		if (actor_json.HasMember("x")) {
-			actor.position.x = actor_json["x"].GetInt();
-		}
-
-		if (actor_json.HasMember("y")) {
-			actor.position.y = actor_json["y"].GetInt();
-		}
-
-		if (actor_json.HasMember("vel_x")) {
-			actor.velocity.x = actor_json["vel_x"].GetInt();
-		}
-
-		if (actor_json.HasMember("vel_y")) {
-			actor.velocity.y = actor_json["vel_y"].GetInt();
-		}
-
-		if (actor_json.HasMember("blocking")) {
-			actor.blocking = actor_json["blocking"].GetBool();
-		}
-
-		if (actor_json.HasMember("nearby_dialogue")) {
-			actor.nearby_dialogue = actor_json["nearby_dialogue"].GetString();
-		}
-
-		if (actor_json.HasMember("contact_dialogue")) {
-			actor.contact_dialogue = actor_json["contact_dialogue"].GetString();
-		}
+		actor.ParseActorFromJson(renderer, imageDB, actor_json, current_actor_id);
 
 		if (actor.blocking) {
 			uint64_t composite_position = EngineUtils::CreateCompositeKey(actor.position);
 			blocking_positions_to_num[composite_position]++;
 		}
 
-		actor.id = current_actor_id;
 		current_actor_id++;
 
 		actors.push_back(std::move(actor));
@@ -80,7 +45,7 @@ void SceneDB::LoadActors(rapidjson::Document& scene_json)
 	}
 }
 
-void SceneDB::LoadTemplate(string template_name)
+void SceneDB::LoadTemplate(string template_name, SDL_Renderer* renderer, ImageDB* imageDB, int current_actor_id)
 {
 	TemplateDB& templateDB = TemplateDB::GetInstance();
 	string template_path = "resources/actor_templates/" + template_name + ".template";
@@ -93,7 +58,7 @@ void SceneDB::LoadTemplate(string template_name)
 	rapidjson::Document template_json;
 	EngineUtils::ReadJsonFile(template_path, template_json);
 
-	templateDB.LoadTemplate(template_name, template_json);
+	templateDB.LoadTemplate(template_name, renderer, imageDB, template_json, current_actor_id);
 }
 
 void SceneDB::Reset()

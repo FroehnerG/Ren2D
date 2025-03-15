@@ -7,6 +7,7 @@
 #include "Renderer.h"
 #include "ImageDB.h"
 #include "TextDB.h"
+#include "AudioDB.h"
 
 using std::string, glm::ivec2, std::pair;
 
@@ -31,7 +32,7 @@ public:
 	void LoadScene(string scene_name);
 	SDL_Window* CreateWindow();
 	ivec2 InvertVelocity(ivec2 velocity);
-	string RenderMap();
+	// RenderMap();
 	Actor* GetPlayer();
 	std::vector<Actor>* GetActors();
 	std::unordered_set<int>* GetScoreActors();
@@ -57,4 +58,5 @@ private:
 	Renderer renderer;
 	ImageDB images;
 	TextDB text;
+	AudioDB audio;
 };
