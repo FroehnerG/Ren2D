@@ -12,6 +12,9 @@ public:
 	void HaltMusic();
 	bool HasIntroMusic();
 	bool HasGameplayMusic();
+
+	bool intro_music_playing = true;
+	bool gameplay_music_playing = true;
 private:
 	Mix_Chunk* intro_music = nullptr;
 	Mix_Chunk* gameplay_music = nullptr;
