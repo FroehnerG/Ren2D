@@ -102,14 +102,9 @@ void Engine::PlayIntro()
 		SDL_Event e;
 		while (Helper::SDL_PollEvent(&e)) {
 			if (e.type == SDL_QUIT) {
+				Helper::SDL_RenderPresent(renderer.GetRenderer());
 				exit(0);
 			}
-
-			SDL_SetRenderDrawColor(renderer.GetRenderer(), renderer.GetColor("red"), renderer.GetColor("green"), renderer.GetColor("blue"), 255);
-			SDL_RenderClear(renderer.GetRenderer());
-			renderer.RenderIntro(&images, &text, y_resolution);
-			Helper::SDL_RenderPresent(renderer.GetRenderer());
-			Helper::SDL_RenderPresent(renderer.GetRenderer());
 
 			// Handle advancing intro images
 			if (e.type == SDL_KEYDOWN) {
@@ -117,24 +112,20 @@ void Engine::PlayIntro()
 					e.key.keysym.scancode == SDL_SCANCODE_RETURN) {
 					images.AdvanceIntro();
 					text.AdvanceIntroText();
-					// **Render only intro image**
-					SDL_SetRenderDrawColor(renderer.GetRenderer(), renderer.GetColor("red"), renderer.GetColor("green"), renderer.GetColor("blue"), 255);
-					SDL_RenderClear(renderer.GetRenderer());
-					renderer.RenderIntro(&images, &text, y_resolution);
-					Helper::SDL_RenderPresent(renderer.GetRenderer());
 				}
 			}
 
 			if (e.type == SDL_MOUSEBUTTONDOWN && e.button.button == SDL_BUTTON_LEFT) {
 				images.AdvanceIntro();
 				text.AdvanceIntroText();
-				// **Render only intro image**
-				SDL_SetRenderDrawColor(renderer.GetRenderer(), renderer.GetColor("red"), renderer.GetColor("green"), renderer.GetColor("blue"), 255);
-				SDL_RenderClear(renderer.GetRenderer());
-				renderer.RenderIntro(&images, &text, y_resolution);
-				Helper::SDL_RenderPresent(renderer.GetRenderer());
 			}
 		}
+
+		// **Render only intro image**
+		SDL_SetRenderDrawColor(renderer.GetRenderer(), renderer.GetColor("red"), renderer.GetColor("green"), renderer.GetColor("blue"), 255);
+		SDL_RenderClear(renderer.GetRenderer());
+		renderer.RenderIntro(&images, &text, y_resolution);
+		Helper::SDL_RenderPresent(renderer.GetRenderer());
 	}
 
 	if (!images.IsIntroPlaying() && !text.IsIntroPlaying()) {
