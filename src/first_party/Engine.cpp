@@ -109,6 +109,7 @@ void Engine::PlayIntro()
 			SDL_RenderClear(renderer.GetRenderer());
 			renderer.RenderIntro(&images, &text, y_resolution);
 			Helper::SDL_RenderPresent(renderer.GetRenderer());
+			Helper::SDL_RenderPresent(renderer.GetRenderer());
 
 			// Handle advancing intro images
 			if (e.type == SDL_KEYDOWN) {
