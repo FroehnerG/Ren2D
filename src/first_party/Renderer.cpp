@@ -3,14 +3,14 @@
 Renderer::Renderer(SDL_Window* window, int r, int g, int b)
     : clear_color_r(r), clear_color_g(g), clear_color_b(b) {
     if (!window) {
-        std::cerr << "Error: Invalid SDL_Window pointer!" << std::endl;
+        std::cout << "Error: Invalid SDL_Window pointer!" << std::endl;
         sdl_renderer = nullptr;
         return;
     }
 
     sdl_renderer = Helper::SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
     if (!sdl_renderer) {
-        std::cerr << "SDL_CreateRenderer Error: " << SDL_GetError() << std::endl;
+        std::cout << "SDL_CreateRenderer Error: " << SDL_GetError() << std::endl;
     }
 }
 
@@ -68,11 +68,10 @@ void Renderer::Render(vector<Actor>* actors)
         int screen_y = actor.position.y * 100;
 
         // Use the already defined view_pivot_offset
-        SDL_Point pivot = { static_cast<int>(actor.view_pivot_offset.x),
-                            static_cast<int>(actor.view_pivot_offset.y) };
+        SDL_FPoint pivot = { actor.view_pivot_offset.x, actor.view_pivot_offset.y };
 
         // Define the destination rectangle
-        SDL_Rect dstrect;
+        SDL_FRect dstrect;
         dstrect.x = screen_x - pivot.x;  // Offset by pivot
         dstrect.y = screen_y - pivot.y;
         dstrect.w = img_width;
@@ -84,7 +83,9 @@ void Renderer::Render(vector<Actor>* actors)
         if (actor.transform_scale.y < 0) flip = static_cast<SDL_RendererFlip>(flip | SDL_FLIP_VERTICAL);
 
         // Render the actor with rotation, scaling, and flipping
-        SDL_RenderCopyEx(
+        Helper::SDL_RenderCopyEx(
+            actor.id,
+            actor.actor_name,
             sdl_renderer,
             actor.view_image,
             nullptr,  // Full texture 

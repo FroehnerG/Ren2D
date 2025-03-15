@@ -1,4 +1,5 @@
 #include "Actor.h"
+#include "Helper.h"
 
 void Actor::ParseActorFromJson(SDL_Renderer* renderer, ImageDB* imageDB, rapidjson::Value& actor_json, int current_actor_id)
 {
@@ -43,11 +44,11 @@ void Actor::ParseActorFromJson(SDL_Renderer* renderer, ImageDB* imageDB, rapidjs
         imageDB->LoadImages(actor_json, renderer, false, image_name, current_actor_id);
 
         // TODO: Set default view_pivot_offset based on image height and width
-        int width, height;
-        SDL_QueryTexture(imageDB->GetActorTextureById(current_actor_id), nullptr, nullptr, &width, &height);
+        float width, height;
+        Helper::SDL_QueryTexture(imageDB->GetActorTextureById(current_actor_id), &width, &height);
 
-        view_pivot_offset.x = float(width * 0.5f);
-        view_pivot_offset.y = float(height * 0.5f);
+        view_pivot_offset.x = width * 0.5f;
+        view_pivot_offset.y = height * 0.5f;
     }
 
 
