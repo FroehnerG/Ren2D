@@ -15,7 +15,7 @@ void EngineUtils::ReadJsonFile(const std::string& path, rapidjson::Document& out
 #endif
 
     if (!file_pointer) {
-        std::cerr << "Error: Unable to open JSON file: " << path << std::endl;
+        std::cout << "Error: Unable to open JSON file: " << path << std::endl;
         return;
     }
 
@@ -25,7 +25,7 @@ void EngineUtils::ReadJsonFile(const std::string& path, rapidjson::Document& out
     std::fclose(file_pointer);
 
     if (out_document.HasParseError()) {
-        std::cerr << "Error parsing JSON at [" << path << "]" << std::endl;
+        std::cout << "Error parsing JSON at [" << path << "]" << std::endl;
         exit(1);
     }
 }

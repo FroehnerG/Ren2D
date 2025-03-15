@@ -60,8 +60,8 @@ void Renderer::Render(vector<Actor>* actors)
         }
 
         // Get image width and height
-        int img_width = 0, img_height = 0;
-        SDL_QueryTexture(actor.view_image, nullptr, nullptr, &img_width, &img_height);
+        float img_width = 0, img_height = 0;
+        Helper::SDL_QueryTexture(actor.view_image, &img_width, &img_height);
 
         // Convert actor position from in-game units to screen pixels
         int screen_x = actor.position.x * 100;
