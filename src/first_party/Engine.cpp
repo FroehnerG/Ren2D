@@ -146,6 +146,7 @@ void Engine::PlayIntro()
 			}
 		}
 
+
 		// **Render only intro image**
 		SDL_SetRenderDrawColor(renderer.GetRenderer(), renderer.GetColor("red"), renderer.GetColor("green"), renderer.GetColor("blue"), 255);
 		SDL_RenderClear(renderer.GetRenderer());
