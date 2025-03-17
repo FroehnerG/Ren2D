@@ -89,9 +89,16 @@ void Engine::GameLoop()
 				PlayIntro();
 			}
 
-			if (!images.IsIntroPlaying() && !text.IsIntroPlaying() && !audio.gameplay_music_playing) {
-				audio.PlayMusic(false);
-				audio.gameplay_music_playing = true;
+			if (!images.IsIntroPlaying() && !text.IsIntroPlaying()) {
+				if (audio.HasIntroMusic() && audio.intro_music_playing) {
+					audio.HaltMusic();
+					audio.intro_music_playing = false;
+				}
+
+				if (audio.HasGameplayMusic() && !audio.gameplay_music_playing) {
+					audio.PlayMusic(false);
+					audio.gameplay_music_playing = true;
+				}
 			}
 		}
 
