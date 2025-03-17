@@ -88,6 +88,11 @@ void Engine::GameLoop()
 				audio.PlayMusic(true);
 				PlayIntro();
 			}
+
+			if (!images.IsIntroPlaying() && !text.IsIntroPlaying() && !audio.gameplay_music_playing) {
+				audio.PlayMusic(false);
+				audio.gameplay_music_playing = true;
+			}
 		}
 
 		Input();
