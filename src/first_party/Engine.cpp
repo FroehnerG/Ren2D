@@ -88,24 +88,11 @@ void Engine::GameLoop()
 				audio.PlayMusic(true);
 				PlayIntro();
 			}
-
-			if (!images.IsIntroPlaying() && !text.IsIntroPlaying()) {
-				if (audio.HasIntroMusic() && audio.intro_music_playing) {
-					audio.HaltMusic();
-					audio.intro_music_playing = false;
-				}
-
-				if (audio.HasGameplayMusic() && !audio.gameplay_music_playing) {
-					audio.PlayMusic(false);
-					audio.gameplay_music_playing = true;
-				}
-			
-			}
 		}
 
 		Input();
 		Update();
-		renderer.Render(GetActors());
+		renderer.Render(GetActors(), x_resolution, y_resolution);
 	}
 }
 
@@ -140,6 +127,18 @@ void Engine::PlayIntro()
 		SDL_RenderClear(renderer.GetRenderer());
 		renderer.RenderIntro(&images, &text, y_resolution);
 		Helper::SDL_RenderPresent(renderer.GetRenderer());
+	}
+
+	if (!images.IsIntroPlaying() && !text.IsIntroPlaying()) {
+		if (audio.HasIntroMusic() && audio.intro_music_playing) {
+			audio.HaltMusic();
+			audio.intro_music_playing = false;
+		}
+
+		if (audio.HasGameplayMusic() && !audio.gameplay_music_playing) {
+			audio.PlayMusic(false);
+			audio.gameplay_music_playing = true;
+		}
 	}
 }
 

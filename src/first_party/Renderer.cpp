@@ -48,7 +48,7 @@ void Renderer::SetClearColor(int r, int g, int b)
     clear_color_b = b;
 }
 
-void Renderer::Render(vector<Actor>* actors)
+void Renderer::Render(vector<Actor>* actors, int& x_resolution, int& y_resolution)
 {
     // Set background color
     SDL_SetRenderDrawColor(sdl_renderer, clear_color_r, clear_color_g, clear_color_b, 255);
@@ -63,9 +63,9 @@ void Renderer::Render(vector<Actor>* actors)
         float img_width = 0, img_height = 0;
         Helper::SDL_QueryTexture(actor.view_image, &img_width, &img_height);
 
-        // Convert actor position from in-game units to screen pixels
-        int screen_x = actor.position.x * 100;
-        int screen_y = actor.position.y * 100;
+        // Convert actor position from in-game units to screen pixels, centered 
+        int screen_x = (x_resolution / 2) + actor.position.x * 100;
+        int screen_y = (y_resolution / 2) + actor.position.y * 100;
 
         // Use the already defined view_pivot_offset
         SDL_FPoint pivot = { actor.view_pivot_offset.x, actor.view_pivot_offset.y };

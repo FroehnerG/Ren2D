@@ -15,6 +15,14 @@ void Actor::ParseActorFromJson(SDL_Renderer* renderer, ImageDB* imageDB, rapidjs
         position.y = actor_json["transform_position_y"].GetFloat();
     }
 
+    if (actor_json.HasMember("transform_scale_x")) {
+        transform_scale.x = actor_json["transform_scale_x"].GetFloat();
+    }
+
+    if (actor_json.HasMember("transform_scale_y")) {
+        transform_scale.y = actor_json["transform_scale_y"].GetFloat();
+    }
+
     if (actor_json.HasMember("vel_x")) {
         velocity.x = actor_json["vel_x"].GetInt();
     }
@@ -42,6 +50,8 @@ void Actor::ParseActorFromJson(SDL_Renderer* renderer, ImageDB* imageDB, rapidjs
     if (actor_json.HasMember("view_image")) {
         std::string image_name = actor_json["view_image"].GetString();
         imageDB->LoadImages(actor_json, renderer, false, image_name, current_actor_id);
+
+        view_image = imageDB->GetActorTextureById(current_actor_id);
 
         // TODO: Set default view_pivot_offset based on image height and width
         float width, height;
