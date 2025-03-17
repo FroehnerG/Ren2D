@@ -122,23 +122,23 @@ void Engine::PlayIntro()
 			}
 		}
 
+		if (!images.IsIntroPlaying() && !text.IsIntroPlaying()) {
+			if (audio.HasIntroMusic() && audio.intro_music_playing) {
+				audio.HaltMusic();
+				audio.intro_music_playing = false;
+			}
+
+			if (audio.HasGameplayMusic() && !audio.gameplay_music_playing) {
+				audio.PlayMusic(false);
+				audio.gameplay_music_playing = true;
+			}
+		}
+
 		// **Render only intro image**
 		SDL_SetRenderDrawColor(renderer.GetRenderer(), renderer.GetColor("red"), renderer.GetColor("green"), renderer.GetColor("blue"), 255);
 		SDL_RenderClear(renderer.GetRenderer());
 		renderer.RenderIntro(&images, &text, y_resolution);
 		Helper::SDL_RenderPresent(renderer.GetRenderer());
-	}
-
-	if (!images.IsIntroPlaying() && !text.IsIntroPlaying()) {
-		if (audio.HasIntroMusic() && audio.intro_music_playing) {
-			audio.HaltMusic();
-			audio.intro_music_playing = false;
-		}
-
-		if (audio.HasGameplayMusic() && !audio.gameplay_music_playing) {
-			audio.PlayMusic(false);
-			audio.gameplay_music_playing = true;
-		}
 	}
 }
 

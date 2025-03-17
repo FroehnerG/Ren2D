@@ -74,8 +74,8 @@ void Renderer::Render(vector<Actor>* actors, int& x_resolution, int& y_resolutio
         SDL_FRect dstrect;
         dstrect.x = screen_x - pivot.x;  // Offset by pivot
         dstrect.y = screen_y - pivot.y;
-        dstrect.w = img_width;
-        dstrect.h = img_height;
+        dstrect.w = img_width * actor.transform_scale.x;
+        dstrect.h = img_height * actor.transform_scale.y;
 
         // Determine Flip State (based on transform_scale)
         SDL_RendererFlip flip = SDL_FLIP_NONE;
