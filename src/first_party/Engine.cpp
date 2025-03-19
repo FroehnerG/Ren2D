@@ -110,10 +110,10 @@ void Engine::GameLoop()
 		Update();
 
 		if (GetPlayer() != nullptr) {
-			renderer.Render(GetActors(), x_resolution, y_resolution, images.GetHPImage(), player_health, score);
+			renderer.Render(GetActors(), GetPlayer(), x_resolution, y_resolution, images.GetHPImage(), player_health, score);
 		}
 		else {
-			renderer.Render(GetActors(), x_resolution, y_resolution, nullptr, std::nullopt, score);
+			renderer.Render(GetActors(), GetPlayer(), x_resolution, y_resolution, nullptr, std::nullopt, score);
 		}
 	}
 }
@@ -304,6 +304,18 @@ void Engine::InitResolution(rapidjson::Document& rendering_config)
 
 		renderer.SetClearColor(r, g, b);
 	}
+
+	glm::ivec2 cam_offset = glm::ivec2(0, 0);
+
+	if (rendering_config.HasMember("cam_offset_x")) {
+		cam_offset.x = rendering_config["cam_offset_x"].GetInt();
+	}
+
+	if (rendering_config.HasMember("cam_offset_y")) {
+		cam_offset.y = rendering_config["cam_offset_y"].GetInt();
+	}
+
+	renderer.SetCamOffset(cam_offset);
 }
 
 void Engine::ShowScoreAndHealth()

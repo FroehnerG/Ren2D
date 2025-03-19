@@ -48,11 +48,23 @@ void Renderer::SetClearColor(int r, int g, int b)
     clear_color_b = b;
 }
 
-void Renderer::Render(vector<Actor>* actors, int& x_resolution, int& y_resolution, SDL_Texture* hp_image, std::optional<int> health, int& score)
+void Renderer::SetCamOffset(glm::ivec2 cam_offset_in)
+{
+    cam_offset = cam_offset_in;
+}
+
+
+void Renderer::Render(vector<Actor>* actors, Actor* player, int& x_resolution, int& y_resolution, SDL_Texture* hp_image, std::optional<int> health, int& score)
 {
     // Set background color
     SDL_SetRenderDrawColor(sdl_renderer, clear_color_r, clear_color_g, clear_color_b, 255);
     SDL_RenderClear(sdl_renderer);
+
+    glm::ivec2 camera_position = glm::ivec2(0, 0);
+
+    if (player) {
+        camera_position = player->position;
+    }
 
     for (const auto& actor : *actors) {
         if (actor.view_image == nullptr) {
@@ -64,8 +76,8 @@ void Renderer::Render(vector<Actor>* actors, int& x_resolution, int& y_resolutio
         Helper::SDL_QueryTexture(actor.view_image, &img_width, &img_height);
 
         // Convert actor position from in-game units to screen pixels, centered 
-        int screen_x = (x_resolution / 2) + actor.position.x * 100;
-        int screen_y = (y_resolution / 2) + actor.position.y * 100;
+        int screen_x = (x_resolution / 2) + (actor.position.x - camera_position.x) * 100 + cam_offset.x;
+        int screen_y = (y_resolution / 2) + (actor.position.y - camera_position.y) * 100 + cam_offset.y;
 
         // Use the already defined view_pivot_offset
         SDL_FPoint pivot = { actor.view_pivot_offset.x, actor.view_pivot_offset.y };
