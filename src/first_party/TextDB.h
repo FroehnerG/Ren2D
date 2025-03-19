@@ -9,6 +9,7 @@
 class TextDB {
 public:
 	void LoadText(rapidjson::Document& game_config, ImageDB* images, bool is_intro_text);
+	void SetTextFont(rapidjson::Document& game_config);
 	void AdvanceIntroText();
 	TTF_Font* GetTextFont();
 	std::string GetCurrentIntroText();

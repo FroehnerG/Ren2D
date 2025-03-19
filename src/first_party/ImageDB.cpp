@@ -34,6 +34,31 @@ void ImageDB::LoadImages(rapidjson::Value& image_json, SDL_Renderer* renderer, b
 		return;
 	}
 
+    if (image_name == "hp_image") {
+        if (image_json.HasMember("hp_image")) {
+            // Load actor view image
+            std::string hp_image_name = image_json["hp_image"].GetString();
+            std::string hp_image_path = "resources/images/" + hp_image_name + ".png";
+
+            if (!fs::exists(hp_image_path)) {
+                std::cout << "error: missing image " << image_name;
+                exit(0);
+            }
+
+            SDL_Texture* texture = IMG_LoadTexture(renderer, hp_image_path.c_str());
+            if (!texture) {
+                std::cout << "error: failed to load texture " << image_name
+                    << " (" << IMG_GetError() << ")" << std::endl;
+                exit(0);
+            }
+            hp_image = texture;
+            return;
+        }
+
+        std::cout << "error: player actor requires an hp_image be defined";
+        exit(0);
+    }
+
     // Load actor view image
     std::string image_path = "resources/images/" + image_name + ".png";
 
@@ -64,6 +89,11 @@ SDL_Texture* ImageDB::GetLastIntroImage()
 SDL_Texture* ImageDB::GetActorTextureById(int actor_id)
 {
     return actor_textures[actor_id];
+}
+
+SDL_Texture* ImageDB::GetHPImage()
+{
+    return hp_image;
 }
 
 void ImageDB::AdvanceIntro()

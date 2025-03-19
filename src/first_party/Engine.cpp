@@ -62,13 +62,17 @@ Engine::Engine(rapidjson::Document& game_config)
 	renderer.SetRenderer(window);
 	SDL_SetRenderDrawColor(renderer.GetRenderer(), renderer.GetColor("red"), renderer.GetColor("green"), renderer.GetColor("blue"), 255);
 	SDL_RenderClear(renderer.GetRenderer());
-	images.LoadImages(game_config, renderer.GetRenderer(), true, "", - 1);
+	images.LoadImages(game_config, renderer.GetRenderer(), true, "", - 1); // Load intro
 	text.LoadText(game_config, &images, true);
 	renderer.SetFont(&text);
 	audio.LoadAudio(game_config, "intro_bgm", true);
 	audio.LoadAudio(game_config, "gameplay_audio", false);
 
 	scene.LoadActors(scene_json, renderer.GetRenderer(), &images);
+
+	if (GetPlayer() != nullptr) {
+		images.LoadImages(game_config, renderer.GetRenderer(), false, "hp_image", -1);
+	}
 }
 
 void Engine::GameLoop()
@@ -102,9 +106,15 @@ void Engine::GameLoop()
 			}
 		}
 
-		Input();
+		//Input();
 		Update();
-		renderer.Render(GetActors(), x_resolution, y_resolution);
+
+		if (GetPlayer() != nullptr) {
+			renderer.Render(GetActors(), x_resolution, y_resolution, images.GetHPImage(), player_health, score);
+		}
+		else {
+			renderer.Render(GetActors(), x_resolution, y_resolution, nullptr, std::nullopt, score);
+		}
 	}
 }
 

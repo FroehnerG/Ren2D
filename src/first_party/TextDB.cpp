@@ -7,6 +7,10 @@ namespace fs = std::filesystem;
 
 void TextDB::LoadText(rapidjson::Document& game_config, ImageDB* images, bool is_intro_text)
 {
+	if (game_config.HasMember("font")) {
+		SetTextFont(game_config);
+	}
+
 	if (is_intro_text) {
 		if (!game_config.HasMember("intro_image")) {
 			return;
@@ -16,13 +20,25 @@ void TextDB::LoadText(rapidjson::Document& game_config, ImageDB* images, bool is
 			has_intro_text = false;
 			return;
 		}
+		// if intro_text specified but no intro_text
+		else {
+			if (!game_config.HasMember("font")) {
+				std::cout << "error: text render failed. No font configured";
+				exit(0);
+			}
+		}
 	}
 
-	if (!game_config.HasMember("font")) {
-		std::cout << "error: text render failed. No font configured";
-		exit(0);
+	for (const auto& text : game_config["intro_text"].GetArray()) {
+		intro_text.push_back(text.GetString());
 	}
+	
+	if (intro_text.size() == 0) {
+		has_intro_text = false;
+	}
+}
 
+void TextDB::SetTextFont(rapidjson::Document& game_config) {
 	std::string font_name = game_config["font"].GetString();
 
 	std::string font_path = "resources/fonts/" + font_name + ".ttf";
@@ -36,14 +52,6 @@ void TextDB::LoadText(rapidjson::Document& game_config, ImageDB* images, bool is
 
 	if (!text_font) {
 		exit(0);
-	}
-
-	for (const auto& text : game_config["intro_text"].GetArray()) {
-		intro_text.push_back(text.GetString());
-	}
-	
-	if (intro_text.size() == 0) {
-		has_intro_text = false;
 	}
 }
 

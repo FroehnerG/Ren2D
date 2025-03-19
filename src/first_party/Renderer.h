@@ -1,5 +1,6 @@
 #pragma once
 #include <string>
+#include <optional>
 #include "EngineUtils.h"
 #include "SDL2/SDL.h"
 #include "Helper.h"
@@ -18,9 +19,10 @@ public:
     void SetFont(TextDB* textDB);
 	void SetRenderer(SDL_Window* window);
     void SetClearColor(int r, int g, int b);
-	void Render(vector<Actor>* actors, int& x_resolution, int& y_resolution);
+	void Render(vector<Actor>* actors, int& x_resolution, int& y_resolution, SDL_Texture* hp_image, std::optional<int> health, int& score);
     // New methods for rendering images
-    void RenderIntro(ImageDB* imageDB, TextDB* textDB, int y_resolution);
+    void RenderIntro(ImageDB* imageDB, TextDB* textDB, int& y_resolution);
+    void RenderHealth(SDL_Texture* hp_image, int& health, int& x_resolution, int& y_resolution);
     void DrawText(const std::string& text_content, int font_size, SDL_Color font_color, int x, int y);
 
 private:

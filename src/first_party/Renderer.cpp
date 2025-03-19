@@ -48,7 +48,7 @@ void Renderer::SetClearColor(int r, int g, int b)
     clear_color_b = b;
 }
 
-void Renderer::Render(vector<Actor>* actors, int& x_resolution, int& y_resolution)
+void Renderer::Render(vector<Actor>* actors, int& x_resolution, int& y_resolution, SDL_Texture* hp_image, std::optional<int> health, int& score)
 {
     // Set background color
     SDL_SetRenderDrawColor(sdl_renderer, clear_color_r, clear_color_g, clear_color_b, 255);
@@ -96,12 +96,18 @@ void Renderer::Render(vector<Actor>* actors, int& x_resolution, int& y_resolutio
         );
     }
 
+    if (health != std::nullopt) {
+        std::string score_text = "score : " + std::to_string(score);
+
+        RenderHealth(hp_image, *health, x_resolution, y_resolution);
+        DrawText(score_text, 16, { 255, 255, 255, 255 }, 5, 5);
+    }
 
     // Present the frame (finish rendering)
     Helper::SDL_RenderPresent(sdl_renderer);
 }
 
-void Renderer::RenderIntro(ImageDB* imageDB, TextDB* textDB, int y_resolution)
+void Renderer::RenderIntro(ImageDB* imageDB, TextDB* textDB, int& y_resolution)
 {
     if (imageDB->IsIntroPlaying() && textDB->IsIntroPlaying()) {
         Helper::SDL_RenderCopy(sdl_renderer, imageDB->GetCurrentIntroImage(), nullptr, nullptr);
@@ -117,6 +123,38 @@ void Renderer::RenderIntro(ImageDB* imageDB, TextDB* textDB, int y_resolution)
         if (textDB->GetHasIntroText()) {
             DrawText(textDB->GetLastIntroText(), 16, { 255, 255, 255, 255 }, 25, (y_resolution - 50));
         }
+    }
+}
+
+void Renderer::RenderHealth(SDL_Texture* hp_image, int& health, int& x_resolution, int& y_resolution)
+{    // Get image width and height
+    float img_width = 0, img_height = 0;
+    Helper::SDL_QueryTexture(hp_image, &img_width, &img_height);
+
+    for (int i = 0; i < health; i++) {
+        // Convert actor position from in-game units to screen pixels, centered 
+        int screen_x = 5 + (i * (img_width + 5));
+        int screen_y = 25;
+
+        // Define the destination rectangle
+        SDL_FRect dstrect;
+        dstrect.x = screen_x;
+        dstrect.y = screen_y;
+        dstrect.w = img_width;
+        dstrect.h = img_height;
+
+        // Render the actor with rotation, scaling, and flipping
+        Helper::SDL_RenderCopyEx(
+            -1,
+            "heart",
+            sdl_renderer,
+            hp_image,
+            nullptr,  // Full texture 
+            &dstrect,
+            0,
+            nullptr,
+            SDL_FLIP_NONE
+        );
     }
 }
 
