@@ -19,7 +19,7 @@ public:
     void SetFont(TextDB* textDB);
 	void SetRenderer(SDL_Window* window);
     void SetClearColor(int r, int g, int b);
-    void SetCamOffset(glm::ivec2 cam_offset_in);
+    void SetCamOffset(glm::vec2 cam_offset_in);
 	void Render(vector<Actor>* actors, Actor* player, int& x_resolution, int& y_resolution, SDL_Texture* hp_image, std::optional<int> health, int& score);
     // New methods for rendering images
     void RenderIntro(ImageDB* imageDB, TextDB* textDB, int& y_resolution);
@@ -29,7 +29,7 @@ public:
 private:
 	SDL_Renderer* sdl_renderer = nullptr;
     TTF_Font* text_font = nullptr;
-    glm::ivec2 cam_offset = glm::ivec2(0, 0);
+    glm::vec2 cam_offset = glm::vec2(0.0f, 0.0f);
     int clear_color_r = 255;
     int clear_color_g = 255;
     int clear_color_b = 255;

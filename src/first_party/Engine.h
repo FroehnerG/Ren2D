@@ -9,7 +9,7 @@
 #include "TextDB.h"
 #include "AudioDB.h"
 
-using std::string, glm::ivec2, std::pair;
+using std::string, glm::vec2, std::pair;
 
 class Engine
 {
@@ -23,15 +23,15 @@ public:
 	void Render();
 	void InitResolution(rapidjson::Document& rendering_config);
 	void ShowScoreAndHealth();
-	bool IsPositionValid(ivec2 position);
-	bool IsNPCAdjacent(ivec2 NPC_position);
-	bool IsNPCInSameCell(ivec2 NPC_position);
+	bool IsPositionValid(vec2 position);
+	bool IsNPCAdjacent(vec2 NPC_position);
+	bool IsNPCInSameCell(vec2 NPC_position);
 	void ShowNPCDialogue();
 	void CheckNPCDialogue(string dialogue, int actor_id);
 	void MoveNPCs();
 	void LoadScene(string scene_name);
 	SDL_Window* CreateWindow();
-	ivec2 InvertVelocity(ivec2 velocity);
+	ivec2 InvertVelocity(vec2 velocity);
 	// RenderMap();
 	Actor* GetPlayer();
 	std::vector<Actor>* GetActors();

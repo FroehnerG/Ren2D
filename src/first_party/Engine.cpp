@@ -10,15 +10,15 @@ namespace fs = std::filesystem;
 const string prompt = "Please make a decision...\n";
 const string options = "Your options are \"n\", \"e\", \"s\", \"w\", \"quit\"\n";
 
-const ivec2 ADJACENT_OFFSETS[8] = {
-	ivec2(0, -1), 
-	ivec2(0, 1), 
-	ivec2(-1, 0), 
-	ivec2(1, 0), // Cardinal directions
-	ivec2(-1, -1), 
-	ivec2(-1, 1), 
-	ivec2(1, -1), 
-	ivec2(1, 1) // Diagonal directions
+const vec2 ADJACENT_OFFSETS[8] = {
+	vec2(0, -1), 
+	vec2(0, 1), 
+	vec2(-1, 0), 
+	vec2(1, 0), // Cardinal directions
+	vec2(-1, -1), 
+	vec2(-1, 1), 
+	vec2(1, -1), 
+	vec2(1, 1) // Diagonal directions
 };
 
 Engine::Engine(rapidjson::Document& game_config)
@@ -106,7 +106,7 @@ void Engine::GameLoop()
 			}
 		}
 
-		//Input();
+		Input();
 		Update();
 
 		if (GetPlayer() != nullptr) {
@@ -169,38 +169,32 @@ void Engine::Input()
 {
 	Actor* player = GetPlayer();
 
-	if (player != nullptr) {
-		ShowScoreAndHealth();
-		cout << prompt << options;
+	if (player == nullptr) {
+		return;
+	}
 
-		cin >> user_input;
-
-		if (user_input == "quit") {
-			if (game_over_bad_message != "")
-				cout << game_over_bad_message;
-
-			is_running = false;
-			return;
-		}
-		else if (user_input == "n") {
-			player->velocity = ivec2(0, -1);
-		}
-		else if (user_input == "e") {
-			player->velocity = ivec2(1, 0);
-		}
-		else if (user_input == "s") {
-			player->velocity = ivec2(0, 1);
-		}
-		else if (user_input == "w") {
-			player->velocity = ivec2(-1, 0);
-		}
-		else {
-			player->velocity = ivec2(0, 0);
+	SDL_Event e;
+	while (Helper::SDL_PollEvent(&e)) {
+		// Handle advancing intro images
+		if (e.type == SDL_KEYDOWN) {
+			if (e.key.keysym.scancode == SDL_SCANCODE_UP) {
+				player->velocity = vec2(0.0f, -1.0f);
+			}
+			else if (e.key.keysym.scancode == SDL_SCANCODE_LEFT) {
+				player->velocity = vec2(1.0f, 0.0f);
+			}
+			else if (e.key.keysym.scancode == SDL_SCANCODE_DOWN) {
+				player->velocity = vec2(0.0f, 1.0f);
+			}
+			else if (e.key.keysym.scancode == SDL_SCANCODE_RIGHT) {
+				player->velocity = vec2(-1.0f, 0.0f);
+			}
 		}
 	}
+
 }
 
-bool Engine::IsPositionValid(ivec2 position)
+bool Engine::IsPositionValid(vec2 position)
 {
 	uint64_t composite_position = EngineUtils::CreateCompositeKey(position);
 
@@ -220,8 +214,8 @@ void Engine::MoveNPCs()
 	vector<Actor>* actors = GetActors();
 	// Go through each actor in actor vector and move them
 	for (auto& actor : *actors) {
-		if (actor.velocity != ivec2(0, 0)) {
-			ivec2 new_actor_position = actor.position + actor.velocity;
+		if (actor.velocity != vec2(0.0f, 0.0f)) {
+			vec2 new_actor_position = actor.position + actor.velocity;
 
 			// If actor can move to new location, move them
 			if (IsPositionValid(new_actor_position)) {
@@ -269,9 +263,9 @@ SDL_Window* Engine::CreateWindow()
 	return Helper::SDL_CreateWindow(game_title_cstr.data(), 500, 500, x_resolution, y_resolution, SDL_WINDOW_SHOWN);
 }
 
-ivec2 Engine::InvertVelocity(ivec2 velocity)
+ivec2 Engine::InvertVelocity(vec2 velocity)
 {
-	return ivec2(velocity.x * -1, velocity.y * -1);
+	return vec2(velocity.x * -1, velocity.y * -1);
 }
 
 void Engine::Update()
@@ -305,14 +299,14 @@ void Engine::InitResolution(rapidjson::Document& rendering_config)
 		renderer.SetClearColor(r, g, b);
 	}
 
-	glm::ivec2 cam_offset = glm::ivec2(0, 0);
+	glm::vec2 cam_offset = glm::vec2(0.0f, 0.0f);
 
 	if (rendering_config.HasMember("cam_offset_x")) {
-		cam_offset.x = rendering_config["cam_offset_x"].GetInt();
+		cam_offset.x = rendering_config["cam_offset_x"].GetFloat();
 	}
 
 	if (rendering_config.HasMember("cam_offset_y")) {
-		cam_offset.y = rendering_config["cam_offset_y"].GetInt();
+		cam_offset.y = rendering_config["cam_offset_y"].GetFloat();
 	}
 
 	renderer.SetCamOffset(cam_offset);
@@ -323,13 +317,13 @@ void Engine::ShowScoreAndHealth()
 	cout << "health : " << player_health << ", score : " << score << '\n';
 }
 
-bool Engine::IsNPCAdjacent(ivec2 NPC_position)
+bool Engine::IsNPCAdjacent(vec2 NPC_position)
 {
 	// Check all neighbors
 	Actor* player = GetPlayer();
 
 	for (const auto& offset : ADJACENT_OFFSETS) {
-		ivec2 neighbor_position = player->position + offset;
+		vec2 neighbor_position = player->position + offset;
 
 		if (NPC_position == neighbor_position) {
 			return true; // Found an adjacent actor
@@ -339,7 +333,7 @@ bool Engine::IsNPCAdjacent(ivec2 NPC_position)
 	return false;
 }
 
-bool Engine::IsNPCInSameCell(ivec2 NPC_position)
+bool Engine::IsNPCInSameCell(vec2 NPC_position)
 {
 	if (NPC_position == GetPlayer()->position) {
 		return true;
