@@ -126,6 +126,10 @@ void Engine::GameLoop()
 			}
 		}
 
+		if (current_frame == 78) {
+			//cout << "test";
+		}
+
 		if (!images.IsIntroPlaying() && !text.IsIntroPlaying()) {
 			Update();
 		}
@@ -136,9 +140,11 @@ void Engine::GameLoop()
 
 		if (GetPlayer() != nullptr) {
 			renderer.Render(GetActors(), &dialogue, GetPlayer(), x_resolution, y_resolution, images.GetHPImage(), player_health, score);
+			//cout << current_frame << '\n';
 		}
 		else {
 			renderer.Render(GetActors(), &dialogue, GetPlayer(), x_resolution, y_resolution, nullptr, std::nullopt, score);
+			//cout << current_frame << '\n';
 		}
 	}
 }
