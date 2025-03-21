@@ -126,7 +126,9 @@ void Engine::GameLoop()
 			}
 		}
 
-		Update();
+		if (!images.IsIntroPlaying() && !text.IsIntroPlaying()) {
+			Update();
+		}
 
 		vector<string> dialogue;
 
@@ -299,7 +301,9 @@ ivec2 Engine::InvertVelocity(vec2 velocity)
 
 void Engine::Update()
 {
-	MoveNPCs();
+	if (current_frame != 0 && current_frame % 60 == 0) {
+		MoveNPCs();
+	}
 }
 
 void Engine::Render(vector<string>* dialogue)
