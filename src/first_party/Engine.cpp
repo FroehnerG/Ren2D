@@ -126,16 +126,16 @@ void Engine::GameLoop()
 				}
 				Update();
 
-				vector<string> dialogue;
+			}
+			vector<string> dialogue;
 
-				Render(&dialogue);
+			Render(&dialogue);
 
-				if (GetPlayer() != nullptr) {
-					renderer.Render(GetActors(), &dialogue, GetPlayer(), x_resolution, y_resolution, images.GetHPImage(), player_health, score);
-				}
-				else {
-					renderer.Render(GetActors(), &dialogue, GetPlayer(), x_resolution, y_resolution, nullptr, std::nullopt, score);
-				}
+			if (GetPlayer() != nullptr) {
+				renderer.Render(GetActors(), &dialogue, GetPlayer(), x_resolution, y_resolution, images.GetHPImage(), player_health, score);
+			}
+			else {
+				renderer.Render(GetActors(), &dialogue, GetPlayer(), x_resolution, y_resolution, nullptr, std::nullopt, score);
 			}
 		}
 	}
