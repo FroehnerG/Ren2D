@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string>
+#include <optional>
 #include "glm/glm.hpp"
 #include "SDL2/SDL.h"
 #include "rapidjson/document.h"
@@ -21,6 +22,7 @@ public:
     bool blocking = false;
     std::string nearby_dialogue = "";
     std::string contact_dialogue = "";
+    std::optional<float> render_order = std::nullopt;
 
     void ParseActorFromJson(SDL_Renderer* renderer, ImageDB* imageDB, rapidjson::Value& actor_json, int current_actor_id);
 };

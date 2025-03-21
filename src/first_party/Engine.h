@@ -21,6 +21,7 @@ public:
 	void Input();
 	void Update();
 	void Render();
+	void UpdatePlayerPosition(vec2 new_position);
 	void InitResolution(rapidjson::Document& rendering_config);
 	void ShowScoreAndHealth();
 	bool IsPositionValid(vec2 position);

@@ -66,43 +66,58 @@ void Renderer::Render(vector<Actor>* actors, Actor* player, int& x_resolution, i
         camera_position = player->position;
     }
 
+    // Create a sorted copy of actor pointers (without modifying the original vector)
+    std::vector<const Actor*> sorted_actors;
+    sorted_actors.reserve(actors->size()); // Avoids multiple reallocations
+
     for (const auto& actor : *actors) {
-        if (actor.view_image == nullptr) {
+        sorted_actors.push_back(&actor);
+    }
+    
+    // Sort using render_order if available, otherwise use position.y
+    std::sort(sorted_actors.begin(), sorted_actors.end(), [](const Actor* a, const Actor* b) {
+        float a_sort_value = a->render_order.value_or(a->position.y);
+        float b_sort_value = b->render_order.value_or(b->position.y);
+        return a_sort_value < b_sort_value;
+    });
+
+    for (const auto* actor : sorted_actors) {
+        if (actor->view_image == nullptr) {
             continue;
         }
 
         // Get image width and height
         float img_width = 0, img_height = 0;
-        Helper::SDL_QueryTexture(actor.view_image, &img_width, &img_height);
+        Helper::SDL_QueryTexture(actor->view_image, &img_width, &img_height);
 
         // Convert actor position from in-game units to screen pixels, centered 
-        float screen_x = (x_resolution / 2) + (actor.position.x - camera_position.x) * 100 - cam_offset.x * 100;
-        float screen_y = (y_resolution / 2) + (actor.position.y - camera_position.y) * 100 - cam_offset.y * 100;
+        float screen_x = (x_resolution / 2) + (actor->position.x - camera_position.x) * 100 - cam_offset.x * 100;
+        float screen_y = (y_resolution / 2) + (actor->position.y - camera_position.y) * 100 - cam_offset.y * 100;
 
         // Use the already defined view_pivot_offset
-        SDL_FPoint pivot = { actor.view_pivot_offset.x, actor.view_pivot_offset.y };
+        SDL_FPoint pivot = { actor->view_pivot_offset.x, actor->view_pivot_offset.y };
 
         // Define the destination rectangle
         SDL_FRect dstrect;
-        dstrect.x = screen_x - pivot.x * glm::abs(actor.transform_scale.x);  // Offset by pivot
-        dstrect.y = screen_y - pivot.y * glm::abs(actor.transform_scale.y);
-        dstrect.w = img_width * glm::abs(actor.transform_scale.x);
-        dstrect.h = img_height * glm::abs(actor.transform_scale.y);
+        dstrect.x = screen_x - pivot.x * glm::abs(actor->transform_scale.x);  // Offset by pivot
+        dstrect.y = screen_y - pivot.y * glm::abs(actor->transform_scale.y);
+        dstrect.w = img_width * glm::abs(actor->transform_scale.x);
+        dstrect.h = img_height * glm::abs(actor->transform_scale.y);
 
         // Determine Flip State (based on transform_scale)
         SDL_RendererFlip flip = SDL_FLIP_NONE;
-        if (actor.transform_scale.x < 0) flip = static_cast<SDL_RendererFlip>(flip | SDL_FLIP_HORIZONTAL);
-        if (actor.transform_scale.y < 0) flip = static_cast<SDL_RendererFlip>(flip | SDL_FLIP_VERTICAL);
+        if (actor->transform_scale.x < 0) flip = static_cast<SDL_RendererFlip>(flip | SDL_FLIP_HORIZONTAL);
+        if (actor->transform_scale.y < 0) flip = static_cast<SDL_RendererFlip>(flip | SDL_FLIP_VERTICAL);
 
         // Render the actor with rotation, scaling, and flipping
         Helper::SDL_RenderCopyEx(
-            actor.id,
-            actor.actor_name,
+            actor->id,
+            actor->actor_name,
             sdl_renderer,
-            actor.view_image,
+            actor->view_image,
             nullptr,  // Full texture 
             &dstrect,
-            actor.transform_rotation_degrees,
+            actor->transform_rotation_degrees,
             &pivot,
             flip
         );

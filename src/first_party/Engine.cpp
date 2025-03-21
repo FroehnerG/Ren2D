@@ -103,10 +103,29 @@ void Engine::GameLoop()
 					audio.PlayMusic(false);
 					audio.gameplay_music_playing = true;
 				}
+
+				if (e.type == SDL_KEYDOWN) {
+					if (e.key.keysym.scancode == SDL_SCANCODE_UP) {
+						vec2 north = vec2(0.0f, -1.0f);
+						UpdatePlayerPosition(north);
+					}
+					else if (e.key.keysym.scancode == SDL_SCANCODE_LEFT) {
+						vec2 east = vec2(-1.0f, 0.0f);
+						UpdatePlayerPosition(east);
+					}
+					else if (e.key.keysym.scancode == SDL_SCANCODE_DOWN) {
+						vec2 south = vec2(0.0f, 1.0f);
+						UpdatePlayerPosition(south);
+					}
+					else if (e.key.keysym.scancode == SDL_SCANCODE_RIGHT) {
+						vec2 west = vec2(1.0f, 0.0f);
+						UpdatePlayerPosition(west);
+					}
+				}
 			}
 		}
 
-		Input();
+		//Input();
 		Update();
 
 		if (GetPlayer() != nullptr) {
@@ -178,16 +197,20 @@ void Engine::Input()
 		// Handle advancing intro images
 		if (e.type == SDL_KEYDOWN) {
 			if (e.key.keysym.scancode == SDL_SCANCODE_UP) {
-				player->velocity = vec2(0.0f, -1.0f);
+				vec2 north = vec2(0.0f, -1.0f);
+				UpdatePlayerPosition(north);
 			}
 			else if (e.key.keysym.scancode == SDL_SCANCODE_LEFT) {
-				player->velocity = vec2(1.0f, 0.0f);
+				vec2 east = vec2(1.0f, 0.0f);
+				UpdatePlayerPosition(east);
 			}
 			else if (e.key.keysym.scancode == SDL_SCANCODE_DOWN) {
-				player->velocity = vec2(0.0f, 1.0f);
+				vec2 south = vec2(0.0f, 1.0f);
+				UpdatePlayerPosition(south);
 			}
 			else if (e.key.keysym.scancode == SDL_SCANCODE_RIGHT) {
-				player->velocity = vec2(-1.0f, 0.0f);
+				vec2 west = vec2(-1.0f, 0.0f);
+				UpdatePlayerPosition(west);
 			}
 		}
 	}
@@ -214,6 +237,10 @@ void Engine::MoveNPCs()
 	vector<Actor>* actors = GetActors();
 	// Go through each actor in actor vector and move them
 	for (auto& actor : *actors) {
+		if (actor.actor_name == "player") {
+			continue;
+		}
+
 		if (actor.velocity != vec2(0.0f, 0.0f)) {
 			vec2 new_actor_position = actor.position + actor.velocity;
 
@@ -230,10 +257,8 @@ void Engine::MoveNPCs()
 
 				actor.position = new_actor_position;
 			}
-			// If actor cannot move to new location and is not the player, invert velocity
-			else if (actor.actor_name != "player") {
-				actor.velocity = InvertVelocity(actor.velocity);
-			}
+
+			actor.velocity = InvertVelocity(actor.velocity);
 		}
 	}
 }
@@ -277,6 +302,24 @@ void Engine::Render()
 {
 	//cout << RenderMap();
 	ShowNPCDialogue();
+}
+
+void Engine::UpdatePlayerPosition(vec2 direction)
+{
+	vec2 new_position = GetPlayer()->position + direction;
+
+	if (IsPositionValid(new_position)) {
+		if (GetPlayer()->blocking) {
+			uint64_t composite_position = EngineUtils::CreateCompositeKey(new_position);
+			uint64_t old_composite_position = EngineUtils::CreateCompositeKey(GetPlayer()->position);
+
+			// Add new position and remove old position to blocking map
+			(*GetBlockingPositionsToNum())[composite_position]++;
+			(*GetBlockingPositionsToNum())[old_composite_position]--;
+		}
+
+		GetPlayer()->position = new_position;
+	}
 }
 
 void Engine::InitResolution(rapidjson::Document& rendering_config)

@@ -69,4 +69,8 @@ void Actor::ParseActorFromJson(SDL_Renderer* renderer, ImageDB* imageDB, rapidjs
     if (actor_json.HasMember("view_pivot_offset_y")) {
         view_pivot_offset.y = actor_json["view_pivot_offset_y"].GetFloat();
     }
+
+    if (actor_json.HasMember("render_order")) {
+        render_order = actor_json["render_order"].GetFloat();
+    }
 }
