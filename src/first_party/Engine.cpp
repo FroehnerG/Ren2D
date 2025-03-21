@@ -263,8 +263,9 @@ void Engine::MoveNPCs()
 
 				actor.position = new_actor_position;
 			}
-
-			actor.velocity = InvertVelocity(actor.velocity);
+			else {
+				actor.velocity = InvertVelocity(actor.velocity);
+			}
 		}
 	}
 }
