@@ -81,6 +81,7 @@ void Engine::GameLoop()
 		cout << game_start_message << '\n';
 
 	while (is_running) {
+		current_frame = Helper::GetFrameNumber();  // Call this every frame
 		SDL_Event e;
 		while (Helper::SDL_PollEvent(&e)) {
 			if (e.type == SDL_QUIT) {
@@ -298,7 +299,6 @@ ivec2 Engine::InvertVelocity(vec2 velocity)
 
 void Engine::Update()
 {
-	int current_frame = Helper::GetFrameNumber();  // Call this every frame
 	MoveNPCs();
 }
 
@@ -452,7 +452,6 @@ void Engine::RenderNPCDialogue(vector<string>* dialogue) {
 void Engine::CheckNPCDialogue(std::string& dialogue, int actor_id)
 {
 	std::unordered_set<int>* score_actors = GetScoreActors();
-	int current_frame = Helper::GetFrameNumber();
 
 	const std::string health_down = "health down";
 	const std::string score_up = "score up";
