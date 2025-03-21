@@ -1,6 +1,7 @@
 #pragma once
 #include <string>
 #include <unordered_set>
+#include <optional>
 #include "glm/glm.hpp"
 #include "rapidjson/document.h"
 #include "SceneDB.h"
@@ -50,6 +51,7 @@ private:
 	int y_resolution = 360;
 	int last_damage_frame = -999999;  // Large negative number to allow damage on first interaction
 	int current_frame = 0;
+	std::optional<int> stop_frame = std::nullopt;
 	string game_title = "";
 	string user_input = "";
 	string game_start_message = "";

@@ -126,7 +126,7 @@ void Engine::GameLoop()
 			}
 		}
 
-		if (current_frame == 78) {
+		if (stop_frame.has_value()) {
 			//cout << "test";
 		}
 
@@ -185,6 +185,7 @@ void Engine::PlayIntro()
 				audio.PlayMusic(false);
 				audio.gameplay_music_playing = true;
 			}
+			return;
 		}
 
 
@@ -194,6 +195,7 @@ void Engine::PlayIntro()
 		renderer.RenderIntro(&images, &text, y_resolution);
 		Helper::SDL_RenderPresent(renderer.GetRenderer());
 	}
+	stop_frame = current_frame;
 }
 
 void Engine::Input()
