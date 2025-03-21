@@ -148,6 +148,14 @@ void Renderer::RenderDialogue(vector<string>* dialogue, int y_resolution)
     }
 }
 
+void Renderer::RenderEnd(SDL_Texture* game_over_image)
+{
+    SDL_SetRenderDrawColor(sdl_renderer, clear_color_r, clear_color_g, clear_color_b, 255);
+    SDL_RenderClear(sdl_renderer);
+    Helper::SDL_RenderCopy(sdl_renderer, game_over_image, nullptr, nullptr);
+    Helper::SDL_RenderPresent(sdl_renderer);
+}
+
 void Renderer::RenderIntro(ImageDB* imageDB, TextDB* textDB, int& y_resolution)
 {
     if (imageDB->IsIntroPlaying() && textDB->IsIntroPlaying()) {

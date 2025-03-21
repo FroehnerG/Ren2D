@@ -17,10 +17,14 @@ public:
 	SDL_Texture* GetHPImage();
 
 	bool IsIntroPlaying() const { return current_intro_index < intro_images.size(); }
+	bool HasGameOverImage(bool is_good);
+	SDL_Texture* GetGameOverImage(bool is_good);
 private:
 	std::unordered_map<uint64_t, SDL_Texture*> textures;
 	std::unordered_map<int, SDL_Texture*> actor_textures; // Index by actor id
 	std::vector<SDL_Texture*> intro_images;
 	SDL_Texture* hp_image;
+	SDL_Texture* game_over_good_image = nullptr;
+	SDL_Texture* game_over_bad_image = nullptr;
 	size_t current_intro_index = 0;         // Index of current image being displayed
 };

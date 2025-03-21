@@ -63,10 +63,14 @@ Engine::Engine(rapidjson::Document& game_config)
 	SDL_SetRenderDrawColor(renderer.GetRenderer(), renderer.GetColor("red"), renderer.GetColor("green"), renderer.GetColor("blue"), 255);
 	SDL_RenderClear(renderer.GetRenderer());
 	images.LoadImages(game_config, renderer.GetRenderer(), true, "", -1); // Load intro
+	images.LoadImages(game_config, renderer.GetRenderer(), false, "game_over_good_image", -1);
+	images.LoadImages(game_config, renderer.GetRenderer(), false, "game_over_bad_image", -1);
 	text.LoadText(game_config, &images, true);
 	renderer.SetFont(&text);
 	audio.LoadAudio(game_config, "intro_bgm", true);
 	audio.LoadAudio(game_config, "gameplay_audio", false);
+	audio.LoadAudio(game_config, "game_over_good_audio", false);
+	audio.LoadAudio(game_config, "game_over_bad_audio", false);
 
 	scene.LoadActors(scene_json, renderer.GetRenderer(), &images);
 
@@ -126,11 +130,7 @@ void Engine::GameLoop()
 			}
 		}
 
-		if (stop_frame.has_value()) {
-			//cout << "test";
-		}
-
-		if (!images.IsIntroPlaying() && !text.IsIntroPlaying()) {
+		if (!images.IsIntroPlaying() && !text.IsIntroPlaying() && !game_over_bad && !game_over_good) {
 			Update();
 		}
 
@@ -138,7 +138,31 @@ void Engine::GameLoop()
 
 		Render(&dialogue);
 
-		if (GetPlayer() != nullptr) {
+		if (game_over_good) {
+			renderer.RenderEnd(images.GetGameOverImage(true));
+
+			if (!audio.game_over_music_playing) {
+				AudioHelper::Mix_HaltChannel(0);
+
+				if (audio.has_game_over_good_audio) {
+					audio.PlayGameOverMusic(true);
+				}
+				audio.game_over_music_playing = true;
+			}
+		}
+		else if (game_over_bad) {
+			renderer.RenderEnd(images.GetGameOverImage(false));
+
+			if (!audio.game_over_music_playing) {
+				AudioHelper::Mix_HaltChannel(0);
+
+				if (audio.has_game_over_bad_audio) {
+					audio.PlayGameOverMusic(false);
+				}
+				audio.game_over_music_playing = true;
+			}
+		}
+		else if (GetPlayer() != nullptr) {
 			renderer.Render(GetActors(), &dialogue, GetPlayer(), x_resolution, y_resolution, images.GetHPImage(), player_health, score);
 			//cout << current_frame << '\n';
 		}
@@ -195,7 +219,6 @@ void Engine::PlayIntro()
 		renderer.RenderIntro(&images, &text, y_resolution);
 		Helper::SDL_RenderPresent(renderer.GetRenderer());
 	}
-	stop_frame = current_frame;
 }
 
 void Engine::Input()
@@ -432,6 +455,11 @@ void Engine::ShowNPCDialogue(vector<string>* dialogue)
 
 			dialogue->push_back(message);  // Queue message for rendering
 			CheckNPCDialogue(message, actor.id);
+
+			if (game_over_good || game_over_bad) {
+				dialogue->clear();
+				return;
+			}
 		}
 	}
 
@@ -478,8 +506,12 @@ void Engine::CheckNPCDialogue(std::string& dialogue, int actor_id)
 			last_damage_frame = current_frame;
 
 			if (player_health <= 0) {
-				is_running = false;
+				if (!images.HasGameOverImage(false)) {
+					exit(0);
+				}
+
 				game_over_bad = true;
+				return;
 			}
 		}
 	}
@@ -488,13 +520,21 @@ void Engine::CheckNPCDialogue(std::string& dialogue, int actor_id)
 		score_actors->insert(actor_id);
 	}
 	else if (dialogue.find(you_win) != std::string::npos) {
-		is_running = false;
+		if (!images.HasGameOverImage(true)) {
+			exit(0);
+		}
+
 		game_over_good = true;
+		return;
 	}
 	else if (dialogue.find(game_over) != std::string::npos) {
 		if (current_frame >= last_damage_frame + 180) {
-			is_running = false;
+			if (!images.HasGameOverImage(false)) {
+				exit(0);
+			}
+
 			game_over_bad = true;
+			return;
 		}
 	}
 	else if (dialogue.find(proceed_to) != std::string::npos) {

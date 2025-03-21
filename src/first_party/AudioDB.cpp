@@ -13,8 +13,18 @@ void AudioDB::LoadAudio(rapidjson::Document& game_config, std::string audio_type
 		return;
 	}
 	
-	if (!is_intro && !game_config.HasMember(audio_type.c_str())) {
+	if (audio_type == "gameplay_audio" && !game_config.HasMember("gameplay_audio")) {
 		has_gameplay_music = false;
+		return;
+	}
+
+	if (audio_type == "game_over_good_audio" && !game_config.HasMember("game_over_good_audio")) {
+		has_game_over_good_audio = false;
+		return;
+	}
+
+	if (audio_type == "game_over_bad_audio" && !game_config.HasMember("game_over_bad_audio")) {
+		has_game_over_bad_audio = false;
 		return;
 	}
 
@@ -38,6 +48,22 @@ void AudioDB::LoadAudio(rapidjson::Document& game_config, std::string audio_type
 		}
 		else {
 			intro_music = AudioHelper::Mix_LoadWAV(audio_path_ogg.c_str());
+		}
+	}
+	else if (audio_type == "game_over_good_audio") {
+		if (fs::exists(audio_path_wav)) {
+			game_over_good_audio = AudioHelper::Mix_LoadWAV(audio_path_wav.c_str());
+		}
+		else {
+			game_over_good_audio = AudioHelper::Mix_LoadWAV(audio_path_ogg.c_str());
+		}
+	}
+	else if (audio_type == "game_over_bad_audio") {
+		if (fs::exists(audio_path_wav)) {
+			game_over_bad_audio = AudioHelper::Mix_LoadWAV(audio_path_wav.c_str());
+		}
+		else {
+			game_over_bad_audio = AudioHelper::Mix_LoadWAV(audio_path_ogg.c_str());
 		}
 	}
 	else {
@@ -68,6 +94,21 @@ void AudioDB::PlayMusic(bool is_intro)
 	if (AudioHelper::Mix_PlayChannel(0, gameplay_music, -1) < 0) {
 		exit(0);
 	}
+}
+
+void AudioDB::PlayGameOverMusic(bool is_good)
+{
+	if (is_good) {
+		if (AudioHelper::Mix_PlayChannel(0, game_over_good_audio, -1) < 0) {
+			exit(0);
+		}
+		return;
+	}
+
+	if (AudioHelper::Mix_PlayChannel(0, game_over_bad_audio, -1) < 0) {
+		exit(0);
+	}
+	
 }
 
 bool AudioDB::CheckIfHasMusic(bool is_intro) {
