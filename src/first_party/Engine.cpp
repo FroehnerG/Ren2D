@@ -11,13 +11,13 @@ const string prompt = "Please make a decision...\n";
 const string options = "Your options are \"n\", \"e\", \"s\", \"w\", \"quit\"\n";
 
 const vec2 ADJACENT_OFFSETS[8] = {
-	vec2(0, -1), 
-	vec2(0, 1), 
-	vec2(-1, 0), 
+	vec2(0, -1),
+	vec2(0, 1),
+	vec2(-1, 0),
 	vec2(1, 0), // Cardinal directions
-	vec2(-1, -1), 
-	vec2(-1, 1), 
-	vec2(1, -1), 
+	vec2(-1, -1),
+	vec2(-1, 1),
+	vec2(1, -1),
 	vec2(1, 1) // Diagonal directions
 };
 
@@ -62,7 +62,7 @@ Engine::Engine(rapidjson::Document& game_config)
 	renderer.SetRenderer(window);
 	SDL_SetRenderDrawColor(renderer.GetRenderer(), renderer.GetColor("red"), renderer.GetColor("green"), renderer.GetColor("blue"), 255);
 	SDL_RenderClear(renderer.GetRenderer());
-	images.LoadImages(game_config, renderer.GetRenderer(), true, "", - 1); // Load intro
+	images.LoadImages(game_config, renderer.GetRenderer(), true, "", -1); // Load intro
 	text.LoadText(game_config, &images, true);
 	renderer.SetFont(&text);
 	audio.LoadAudio(game_config, "intro_bgm", true);
@@ -81,7 +81,6 @@ void Engine::GameLoop()
 		cout << game_start_message << '\n';
 
 	while (is_running) {
-		current_frame = Helper::GetFrameNumber();
 		SDL_Event e;
 		while (Helper::SDL_PollEvent(&e)) {
 			if (e.type == SDL_QUIT) {
@@ -123,19 +122,20 @@ void Engine::GameLoop()
 						UpdatePlayerPosition(west);
 					}
 				}
-				Update();
-
-				vector<string> dialogue;
-
-				Render(&dialogue);
-
-				if (GetPlayer() != nullptr) {
-					renderer.Render(GetActors(), &dialogue, GetPlayer(), x_resolution, y_resolution, images.GetHPImage(), player_health, score);
-				}
-				else {
-					renderer.Render(GetActors(), &dialogue, GetPlayer(), x_resolution, y_resolution, nullptr, std::nullopt, score);
-				}
 			}
+		}
+
+		Update();
+
+		vector<string> dialogue;
+
+		Render(&dialogue);
+
+		if (GetPlayer() != nullptr) {
+			renderer.Render(GetActors(), &dialogue, GetPlayer(), x_resolution, y_resolution, images.GetHPImage(), player_health, score);
+		}
+		else {
+			renderer.Render(GetActors(), &dialogue, GetPlayer(), x_resolution, y_resolution, nullptr, std::nullopt, score);
 		}
 	}
 }
@@ -298,9 +298,8 @@ ivec2 Engine::InvertVelocity(vec2 velocity)
 
 void Engine::Update()
 {
-	if (current_frame % 60 == 0) {
-		MoveNPCs();
-	}
+	int current_frame = Helper::GetFrameNumber();  // Call this every frame
+	MoveNPCs();
 }
 
 void Engine::Render(vector<string>* dialogue)
@@ -498,7 +497,7 @@ std::string Engine::RenderMap()
 {
 	// Compute camera bounds directly based on the player's position
 	Actor* player = GetPlayer();
-	
+
 	int camera_x = 0;
 	int camera_y = 0;
 
@@ -542,11 +541,11 @@ std::string Engine::RenderMap()
 */
 
 
-Actor* Engine::GetPlayer() { 
+Actor* Engine::GetPlayer() {
 	return scene.GetPlayer().get();
 }
 
-std::vector<Actor>* Engine::GetActors() { 
+std::vector<Actor>* Engine::GetActors() {
 	return &scene.GetActors();
 }
 
