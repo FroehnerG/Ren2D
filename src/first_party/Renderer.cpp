@@ -54,7 +54,8 @@ void Renderer::SetCamOffset(glm::vec2 cam_offset_in)
 }
 
 
-void Renderer::Render(vector<Actor>* actors, Actor* player, int& x_resolution, int& y_resolution, SDL_Texture* hp_image, std::optional<int> health, int& score)
+void Renderer::Render(vector<Actor>* actors, vector<string>* dialogue, Actor* player, int& x_resolution, int& y_resolution, 
+    SDL_Texture* hp_image, std::optional<int> health, int& score)
 {
     // Set background color
     SDL_SetRenderDrawColor(sdl_renderer, clear_color_r, clear_color_g, clear_color_b, 255);
@@ -128,10 +129,23 @@ void Renderer::Render(vector<Actor>* actors, Actor* player, int& x_resolution, i
 
         RenderHealth(hp_image, *health, x_resolution, y_resolution);
         DrawText(score_text, 16, { 255, 255, 255, 255 }, 5, 5);
+        RenderDialogue(dialogue, y_resolution);
     }
 
     // Present the frame (finish rendering)
     Helper::SDL_RenderPresent(sdl_renderer);
+}
+
+void Renderer::RenderDialogue(vector<string>* dialogue, int y_resolution)
+{
+    // Render dialogue messages to screen (bottom-left)
+    int m = dialogue->size();
+    for (int i = 0; i < m; ++i) {
+        int x = 25;
+        int y = y_resolution - 50 - (m - 1 - i) * 50;
+
+        DrawText(dialogue->at(i), 16, { 255, 255, 255, 255 }, x, y);  // white text, size 24
+    }
 }
 
 void Renderer::RenderIntro(ImageDB* imageDB, TextDB* textDB, int& y_resolution)

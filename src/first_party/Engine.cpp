@@ -125,14 +125,17 @@ void Engine::GameLoop()
 			}
 		}
 
-		//Input();
 		Update();
 
+		vector<string> dialogue;
+
+		Render(&dialogue);
+
 		if (GetPlayer() != nullptr) {
-			renderer.Render(GetActors(), GetPlayer(), x_resolution, y_resolution, images.GetHPImage(), player_health, score);
+			renderer.Render(GetActors(), &dialogue, GetPlayer(), x_resolution, y_resolution, images.GetHPImage(), player_health, score);
 		}
 		else {
-			renderer.Render(GetActors(), GetPlayer(), x_resolution, y_resolution, nullptr, std::nullopt, score);
+			renderer.Render(GetActors(), &dialogue, GetPlayer(), x_resolution, y_resolution, nullptr, std::nullopt, score);
 		}
 	}
 }
@@ -295,13 +298,14 @@ ivec2 Engine::InvertVelocity(vec2 velocity)
 
 void Engine::Update()
 {
+	int current_frame = Helper::GetFrameNumber();  // Call this every frame
 	MoveNPCs();
 }
 
-void Engine::Render()
+void Engine::Render(vector<string>* dialogue)
 {
 	//cout << RenderMap();
-	ShowNPCDialogue();
+	ShowNPCDialogue(dialogue);
 }
 
 void Engine::UpdatePlayerPosition(vec2 direction)
@@ -385,76 +389,104 @@ bool Engine::IsNPCInSameCell(vec2 NPC_position)
 	return false;
 }
 
-void Engine::ShowNPCDialogue()
+void Engine::ShowNPCDialogue(vector<string>* dialogue)
 {
 	vector<Actor>* actors = GetActors();
 
+	bool skip_rendering = false;  // Flag to avoid rendering dialogue on scene transition
+
 	for (const auto& actor : *actors) {
-		if (IsNPCAdjacent(actor.position) && actor.nearby_dialogue != "") {
-			cout << actor.nearby_dialogue << '\n';
-			CheckNPCDialogue(actor.nearby_dialogue, actor.id);
+		std::string message;
+
+		if (IsNPCInSameCell(actor.position) && actor.contact_dialogue != "") {
+			message = actor.contact_dialogue;
 		}
-		else if (IsNPCInSameCell(actor.position) && actor.contact_dialogue != "") {
-			cout << actor.contact_dialogue << '\n';
-			CheckNPCDialogue(actor.contact_dialogue, actor.id);
+		else if (IsNPCAdjacent(actor.position) && actor.nearby_dialogue != "") {
+			message = actor.nearby_dialogue;
+		}
+
+		if (!message.empty()) {
+			// Check for "proceed to" before rendering
+			if (message.find("proceed to") != std::string::npos) {
+				CheckNPCDialogue(message, actor.id);
+				skip_rendering = true;  // Don't show dialogue for this frame
+				break;  // Stop processing further to avoid one-frame hitch
+			}
+
+			dialogue->push_back(message);  // Queue message for rendering
+			CheckNPCDialogue(message, actor.id);
 		}
 	}
 
+	if (skip_rendering) {
+		next_scene = false;
+		LoadScene(next_scene_name);
+		dialogue->clear();
+		return;  // Skip rendering this frame
+	}
+
+	// Game over rendering
 	if (!is_running) {
 		ShowScoreAndHealth();
-		if (game_over_good) {
-			if (game_over_good_message != "")
-				cout << game_over_good_message;
+
+		if (game_over_good && !game_over_good_message.empty()) {
+			//renderer.DrawText(game_over_good_message, 16, { 255, 255, 255, 255 }, 25, y_resolution - 100);
 			return;
 		}
 
-		if (game_over_bad_message != "")
-			cout << game_over_bad_message;
-	}
-
-	if (next_scene) {
-		next_scene = false;
-		ShowScoreAndHealth();
-		LoadScene(next_scene_name);
-		Render();
+		if (!game_over_bad_message.empty()) {
+			//renderer.DrawText(game_over_bad_message, 16, { 255, 0, 0, 255 }, 25, y_resolution - 100);
+		}
 	}
 }
 
-void Engine::CheckNPCDialogue(string dialogue, int actor_id)
+
+void Engine::RenderNPCDialogue(vector<string>* dialogue) {
+
+}
+
+void Engine::CheckNPCDialogue(std::string& dialogue, int actor_id)
 {
-	std::unordered_set<int>*score_actors = GetScoreActors();
+	std::unordered_set<int>* score_actors = GetScoreActors();
+	int current_frame = Helper::GetFrameNumber();
 
-	string health_down = "health down";
-	string score_up = "score up";
-	string you_win = "you win";
-	string game_over = "game over";
-	string proceed_to = "proceed to";
+	const std::string health_down = "health down";
+	const std::string score_up = "score up";
+	const std::string you_win = "you win";
+	const std::string game_over = "game over";
+	const std::string proceed_to = "proceed to";
 
-	if (dialogue.find(health_down) != string::npos) {
-		player_health--;
+	if (dialogue.find(health_down) != std::string::npos) {
+		if (current_frame >= last_damage_frame + 180) {
+			player_health--;
+			last_damage_frame = current_frame;
 
-		if (player_health <= 0) {
+			if (player_health <= 0) {
+				is_running = false;
+				game_over_bad = true;
+			}
+		}
+	}
+	else if (dialogue.find(score_up) != std::string::npos && score_actors->find(actor_id) == score_actors->end()) {
+		score++;
+		score_actors->insert(actor_id);
+	}
+	else if (dialogue.find(you_win) != std::string::npos) {
+		is_running = false;
+		game_over_good = true;
+	}
+	else if (dialogue.find(game_over) != std::string::npos) {
+		if (current_frame >= last_damage_frame + 180) {
 			is_running = false;
 			game_over_bad = true;
 		}
 	}
-	else if (dialogue.find(score_up) != string::npos && score_actors->find(actor_id) == score_actors->end()) {
-		score++;
-		score_actors->insert(actor_id);
-	}
-	else if (dialogue.find(you_win) != string::npos) {
-		is_running = false;
-		game_over_good = true;
-	}
-	else if (dialogue.find(game_over) != string::npos) {
-		is_running = false;
-		game_over_bad = true;
-	}
-	else if (dialogue.find(proceed_to) != string::npos) {
+	else if (dialogue.find(proceed_to) != std::string::npos) {
 		next_scene = true;
 		next_scene_name = EngineUtils::ObtainWordAfterPhrase(dialogue, proceed_to);
 	}
 }
+
 
 /*
 std::string Engine::RenderMap()

@@ -20,15 +20,16 @@ public:
 	void PlayIntro();
 	void Input();
 	void Update();
-	void Render();
+	void Render(vector<string>* dialogue);
 	void UpdatePlayerPosition(vec2 new_position);
 	void InitResolution(rapidjson::Document& rendering_config);
 	void ShowScoreAndHealth();
 	bool IsPositionValid(vec2 position);
 	bool IsNPCAdjacent(vec2 NPC_position);
 	bool IsNPCInSameCell(vec2 NPC_position);
-	void ShowNPCDialogue();
-	void CheckNPCDialogue(string dialogue, int actor_id);
+	void ShowNPCDialogue(vector<string>* dialogue);
+	void RenderNPCDialogue(vector<string>* dialogue);
+	void CheckNPCDialogue(string& dialogue, int actor_id);
 	void MoveNPCs();
 	void LoadScene(string scene_name);
 	SDL_Window* CreateWindow();
@@ -47,6 +48,8 @@ private:
 	int score = 0;
 	int x_resolution = 640;
 	int y_resolution = 360;
+	int last_damage_frame = -999999;  // Large negative number to allow damage on first interaction
+	int current_frame = 0;
 	string game_title = "";
 	string user_input = "";
 	string game_start_message = "";

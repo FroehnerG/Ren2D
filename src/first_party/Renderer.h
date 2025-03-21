@@ -20,7 +20,8 @@ public:
 	void SetRenderer(SDL_Window* window);
     void SetClearColor(int r, int g, int b);
     void SetCamOffset(glm::vec2 cam_offset_in);
-	void Render(vector<Actor>* actors, Actor* player, int& x_resolution, int& y_resolution, SDL_Texture* hp_image, std::optional<int> health, int& score);
+	void Render(vector<Actor>* actors, vector<string>* dialogue, Actor* player, int& x_resolution, int& y_resolution, SDL_Texture* hp_image, std::optional<int> health, int& score);
+    void RenderDialogue(vector<string>* dialogue, int y_resolution);
     // New methods for rendering images
     void RenderIntro(ImageDB* imageDB, TextDB* textDB, int& y_resolution);
     void RenderHealth(SDL_Texture* hp_image, int& health, int& x_resolution, int& y_resolution);
