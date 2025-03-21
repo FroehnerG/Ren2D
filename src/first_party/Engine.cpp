@@ -81,6 +81,8 @@ void Engine::GameLoop()
 		cout << game_start_message << '\n';
 
 	while (is_running) {
+		current_frame = Helper::GetFrameNumber();  // Call this every frame
+		cout << current_frame << '\n';
 		SDL_Event e;
 		while (Helper::SDL_PollEvent(&e)) {
 			if (e.type == SDL_QUIT) {
@@ -122,20 +124,19 @@ void Engine::GameLoop()
 						UpdatePlayerPosition(west);
 					}
 				}
+				Update();
+
+				vector<string> dialogue;
+
+				Render(&dialogue);
+
+				if (GetPlayer() != nullptr) {
+					renderer.Render(GetActors(), &dialogue, GetPlayer(), x_resolution, y_resolution, images.GetHPImage(), player_health, score);
+				}
+				else {
+					renderer.Render(GetActors(), &dialogue, GetPlayer(), x_resolution, y_resolution, nullptr, std::nullopt, score);
+				}
 			}
-		}
-
-		Update();
-
-		vector<string> dialogue;
-
-		Render(&dialogue);
-
-		if (GetPlayer() != nullptr) {
-			renderer.Render(GetActors(), &dialogue, GetPlayer(), x_resolution, y_resolution, images.GetHPImage(), player_health, score);
-		}
-		else {
-			renderer.Render(GetActors(), &dialogue, GetPlayer(), x_resolution, y_resolution, nullptr, std::nullopt, score);
 		}
 	}
 }
@@ -298,8 +299,9 @@ ivec2 Engine::InvertVelocity(vec2 velocity)
 
 void Engine::Update()
 {
-	int current_frame = Helper::GetFrameNumber();  // Call this every frame
-	MoveNPCs();
+	if (current_frame % 60 == 0 && current_frame != 0) {
+		MoveNPCs();
+	}
 }
 
 void Engine::Render(vector<string>* dialogue)
