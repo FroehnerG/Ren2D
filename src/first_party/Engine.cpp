@@ -139,8 +139,6 @@ void Engine::GameLoop()
 		Render(&dialogue);
 
 		if (game_over_good) {
-			renderer.RenderEnd(images.GetGameOverImage(true));
-
 			if (!audio.game_over_music_playing) {
 				AudioHelper::Mix_HaltChannel(0);
 
@@ -149,10 +147,9 @@ void Engine::GameLoop()
 				}
 				audio.game_over_music_playing = true;
 			}
+			renderer.RenderEnd(images.GetGameOverImage(true));
 		}
 		else if (game_over_bad) {
-			renderer.RenderEnd(images.GetGameOverImage(false));
-
 			if (!audio.game_over_music_playing) {
 				AudioHelper::Mix_HaltChannel(0);
 
@@ -161,6 +158,7 @@ void Engine::GameLoop()
 				}
 				audio.game_over_music_playing = true;
 			}
+			renderer.RenderEnd(images.GetGameOverImage(false));
 		}
 		else if (GetPlayer() != nullptr) {
 			renderer.Render(GetActors(), &dialogue, GetPlayer(), x_resolution, y_resolution, images.GetHPImage(), player_health, score);
