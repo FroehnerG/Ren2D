@@ -124,9 +124,9 @@ void Engine::GameLoop()
 						UpdatePlayerPosition(west);
 					}
 				}
-				Update();
-
 			}
+
+			Update();
 			vector<string> dialogue;
 
 			Render(&dialogue);
