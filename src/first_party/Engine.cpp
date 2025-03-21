@@ -82,7 +82,7 @@ void Engine::GameLoop()
 
 	while (is_running) {
 		current_frame = Helper::GetFrameNumber();  // Call this every frame
-		cout << current_frame << '\n';
+		//cout << current_frame << '\n';
 		SDL_Event e;
 		while (Helper::SDL_PollEvent(&e)) {
 			if (e.type == SDL_QUIT) {
