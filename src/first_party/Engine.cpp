@@ -395,6 +395,10 @@ void Engine::ShowNPCDialogue(vector<string>* dialogue)
 {
 	vector<Actor>* actors = GetActors();
 
+	if (GetPlayer() == nullptr) {
+		return;
+	}
+
 	bool skip_rendering = false;  // Flag to avoid rendering dialogue on scene transition
 
 	for (const auto& actor : *actors) {
