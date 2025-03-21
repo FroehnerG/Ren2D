@@ -99,13 +99,13 @@ void AudioDB::PlayMusic(bool is_intro)
 void AudioDB::PlayGameOverMusic(bool is_good)
 {
 	if (is_good) {
-		if (AudioHelper::Mix_PlayChannel(0, game_over_good_audio, -1) < 0) {
+		if (AudioHelper::Mix_PlayChannel(0, game_over_good_audio, 0) < 0) {
 			exit(0);
 		}
 		return;
 	}
 
-	if (AudioHelper::Mix_PlayChannel(0, game_over_bad_audio, -1) < 0) {
+	if (AudioHelper::Mix_PlayChannel(0, game_over_bad_audio, 0) < 0) {
 		exit(0);
 	}
 	
