@@ -62,7 +62,7 @@ void Renderer::SetZoomFactor(float zoom_factor_in)
 void Renderer::Render(vector<Actor>* actors, vector<string>* dialogue, Actor* player, int& x_resolution, int& y_resolution, 
     SDL_Texture* hp_image, std::optional<int> health, int& score)
 {
-    SDL_RenderSetScale(sdl_renderer, 0.5f, 0.5f);
+    SDL_RenderSetScale(sdl_renderer, zoom_factor, zoom_factor);
 
     // Set background color
     SDL_SetRenderDrawColor(sdl_renderer, clear_color_r, clear_color_g, clear_color_b, 255);
@@ -101,8 +101,8 @@ void Renderer::Render(vector<Actor>* actors, vector<string>* dialogue, Actor* pl
         float scale_units = 100.0f;  // your world units to pixel scale
 
         // Adjust for zoom: divide camera offset by zoom
-        float screen_x = (x_resolution / 2.0f / 0.5f) + ((actor->position.x - camera_position.x - cam_offset.x) * scale_units);
-        float screen_y = (y_resolution / 2.0f / 0.5f) + ((actor->position.y - camera_position.y - cam_offset.y) * scale_units);
+        float screen_x = (x_resolution / 2.0f / zoom_factor) + ((actor->position.x - camera_position.x - cam_offset.x) * scale_units);
+        float screen_y = (y_resolution / 2.0f / zoom_factor) + ((actor->position.y - camera_position.y - cam_offset.y) * scale_units);
 
         // Use the already defined view_pivot_offset
         SDL_FPoint pivot = { actor->view_pivot_offset.x, actor->view_pivot_offset.y };
