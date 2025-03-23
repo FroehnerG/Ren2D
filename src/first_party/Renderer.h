@@ -20,6 +20,7 @@ public:
 	void SetRenderer(SDL_Window* window);
     void SetClearColor(int r, int g, int b);
     void SetCamOffset(glm::vec2 cam_offset_in);
+    void SetZoomFactor(float zoom_factor_in);
 	void Render(vector<Actor>* actors, vector<string>* dialogue, Actor* player, int& x_resolution, int& y_resolution, SDL_Texture* hp_image, std::optional<int> health, int& score);
     void RenderDialogue(vector<string>* dialogue, int y_resolution);
     void RenderEnd(SDL_Texture* game_over_image);
@@ -32,6 +33,7 @@ private:
 	SDL_Renderer* sdl_renderer = nullptr;
     TTF_Font* text_font = nullptr;
     glm::vec2 cam_offset = glm::vec2(0.0f, 0.0f);
+    float zoom_factor = 1.0f;
     int clear_color_r = 255;
     int clear_color_g = 255;
     int clear_color_b = 255;
