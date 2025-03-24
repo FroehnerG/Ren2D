@@ -19,7 +19,7 @@ public:
 
 	void GameLoop();
 	void PlayIntro();
-	void Input();
+	void HandlePlayerMovement();
 	void Update();
 	void Render(vector<string>* dialogue);
 	void UpdatePlayerPosition(vec2 new_position);
@@ -45,6 +45,7 @@ private:
 	bool game_over_bad = false;
 	bool game_over_good = false;
 	bool next_scene = false;
+	float player_movement_speed = 0.02f;
 	int player_health = 3;
 	int score = 0;
 	int x_resolution = 640;

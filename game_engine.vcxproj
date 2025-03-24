@@ -146,6 +146,7 @@
     <ClInclude Include="src\first_party\AudioDB.h" />
     <ClInclude Include="src\first_party\Engine.h" />
     <ClInclude Include="src\first_party\ImageDB.h" />
+    <ClInclude Include="src\first_party\Input.h" />
     <ClInclude Include="src\first_party\Renderer.h" />
     <ClInclude Include="src\first_party\SceneDB.h" />
     <ClInclude Include="src\first_party\TemplateDB.h" />
@@ -1276,6 +1277,7 @@
     <ClCompile Include="src\first_party\AudioDB.cpp" />
     <ClCompile Include="src\first_party\Engine.cpp" />
     <ClCompile Include="src\first_party\ImageDB.cpp" />
+    <ClCompile Include="src\first_party\Input.cpp" />
     <ClCompile Include="src\first_party\main.cpp" />
     <ClCompile Include="src\first_party\Renderer.cpp" />
     <ClCompile Include="src\first_party\SceneDB.cpp" />

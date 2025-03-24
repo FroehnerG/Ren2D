@@ -86,7 +86,13 @@ void Renderer::Render(vector<Actor>* actors, vector<string>* dialogue, Actor* pl
     std::sort(sorted_actors.begin(), sorted_actors.end(), [](const Actor* a, const Actor* b) {
         float a_sort_value = a->render_order.value_or(a->position.y);
         float b_sort_value = b->render_order.value_or(b->position.y);
-        return a_sort_value < b_sort_value;
+        
+        if (a_sort_value != b_sort_value) {
+            return a_sort_value < b_sort_value;
+        }
+
+        // Tie-breaker: smaller actor ID goes first (lower renders behind)
+        return a->id < b->id;
     });
 
     for (const auto* actor : sorted_actors) {

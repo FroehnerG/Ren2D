@@ -3,6 +3,7 @@
 #include "rapidjson/document.h"
 #include "EngineUtils.h"
 #include "Engine.h"
+#include "Input.h"
 
 using std::string, std::cin, std::cout;
 namespace fs = std::filesystem;
@@ -39,6 +40,10 @@ Engine::Engine(rapidjson::Document& game_config)
 
 	if (game_config.HasMember("game_title")) {
 		game_title = game_config["game_title"].GetString();
+	}
+
+	if (game_config.HasMember("player_movement_speed")) {
+		player_movement_speed = game_config["player_movement_speed"].GetFloat();
 	}
 
 	if (game_config.HasMember("initial_scene")) {
@@ -93,41 +98,26 @@ void Engine::GameLoop()
 				exit(0);
 			}
 
-			if (images.IsIntroPlaying() || text.IsIntroPlaying()) {
-				audio.PlayMusic(true);
-				PlayIntro();
+			Input::ProcessEvent(e);
+		}
+
+		if (images.IsIntroPlaying() || text.IsIntroPlaying()) {
+			audio.PlayMusic(true);
+			PlayIntro();
+		}
+
+		if (!images.IsIntroPlaying() && !text.IsIntroPlaying()) {
+			if (audio.HasIntroMusic() && audio.intro_music_playing) {
+				audio.HaltMusic();
+				audio.intro_music_playing = false;
 			}
 
-			if (!images.IsIntroPlaying() && !text.IsIntroPlaying()) {
-				if (audio.HasIntroMusic() && audio.intro_music_playing) {
-					audio.HaltMusic();
-					audio.intro_music_playing = false;
-				}
-
-				if (audio.HasGameplayMusic() && !audio.gameplay_music_playing) {
-					audio.PlayMusic(false);
-					audio.gameplay_music_playing = true;
-				}
-
-				if (e.type == SDL_KEYDOWN) {
-					if (e.key.keysym.scancode == SDL_SCANCODE_UP) {
-						vec2 north = vec2(0.0f, -1.0f);
-						UpdatePlayerPosition(north);
-					}
-					else if (e.key.keysym.scancode == SDL_SCANCODE_LEFT) {
-						vec2 east = vec2(-1.0f, 0.0f);
-						UpdatePlayerPosition(east);
-					}
-					else if (e.key.keysym.scancode == SDL_SCANCODE_DOWN) {
-						vec2 south = vec2(0.0f, 1.0f);
-						UpdatePlayerPosition(south);
-					}
-					else if (e.key.keysym.scancode == SDL_SCANCODE_RIGHT) {
-						vec2 west = vec2(1.0f, 0.0f);
-						UpdatePlayerPosition(west);
-					}
-				}
+			if (audio.HasGameplayMusic() && !audio.gameplay_music_playing) {
+				audio.PlayMusic(false);
+				audio.gameplay_music_playing = true;
 			}
+
+			HandlePlayerMovement();
 		}
 
 		if (!images.IsIntroPlaying() && !text.IsIntroPlaying() && !game_over_bad && !game_over_good) {
@@ -219,38 +209,35 @@ void Engine::PlayIntro()
 	}
 }
 
-void Engine::Input()
-{
-	Actor* player = GetPlayer();
-
-	if (player == nullptr) {
+void Engine::HandlePlayerMovement() {
+	if (GetPlayer() == nullptr) {
 		return;
 	}
 
-	SDL_Event e;
-	while (Helper::SDL_PollEvent(&e)) {
-		// Handle advancing intro images
-		if (e.type == SDL_KEYDOWN) {
-			if (e.key.keysym.scancode == SDL_SCANCODE_UP) {
-				vec2 north = vec2(0.0f, -1.0f);
-				UpdatePlayerPosition(north);
-			}
-			else if (e.key.keysym.scancode == SDL_SCANCODE_LEFT) {
-				vec2 east = vec2(1.0f, 0.0f);
-				UpdatePlayerPosition(east);
-			}
-			else if (e.key.keysym.scancode == SDL_SCANCODE_DOWN) {
-				vec2 south = vec2(0.0f, 1.0f);
-				UpdatePlayerPosition(south);
-			}
-			else if (e.key.keysym.scancode == SDL_SCANCODE_RIGHT) {
-				vec2 west = vec2(-1.0f, 0.0f);
-				UpdatePlayerPosition(west);
-			}
-		}
+	vec2 direction = vec2(0.0f, 0.0f);
+
+	// Accumulate direction from WASD/Arrow keys
+	if (Input::GetKey(SDL_SCANCODE_W) || Input::GetKey(SDL_SCANCODE_UP)) {
+		direction.y -= 1.0f;
+	}
+	if (Input::GetKey(SDL_SCANCODE_S) || Input::GetKey(SDL_SCANCODE_DOWN)) {
+		direction.y += 1.0f;
+	}
+	if (Input::GetKey(SDL_SCANCODE_A) || Input::GetKey(SDL_SCANCODE_LEFT)) {
+		direction.x -= 1.0f;
+	}
+	if (Input::GetKey(SDL_SCANCODE_D) || Input::GetKey(SDL_SCANCODE_RIGHT)) {
+		direction.x += 1.0f;
 	}
 
+	// Only move if direction is non-zero
+	if (direction.x != 0.0f || direction.y != 0.0f) {
+		direction = glm::normalize(direction); // Normalize to maintain consistent speed
+		UpdatePlayerPosition(direction * player_movement_speed);
+	}
 }
+
+
 
 bool Engine::IsPositionValid(vec2 position)
 {
@@ -331,9 +318,7 @@ ivec2 Engine::InvertVelocity(vec2 velocity)
 
 void Engine::Update()
 {
-	if (current_frame != 0 && current_frame % 60 == 0) {
-		MoveNPCs();
-	}
+	MoveNPCs();
 }
 
 void Engine::Render(vector<string>* dialogue)
