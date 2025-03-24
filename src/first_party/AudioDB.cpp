@@ -80,8 +80,6 @@ void AudioDB::LoadAudio(rapidjson::Document& game_config, std::string audio_type
 
 __declspec(noinline) void AudioDB::PlayMusic(bool is_intro)
 {
-	volatile int dummy = 0;
-	dummy++;
 
 	if (!CheckIfHasMusic(is_intro)) {
 		return;

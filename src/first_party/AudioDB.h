@@ -20,8 +20,6 @@ public:
 
 	bool has_game_over_good_audio = true;
 	bool has_game_over_bad_audio = true;
-
-	bool music_playing = false;
 private:
 	Mix_Chunk* intro_music = nullptr;
 	Mix_Chunk* gameplay_music = nullptr;
