@@ -113,6 +113,7 @@ void Engine::GameLoop()
 			}
 
 			if (audio.HasGameplayMusic() && !audio.gameplay_music_playing) {
+
 				audio.PlayMusic(false);
 				audio.gameplay_music_playing = true;
 			}

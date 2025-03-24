@@ -78,12 +78,12 @@ void AudioDB::LoadAudio(rapidjson::Document& game_config, std::string audio_type
 	return;
 }
 
-void AudioDB::PlayMusic(bool is_intro)
+__declspec(noinline) void AudioDB::PlayMusic(bool is_intro)
 {
+	volatile int dummy = 0;
+	dummy++;
+
 	if (!CheckIfHasMusic(is_intro)) {
-		// Side effect to make this function non-skippable
-		volatile int dummy = 1;
-		(void)dummy;
 		return;
 	}
 
