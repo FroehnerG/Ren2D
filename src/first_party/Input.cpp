@@ -8,7 +8,7 @@ void Input::Init() {
 }
 
 void Input::ProcessEvent(const SDL_Event& e) {
-    if (e.type == SDL_KEYDOWN && !e.key.repeat) {
+    if (e.type == SDL_KEYDOWN) {
         SDL_Scancode scancode = e.key.keysym.scancode;
 
         // If it was up before, mark as just became down
