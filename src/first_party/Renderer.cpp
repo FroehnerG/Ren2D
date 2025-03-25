@@ -59,7 +59,7 @@ void Renderer::SetZoomFactor(float zoom_factor_in)
 }
 
 
-void Renderer::Render(vector<Actor>* actors, vector<string>* dialogue, Actor* player, int& x_resolution, int& y_resolution, 
+void Renderer::Render(std::multimap<RenderKey, const Actor*>* sorted_actors, vector<string>* dialogue, Actor* player, int& x_resolution, int& y_resolution, 
     SDL_Texture* hp_image, std::optional<int> health, int& score)
 {
     SDL_RenderSetScale(sdl_renderer, zoom_factor, zoom_factor);
@@ -74,66 +74,45 @@ void Renderer::Render(vector<Actor>* actors, vector<string>* dialogue, Actor* pl
         camera_position = player->position;
     }
 
-    // Create a sorted copy of actor pointers (without modifying the original vector)
-    std::vector<const Actor*> sorted_actors;
-    sorted_actors.reserve(actors->size()); // Avoids multiple reallocations
-
-    for (const auto& actor : *actors) {
-        sorted_actors.push_back(&actor);
-    }
-    
-    // Sort using render_order if available, otherwise use position.y
-    std::sort(sorted_actors.begin(), sorted_actors.end(), [](const Actor* a, const Actor* b) {
-        float a_sort_value = a->render_order.value_or(a->position.y);
-        float b_sort_value = b->render_order.value_or(b->position.y);
-        
-        if (a_sort_value != b_sort_value) {
-            return a_sort_value < b_sort_value;
-        }
-
-        // Tie-breaker: smaller actor ID goes first (lower renders behind)
-        return a->id < b->id;
-    });
-
-    for (const auto* actor : sorted_actors) {
-        if (actor->view_image == nullptr) {
+    for (const auto actor : *sorted_actors) {
+        if (actor.second->view_image == nullptr) {
             continue;
         }
 
         // Get image width and height
         float img_width = 0, img_height = 0;
-        Helper::SDL_QueryTexture(actor->view_image, &img_width, &img_height);
+        Helper::SDL_QueryTexture(actor.second->view_image, &img_width, &img_height);
 
         float scale_units = 100.0f;  // your world units to pixel scale
 
         // Adjust for zoom: divide camera offset by zoom
-        float screen_x = (x_resolution / 2.0f / zoom_factor) + ((actor->position.x - camera_position.x - cam_offset.x) * scale_units);
-        float screen_y = (y_resolution / 2.0f / zoom_factor) + ((actor->position.y - camera_position.y - cam_offset.y) * scale_units);
+        float screen_x = (x_resolution / 2.0f / zoom_factor) + ((actor.second->position.x - camera_position.x - cam_offset.x) * scale_units);
+        float screen_y = (y_resolution / 2.0f / zoom_factor) + ((actor.second->position.y - camera_position.y - cam_offset.y) * scale_units);
 
         // Use the already defined view_pivot_offset
-        SDL_FPoint pivot = { actor->view_pivot_offset.x, actor->view_pivot_offset.y };
+        SDL_FPoint pivot = { actor.second->view_pivot_offset.x, actor.second->view_pivot_offset.y };
 
         // Define the destination rectangle
         SDL_FRect dstrect;
-        dstrect.x = screen_x - pivot.x * glm::abs(actor->transform_scale.x);  // Offset by pivot
-        dstrect.y = screen_y - pivot.y * glm::abs(actor->transform_scale.y);
-        dstrect.w = img_width * glm::abs(actor->transform_scale.x);
-        dstrect.h = img_height * glm::abs(actor->transform_scale.y);
+        dstrect.x = screen_x - pivot.x * glm::abs(actor.second->transform_scale.x);  // Offset by pivot
+        dstrect.y = screen_y - pivot.y * glm::abs(actor.second->transform_scale.y);
+        dstrect.w = img_width * glm::abs(actor.second->transform_scale.x);
+        dstrect.h = img_height * glm::abs(actor.second->transform_scale.y);
 
         // Determine Flip State (based on transform_scale)
         SDL_RendererFlip flip = SDL_FLIP_NONE;
-        if (actor->transform_scale.x < 0) flip = static_cast<SDL_RendererFlip>(flip | SDL_FLIP_HORIZONTAL);
-        if (actor->transform_scale.y < 0) flip = static_cast<SDL_RendererFlip>(flip | SDL_FLIP_VERTICAL);
+        if (actor.second->transform_scale.x < 0) flip = static_cast<SDL_RendererFlip>(flip | SDL_FLIP_HORIZONTAL);
+        if (actor.second->transform_scale.y < 0) flip = static_cast<SDL_RendererFlip>(flip | SDL_FLIP_VERTICAL);
 
         // Render the actor with rotation, scaling, and flipping
         Helper::SDL_RenderCopyEx(
-            actor->id,
-            actor->actor_name,
+            actor.second->id,
+            actor.second->actor_name,
             sdl_renderer,
-            actor->view_image,
+            actor.second->view_image,
             nullptr,  // Full texture 
             &dstrect,
-            actor->transform_rotation_degrees,
+            actor.second->transform_rotation_degrees,
             &pivot,
             flip
         );

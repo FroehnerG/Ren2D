@@ -29,7 +29,6 @@ public:
 	bool IsNPCAdjacent(vec2 NPC_position);
 	bool IsNPCInSameCell(vec2 NPC_position);
 	void ShowNPCDialogue(vector<string>* dialogue);
-	void RenderNPCDialogue(vector<string>* dialogue);
 	void CheckNPCDialogue(string& dialogue, int actor_id);
 	void MoveNPCs();
 	void LoadScene(string scene_name);

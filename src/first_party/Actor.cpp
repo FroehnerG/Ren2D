@@ -24,11 +24,11 @@ void Actor::ParseActorFromJson(SDL_Renderer* renderer, ImageDB* imageDB, rapidjs
     }
 
     if (actor_json.HasMember("vel_x")) {
-        velocity.x = actor_json["vel_x"].GetInt();
+        velocity.x = actor_json["vel_x"].GetFloat();
     }
 
     if (actor_json.HasMember("vel_y")) {
-        velocity.y = actor_json["vel_y"].GetInt();
+        velocity.y = actor_json["vel_y"].GetFloat();
     }
 
     if (actor_json.HasMember("transform_rotation_degrees")) {

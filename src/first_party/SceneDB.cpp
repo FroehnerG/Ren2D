@@ -61,6 +61,38 @@ void SceneDB::LoadTemplate(string template_name, SDL_Renderer* renderer, ImageDB
 	templateDB.LoadTemplate(template_name, renderer, imageDB, template_json, current_actor_id);
 }
 
+void SceneDB::SortRenderActors(bool is_map_created, Actor* moved_actor)
+{
+	if (!is_map_created) {
+		sorted_actors.clear();
+
+		for (const auto& actor : actors) {
+			float primary = actor.render_order.value_or(actor.position.y);
+			sorted_actors.insert({ RenderKey{ primary, actor.id }, &actor });
+		}
+
+		return;
+	}
+
+	// Handle update for single moved actor
+	if (moved_actor != nullptr) {
+		// Step 1: Find the old entry
+		for (auto it = sorted_actors.begin(); it != sorted_actors.end(); ++it) {
+			if (it->second == moved_actor) {
+				sorted_actors.erase(it);  // Step 2: Erase the old entry
+				break;
+			}
+		}
+
+		// Step 3: Recompute render key
+		float new_primary = moved_actor->render_order.value_or(moved_actor->position.y);
+		RenderKey new_key = { new_primary, moved_actor->id };
+
+		// Step 4: Insert updated entry
+		sorted_actors.insert({ new_key, moved_actor });
+	}
+}
+
 void SceneDB::Reset()
 {
 	position_to_actor.clear();
@@ -69,6 +101,11 @@ void SceneDB::Reset()
 	actors.clear();
 	player.reset();  // Reset shared pointer
 	current_actor_id = 0;
+}
+
+std::multimap<RenderKey, const Actor*>* SceneDB::GetSortedActors()
+{
+	return &sorted_actors;
 }
 
 std::unordered_set<int>& SceneDB::GetScoreActors()

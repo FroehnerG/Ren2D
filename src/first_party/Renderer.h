@@ -21,7 +21,8 @@ public:
     void SetClearColor(int r, int g, int b);
     void SetCamOffset(glm::vec2 cam_offset_in);
     void SetZoomFactor(float zoom_factor_in);
-	void Render(vector<Actor>* actors, vector<string>* dialogue, Actor* player, int& x_resolution, int& y_resolution, SDL_Texture* hp_image, std::optional<int> health, int& score);
+	void Render(std::multimap<RenderKey, const Actor*>* sorted_actors, vector<string>* dialogue, Actor* player, 
+        int& x_resolution, int& y_resolution, SDL_Texture* hp_image, std::optional<int> health, int& score);
     void RenderDialogue(vector<string>* dialogue, int y_resolution);
     void RenderEnd(SDL_Texture* game_over_image);
     // New methods for rendering images

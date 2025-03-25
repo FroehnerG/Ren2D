@@ -78,6 +78,7 @@ Engine::Engine(rapidjson::Document& game_config)
 	audio.LoadAudio(game_config, "game_over_bad_audio", false);
 
 	scene.LoadActors(scene_json, renderer.GetRenderer(), &images);
+	scene.SortRenderActors(false, nullptr);
 
 	if (GetPlayer() != nullptr) {
 		images.LoadImages(game_config, renderer.GetRenderer(), false, "hp_image", -1);
@@ -113,16 +114,14 @@ void Engine::GameLoop()
 			}
 
 			if (audio.HasGameplayMusic() && !audio.gameplay_music_playing) {
-
 				audio.PlayMusic(false);
 				audio.gameplay_music_playing = true;
 			}
 
-			HandlePlayerMovement();
-		}
-
-		if (!images.IsIntroPlaying() && !text.IsIntroPlaying() && !game_over_bad && !game_over_good) {
-			Update();
+			if (!game_over_bad && !game_over_good) {
+				HandlePlayerMovement();
+				Update();
+			}
 		}
 
 		vector<string> dialogue;
@@ -152,11 +151,11 @@ void Engine::GameLoop()
 			renderer.RenderEnd(images.GetGameOverImage(false));
 		}
 		else if (GetPlayer() != nullptr) {
-			renderer.Render(GetActors(), &dialogue, GetPlayer(), x_resolution, y_resolution, images.GetHPImage(), player_health, score);
+			renderer.Render(scene.GetSortedActors(), &dialogue, GetPlayer(), x_resolution, y_resolution, images.GetHPImage(), player_health, score);
 			//cout << current_frame << '\n';
 		}
 		else {
-			renderer.Render(GetActors(), &dialogue, GetPlayer(), x_resolution, y_resolution, nullptr, std::nullopt, score);
+			renderer.Render(scene.GetSortedActors(), &dialogue, GetPlayer(), x_resolution, y_resolution, nullptr, std::nullopt, score);
 			//cout << current_frame << '\n';
 		}
 	}
@@ -279,6 +278,7 @@ void Engine::MoveNPCs()
 				}
 
 				actor.position = new_actor_position;
+				scene.SortRenderActors(true, &actor);
 			}
 			else {
 				actor.velocity = InvertVelocity(actor.velocity);
@@ -343,6 +343,7 @@ void Engine::UpdatePlayerPosition(vec2 direction)
 		}
 
 		GetPlayer()->position = new_position;
+		scene.SortRenderActors(true, GetPlayer());
 	}
 }
 
@@ -472,11 +473,6 @@ void Engine::ShowNPCDialogue(vector<string>* dialogue)
 			//renderer.DrawText(game_over_bad_message, 16, { 255, 0, 0, 255 }, 25, y_resolution - 100);
 		}
 	}
-}
-
-
-void Engine::RenderNPCDialogue(vector<string>* dialogue) {
-
 }
 
 void Engine::CheckNPCDialogue(std::string& dialogue, int actor_id)
