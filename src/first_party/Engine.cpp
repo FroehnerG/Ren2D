@@ -383,6 +383,11 @@ void Engine::InitResolution(rapidjson::Document& rendering_config)
 		float zoom_factor = rendering_config["zoom_factor"].GetFloat();
 		renderer.SetZoomFactor(zoom_factor);
 	}
+
+	if (rendering_config.HasMember("cam_ease_factor")) {
+		float cam_ease_factor = rendering_config["cam_ease_factor"].GetFloat();
+		renderer.SetCamEaseFactor(cam_ease_factor);
+	}
 }
 
 void Engine::ShowScoreAndHealth()
