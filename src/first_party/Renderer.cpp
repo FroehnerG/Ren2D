@@ -80,8 +80,6 @@ void Renderer::Render(std::multimap<RenderKey, const Actor*>* sorted_actors, vec
         camera_position = glm::vec2(0, 0) + cam_offset;
     }
 
-    cam_ease_factor = 0.05f;
-
     for (const auto actor : *sorted_actors) {
         if (actor.second->view_image == nullptr) {
             continue;
