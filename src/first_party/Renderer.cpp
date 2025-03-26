@@ -73,9 +73,14 @@ void Renderer::Render(std::multimap<RenderKey, const Actor*>* sorted_actors, vec
     SDL_SetRenderDrawColor(sdl_renderer, clear_color_r, clear_color_g, clear_color_b, 255);
     SDL_RenderClear(sdl_renderer);
 
-    camera_position = glm::vec2(0, 0) + cam_offset;
-    cam_ease_factor = 0.05f;
+    if (player) {
+        camera_position = glm::mix(camera_position, player->position + cam_offset, cam_ease_factor);
+    }
+    else {
+        camera_position = glm::vec2(0, 0) + cam_offset;
+    }
 
+    cam_ease_factor = 0.05f;
 
     for (const auto actor : *sorted_actors) {
         if (actor.second->view_image == nullptr) {
@@ -87,11 +92,6 @@ void Renderer::Render(std::multimap<RenderKey, const Actor*>* sorted_actors, vec
         Helper::SDL_QueryTexture(actor.second->view_image, &img_width, &img_height);
 
         float scale_units = 100.0f;  // your world units to pixel scale
-
-        if (player) {
-            glm::vec2 target_cam = player->position + cam_offset;
-            camera_position = glm::mix(camera_position, target_cam, cam_ease_factor);
-        }
 
         // Adjust for zoom: divide camera offset by zoom
         float screen_x = (x_resolution / 2.0f / zoom_factor) + ((actor.second->position.x - camera_position.x) * scale_units);
@@ -124,6 +124,11 @@ void Renderer::Render(std::multimap<RenderKey, const Actor*>* sorted_actors, vec
             &pivot,
             flip
         );
+    }
+
+    if (player) {
+        glm::vec2 target_cam = player->position + cam_offset;
+        camera_position = glm::mix(camera_position, target_cam, cam_ease_factor);
     }
 
     SDL_RenderSetScale(sdl_renderer, 1.0f, 1.0f);
