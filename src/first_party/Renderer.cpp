@@ -95,6 +95,8 @@ void Renderer::Render(std::multimap<RenderKey, const Actor*>* sorted_actors, vec
         camera_position = glm::mix(camera_position, player->position + cam_offset, cam_ease_factor);
     }
 
+    glm::vec2 extra_view_offset = glm::vec2(0, -glm::abs(glm::sin(Helper::GetFrameNumber() * 0.15f)) * 10.0f);
+
     for (const auto& actor : *sorted_actors) {
         if (actor.second->view_image == nullptr) {
             continue;
@@ -104,9 +106,18 @@ void Renderer::Render(std::multimap<RenderKey, const Actor*>* sorted_actors, vec
         float img_width = 0, img_height = 0;
         Helper::SDL_QueryTexture(actor.second->view_image, &img_width, &img_height);
 
+        glm::vec2 extra_view_offset(0.0f);
+
+        if (actor.second->movement_bounce_enabled && actor.second->velocity != glm::vec2(0.0f)) {
+            extra_view_offset = glm::vec2(0, -glm::abs(glm::sin(Helper::GetFrameNumber() * 0.15f)) * 10.0f);
+        }
+
         // Adjust for zoom: divide camera offset by zoom
         float screen_x = (x_resolution / 2.0f / zoom_factor) + ((actor.second->position.x - camera_position.x) * scale_units);
         float screen_y = (y_resolution / 2.0f / zoom_factor) + ((actor.second->position.y - camera_position.y) * scale_units);
+
+        screen_x += extra_view_offset.x;
+        screen_y += extra_view_offset.y;
 
         // Use the already defined view_pivot_offset
         SDL_FPoint pivot = { actor.second->view_pivot_offset.x, actor.second->view_pivot_offset.y };

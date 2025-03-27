@@ -231,6 +231,13 @@ void Engine::HandlePlayerMovement() {
 	if (Input::GetKey(SDL_SCANCODE_D) || Input::GetKey(SDL_SCANCODE_RIGHT)) {
 		direction.x += 1.0f;
 	}
+	
+	if (direction != vec2(0.0f, 0.0f)) {
+		player->velocity = direction;
+	}
+	else {
+		player->velocity = vec2(0.0f, 0.0f);
+	}
 
 	// Only move if direction is non-zero
 	if (direction.x != 0.0f || direction.y != 0.0f) {
@@ -338,6 +345,7 @@ void Engine::LoadScene(string scene_name)
 	scene.Reset();
 
 	scene.LoadActors(scene_json, renderer.GetRenderer(), &images);
+	scene.SortRenderActors(false, nullptr);
 }
 
 SDL_Window* Engine::CreateWindow()
