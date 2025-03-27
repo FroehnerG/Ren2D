@@ -63,9 +63,17 @@ void Renderer::SetCamEaseFactor(float cam_ease_factor_in)
     cam_ease_factor = cam_ease_factor_in;
 }
 
+void Renderer::SetCameraPosition(Actor* player) {
+    if (player) {
+        camera_position = player->position + cam_offset;
+    }
+    else {
+        camera_position = cam_offset; 
+    }
+}
 
-void Renderer::Render(std::multimap<RenderKey, const Actor*>* sorted_actors, vector<string>* dialogue, Actor* player, int& x_resolution, int& y_resolution, 
-    SDL_Texture* hp_image, std::optional<int> health, int& score)
+void Renderer::Render(std::multimap<RenderKey, const Actor*>* sorted_actors, vector<string>* dialogue, Actor* player, int& x_resolution, 
+    int& y_resolution, SDL_Texture* hp_image, std::optional<int> health, int& score)
 {
     SDL_RenderSetScale(sdl_renderer, zoom_factor, zoom_factor);
 
@@ -76,11 +84,8 @@ void Renderer::Render(std::multimap<RenderKey, const Actor*>* sorted_actors, vec
     if (player) {
         camera_position = glm::mix(camera_position, player->position + cam_offset, cam_ease_factor);
     }
-    else {
-        camera_position = glm::vec2(0, 0) + cam_offset;
-    }
 
-    for (const auto actor : *sorted_actors) {
+    for (const auto& actor : *sorted_actors) {
         if (actor.second->view_image == nullptr) {
             continue;
         }
@@ -88,8 +93,6 @@ void Renderer::Render(std::multimap<RenderKey, const Actor*>* sorted_actors, vec
         // Get image width and height
         float img_width = 0, img_height = 0;
         Helper::SDL_QueryTexture(actor.second->view_image, &img_width, &img_height);
-
-        float scale_units = 100.0f;  // your world units to pixel scale
 
         // Adjust for zoom: divide camera offset by zoom
         float screen_x = (x_resolution / 2.0f / zoom_factor) + ((actor.second->position.x - camera_position.x) * scale_units);
@@ -105,6 +108,12 @@ void Renderer::Render(std::multimap<RenderKey, const Actor*>* sorted_actors, vec
         dstrect.w = img_width * glm::abs(actor.second->transform_scale.x);
         dstrect.h = img_height * glm::abs(actor.second->transform_scale.y);
 
+        SDL_Texture* actor_view_image = actor.second->view_image;
+
+        if (actor.second->show_view_image_back) {
+            actor_view_image = actor.second->view_image_back;
+        }
+
         // Determine Flip State (based on transform_scale)
         SDL_RendererFlip flip = SDL_FLIP_NONE;
         if (actor.second->transform_scale.x < 0) flip = static_cast<SDL_RendererFlip>(flip | SDL_FLIP_HORIZONTAL);
@@ -115,7 +124,7 @@ void Renderer::Render(std::multimap<RenderKey, const Actor*>* sorted_actors, vec
             actor.second->id,
             actor.second->actor_name,
             sdl_renderer,
-            actor.second->view_image,
+            actor_view_image,
             nullptr,  // Full texture 
             &dstrect,
             actor.second->transform_rotation_degrees,
@@ -124,14 +133,9 @@ void Renderer::Render(std::multimap<RenderKey, const Actor*>* sorted_actors, vec
         );
     }
 
-    if (player) {
-        glm::vec2 target_cam = player->position + cam_offset;
-        camera_position = glm::mix(camera_position, target_cam, cam_ease_factor);
-    }
-
     SDL_RenderSetScale(sdl_renderer, 1.0f, 1.0f);
 
-    if (health != std::nullopt) {
+    if (health.has_value()) {
         std::string score_text = "score : " + std::to_string(score);
 
         RenderHealth(hp_image, *health, x_resolution, y_resolution);

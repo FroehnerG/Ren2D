@@ -210,7 +210,9 @@ void Engine::PlayIntro()
 }
 
 void Engine::HandlePlayerMovement() {
-	if (GetPlayer() == nullptr) {
+	Actor* player = GetPlayer();
+
+	if (player == nullptr) {
 		return;
 	}
 
@@ -233,6 +235,21 @@ void Engine::HandlePlayerMovement() {
 	// Only move if direction is non-zero
 	if (direction.x != 0.0f || direction.y != 0.0f) {
 		direction = glm::normalize(direction); // Normalize to maintain consistent speed
+
+		if (direction.x > 0 && player->x_scale_actor_flipping_on_movement) {
+			player->transform_scale.x = glm::abs(player->transform_scale.x);
+		}
+		else if (direction.x < 0 && player->x_scale_actor_flipping_on_movement) {
+			player->transform_scale.x = -1.0f * glm::abs(player->transform_scale.x);
+		}
+
+		if (direction.y > 0 && player->view_image_back) {
+			player->show_view_image_back = true;
+		}
+		else if (direction.y < 0 && player->view_image_back) {
+			player->show_view_image_back = false;
+		}
+
 		UpdatePlayerPosition(direction * player_movement_speed);
 	}
 }
@@ -266,6 +283,24 @@ void Engine::MoveNPCs()
 		if (actor.velocity != vec2(0.0f, 0.0f)) {
 			vec2 new_actor_position = actor.position + actor.velocity;
 
+			if (actor.direction_changed) {
+				if (actor.velocity.x > 0 && actor.x_scale_actor_flipping_on_movement) {
+					actor.transform_scale.x = glm::abs(actor.transform_scale.x);
+				}
+				else if (actor.velocity.x < 0 && actor.x_scale_actor_flipping_on_movement) {
+					actor.transform_scale.x = -1.0f * glm::abs(actor.transform_scale.x);
+				}
+
+				if (actor.velocity.y > 0 && actor.view_image_back) {
+					actor.show_view_image_back = true;
+				}
+				else if (actor.velocity.y < 0 && actor.view_image_back) {
+					actor.show_view_image_back = false;
+				}
+
+				actor.direction_changed = false;
+			}
+
 			// If actor can move to new location, move them
 			if (IsPositionValid(new_actor_position)) {
 				if (actor.blocking) {
@@ -282,6 +317,7 @@ void Engine::MoveNPCs()
 			}
 			else {
 				actor.velocity = InvertVelocity(actor.velocity);
+				actor.direction_changed = true;
 			}
 		}
 	}
@@ -388,6 +424,8 @@ void Engine::InitResolution(rapidjson::Document& rendering_config)
 		float cam_ease_factor = rendering_config["cam_ease_factor"].GetFloat();
 		renderer.SetCamEaseFactor(cam_ease_factor);
 	}
+
+	renderer.SetCameraPosition(GetPlayer());
 }
 
 void Engine::ShowScoreAndHealth()

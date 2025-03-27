@@ -22,6 +22,7 @@ public:
     void SetCamOffset(glm::vec2 cam_offset_in);
     void SetZoomFactor(float zoom_factor_in);
     void SetCamEaseFactor(float cam_ease_factor_in);
+    void SetCameraPosition(Actor* player);
 	void Render(std::multimap<RenderKey, const Actor*>* sorted_actors, vector<string>* dialogue, Actor* player, 
         int& x_resolution, int& y_resolution, SDL_Texture* hp_image, std::optional<int> health, int& score);
     void RenderDialogue(vector<string>* dialogue, int y_resolution);
@@ -36,6 +37,7 @@ private:
     TTF_Font* text_font = nullptr;
     glm::vec2 camera_position = glm::vec2(0.0f, 0.0f);
     glm::vec2 cam_offset = glm::vec2(0.0f, 0.0f);
+    float scale_units = 100.0f;
     float zoom_factor = 1.0f;
     float cam_ease_factor = 1.0f;
     int clear_color_r = 255;

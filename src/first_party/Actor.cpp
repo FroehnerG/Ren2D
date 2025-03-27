@@ -39,6 +39,14 @@ void Actor::ParseActorFromJson(SDL_Renderer* renderer, ImageDB* imageDB, rapidjs
         blocking = actor_json["blocking"].GetBool();
     }
 
+    if (actor_json.HasMember("x_scale_actor_flipping_on_movement")) {
+        x_scale_actor_flipping_on_movement = actor_json["x_scale_actor_flipping_on_movement"].GetBool();
+    }
+    
+    if (actor_json.HasMember("movement_bounce_enabled")) {
+        movement_bounce_enabled = actor_json["movement_bounce_enabled"].GetBool();
+    }
+
     if (actor_json.HasMember("nearby_dialogue")) {
         nearby_dialogue = actor_json["nearby_dialogue"].GetString();
     }
@@ -61,6 +69,12 @@ void Actor::ParseActorFromJson(SDL_Renderer* renderer, ImageDB* imageDB, rapidjs
         view_pivot_offset.y = height * 0.5f;
     }
 
+    if (actor_json.HasMember("view_image_back")) {
+        std::string image_name = actor_json["view_image_back"].GetString();
+        imageDB->LoadImages(actor_json, renderer, false, image_name, current_actor_id);
+
+        view_image_back = imageDB->GetActorTextureById(current_actor_id);
+    }
 
     if (actor_json.HasMember("view_pivot_offset_x")) {
         view_pivot_offset.x = actor_json["view_pivot_offset_x"].GetFloat();
