@@ -243,10 +243,10 @@ void Engine::HandlePlayerMovement() {
 			player->transform_scale.x = -1.0f * glm::abs(player->transform_scale.x);
 		}
 
-		if (direction.y > 0 && player->view_image_back) {
+		if (direction.y < 0 && player->view_image_back) {
 			player->show_view_image_back = true;
 		}
-		else if (direction.y < 0 && player->view_image_back) {
+		else if (direction.y > 0 && player->view_image_back) {
 			player->show_view_image_back = false;
 		}
 
@@ -291,10 +291,10 @@ void Engine::MoveNPCs()
 					actor.transform_scale.x = -1.0f * glm::abs(actor.transform_scale.x);
 				}
 
-				if (actor.velocity.y > 0 && actor.view_image_back) {
+				if (actor.velocity.y < 0 && actor.view_image_back) {
 					actor.show_view_image_back = true;
 				}
-				else if (actor.velocity.y < 0 && actor.view_image_back) {
+				else if (actor.velocity.y > 0 && actor.view_image_back) {
 					actor.show_view_image_back = false;
 				}
 
