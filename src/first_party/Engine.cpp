@@ -236,10 +236,10 @@ void Engine::HandlePlayerMovement() {
 	if (direction.x != 0.0f || direction.y != 0.0f) {
 		direction = glm::normalize(direction); // Normalize to maintain consistent speed
 
-		if (direction.x > 0 && player->x_scale_actor_flipping_on_movement) {
+		if (direction.x > 0 && renderer.GetXFlipOnMovement()) {
 			player->transform_scale.x = glm::abs(player->transform_scale.x);
 		}
-		else if (direction.x < 0 && player->x_scale_actor_flipping_on_movement) {
+		else if (direction.x < 0 && renderer.GetXFlipOnMovement()) {
 			player->transform_scale.x = -1.0f * glm::abs(player->transform_scale.x);
 		}
 
@@ -284,10 +284,10 @@ void Engine::MoveNPCs()
 			vec2 new_actor_position = actor.position + actor.velocity;
 
 			if (actor.direction_changed) {
-				if (actor.velocity.x > 0 && actor.x_scale_actor_flipping_on_movement) {
+				if (actor.velocity.x > 0 && renderer.GetXFlipOnMovement()) {
 					actor.transform_scale.x = glm::abs(actor.transform_scale.x);
 				}
-				else if (actor.velocity.x < 0 && actor.x_scale_actor_flipping_on_movement) {
+				else if (actor.velocity.x < 0 && renderer.GetXFlipOnMovement()) {
 					actor.transform_scale.x = -1.0f * glm::abs(actor.transform_scale.x);
 				}
 
@@ -401,6 +401,10 @@ void Engine::InitResolution(rapidjson::Document& rendering_config)
 		int b = rendering_config["clear_color_b"].GetInt();
 
 		renderer.SetClearColor(r, g, b);
+	}
+
+	if (rendering_config.HasMember("x_scale_actor_flipping_on_movement")) {
+		renderer.SetXFlipOnMovement(rendering_config["x_scale_actor_flipping_on_movement"].GetBool());
 	}
 
 	glm::vec2 cam_offset = glm::vec2(0.0f, 0.0f);

@@ -38,10 +38,6 @@ void Actor::ParseActorFromJson(SDL_Renderer* renderer, ImageDB* imageDB, rapidjs
     if (actor_json.HasMember("blocking")) {
         blocking = actor_json["blocking"].GetBool();
     }
-
-    if (actor_json.HasMember("x_scale_actor_flipping_on_movement")) {
-        x_scale_actor_flipping_on_movement = actor_json["x_scale_actor_flipping_on_movement"].GetBool();
-    }
     
     if (actor_json.HasMember("movement_bounce_enabled")) {
         movement_bounce_enabled = actor_json["movement_bounce_enabled"].GetBool();

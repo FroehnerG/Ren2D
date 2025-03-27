@@ -21,7 +21,6 @@ public:
     float transform_rotation_degrees = 0.0f;
     glm::vec2 view_pivot_offset = glm::vec2(0.0f, 0.0f);
     bool blocking = false;
-    bool x_scale_actor_flipping_on_movement = false;
     bool movement_bounce_enabled = false;
     bool direction_changed = true;
     bool show_view_image_back = false;

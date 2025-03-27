@@ -23,6 +23,8 @@ public:
     void SetZoomFactor(float zoom_factor_in);
     void SetCamEaseFactor(float cam_ease_factor_in);
     void SetCameraPosition(Actor* player);
+    void SetXFlipOnMovement(bool x_flip_on_movement);
+    bool GetXFlipOnMovement();
 	void Render(std::multimap<RenderKey, const Actor*>* sorted_actors, vector<string>* dialogue, Actor* player, 
         int& x_resolution, int& y_resolution, SDL_Texture* hp_image, std::optional<int> health, int& score);
     void RenderDialogue(vector<string>* dialogue, int y_resolution);
@@ -43,4 +45,5 @@ private:
     int clear_color_r = 255;
     int clear_color_g = 255;
     int clear_color_b = 255;
+    bool x_scale_actor_flipping_on_movement = false;
 };

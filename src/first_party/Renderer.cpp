@@ -72,6 +72,16 @@ void Renderer::SetCameraPosition(Actor* player) {
     }
 }
 
+void Renderer::SetXFlipOnMovement(bool x_flip_on_movement)
+{
+    x_scale_actor_flipping_on_movement = x_flip_on_movement;
+}
+
+bool Renderer::GetXFlipOnMovement()
+{
+    return x_scale_actor_flipping_on_movement;
+}
+
 void Renderer::Render(std::multimap<RenderKey, const Actor*>* sorted_actors, vector<string>* dialogue, Actor* player, int& x_resolution, 
     int& y_resolution, SDL_Texture* hp_image, std::optional<int> health, int& score)
 {
