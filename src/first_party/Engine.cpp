@@ -388,13 +388,13 @@ void Engine::Update()
 {
 	MoveNPCs();
 	CheckTriggerActors();
-	ClearCollidingActorsSet();
 }
 
 void Engine::Render()
 {
 	//cout << RenderMap();
 	ShowNPCDialogue();
+	ClearCollidingActorsSet();
 }
 
 void Engine::UpdatePlayerPosition(vec2 direction)
