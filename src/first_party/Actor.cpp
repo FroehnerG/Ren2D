@@ -35,8 +35,28 @@ void Actor::ParseActorFromJson(SDL_Renderer* renderer, ImageDB* imageDB, rapidjs
         transform_rotation_degrees = actor_json["transform_rotation_degrees"].GetFloat();
     }
 
-    if (actor_json.HasMember("blocking")) {
-        blocking = actor_json["blocking"].GetBool();
+    if (actor_json.HasMember("box_collider_width")) {
+        box_collider_width = actor_json["box_collider_width"].GetFloat();
+    }
+
+    if (actor_json.HasMember("box_collider_height")) {
+        box_collider_height = actor_json["box_collider_height"].GetFloat();
+    }
+
+    if (box_collider_width != 0.0f && box_collider_height != 0.0f) {
+        blocking = true;
+    }
+
+    if (actor_json.HasMember("box_trigger_width")) {
+        box_trigger_width = actor_json["box_trigger_width"].GetFloat();
+    }
+
+    if (actor_json.HasMember("box_trigger_height")) {
+        box_trigger_height = actor_json["box_trigger_height"].GetFloat();
+    }
+
+    if (box_trigger_width != 0.0f && box_trigger_height != 0.0f) {
+        trigger = true;
     }
     
     if (actor_json.HasMember("movement_bounce_enabled")) {
@@ -84,3 +104,59 @@ void Actor::ParseActorFromJson(SDL_Renderer* renderer, ImageDB* imageDB, rapidjs
         render_order = actor_json["render_order"].GetFloat();
     }
 }
+
+bool Actor::AreBoxesOverlapping(const Actor& other, bool is_trigger)
+{
+    if (!is_trigger) {
+        if (!blocking || !other.blocking) {
+            return false; // can't check if either is missing
+        }
+    }
+    else {
+        if (!trigger || !other.trigger) {
+            return false; // can't check if either is missing
+        }
+    }
+
+    float a_half_w;
+    float a_half_h;
+    float b_half_w;
+    float b_half_h;
+
+    if (!is_trigger) {
+        a_half_w = box_collider_width * glm::abs(transform_scale.x) / 2.0f;
+        a_half_h = box_collider_height * glm::abs(transform_scale.y) / 2.0f;
+        b_half_w = other.box_collider_width * glm::abs(other.transform_scale.x) / 2.0f;
+        b_half_h = other.box_collider_height * glm::abs(other.transform_scale.y) / 2.0f;
+    }
+    else {
+        a_half_w = box_trigger_width * glm::abs(transform_scale.x) / 2.0f;
+        a_half_h = box_trigger_height * glm::abs(transform_scale.y) / 2.0f;
+        b_half_w = other.box_trigger_width * glm::abs(other.transform_scale.x) / 2.0f;
+        b_half_h = other.box_trigger_height * glm::abs(other.transform_scale.y) / 2.0f;
+    }
+
+    float a_left = position.x - a_half_w;
+    float a_right = position.x + a_half_w;
+    float a_top = position.y - a_half_h;
+    float a_bottom = position.y + a_half_h;
+
+    float b_left = other.position.x - b_half_w;
+    float b_right = other.position.x + b_half_w;
+    float b_top = other.position.y - b_half_h;
+    float b_bottom = other.position.y + b_half_h;
+
+    return !(a_right < b_left || a_left > b_right || a_bottom < b_top || a_top > b_bottom);
+}
+
+void Actor::InsertCollidingActor(Actor* actor)
+{
+    colliding_actors_this_frame.insert(actor);
+}
+
+void Actor::ClearCollidingActors()
+{
+    colliding_actors_this_frame.clear();
+}
+
+

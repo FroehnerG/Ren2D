@@ -2,6 +2,7 @@
 
 #include <string>
 #include <optional>
+#include <unordered_set>
 #include "glm/glm.hpp"
 #include "SDL2/SDL.h"
 #include "rapidjson/document.h"
@@ -20,13 +21,22 @@ public:
     glm::vec2 transform_scale = glm::vec2(1.0f, 1.0f);
     float transform_rotation_degrees = 0.0f;
     glm::vec2 view_pivot_offset = glm::vec2(0.0f, 0.0f);
+    float box_collider_width = 0.0f;
+    float box_collider_height = 0.0f;
     bool blocking = false;
+    float box_trigger_width = 0.0f;
+    float box_trigger_height = 0.0f;
+    bool trigger = false;
     bool movement_bounce_enabled = false;
     bool direction_changed = true;
     bool show_view_image_back = false;
     std::string nearby_dialogue = "";
     std::string contact_dialogue = "";
     std::optional<float> render_order = std::nullopt;
+    std::unordered_set<Actor*> colliding_actors_this_frame;
 
     void ParseActorFromJson(SDL_Renderer* renderer, ImageDB* imageDB, rapidjson::Value& actor_json, int current_actor_id);
+    bool AreBoxesOverlapping(const Actor& other, bool is_trigger);
+    void InsertCollidingActor(Actor* actor);
+    void ClearCollidingActors();
 };

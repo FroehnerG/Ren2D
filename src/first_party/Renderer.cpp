@@ -166,6 +166,7 @@ void Renderer::Render(std::multimap<RenderKey, const Actor*>* sorted_actors, vec
 
     // Present the frame (finish rendering)
     Helper::SDL_RenderPresent(sdl_renderer);
+    dialogue->clear();
 }
 
 void Renderer::RenderDialogue(vector<string>* dialogue, int y_resolution)

@@ -8,20 +8,6 @@
 using std::string, std::cin, std::cout;
 namespace fs = std::filesystem;
 
-const string prompt = "Please make a decision...\n";
-const string options = "Your options are \"n\", \"e\", \"s\", \"w\", \"quit\"\n";
-
-const vec2 ADJACENT_OFFSETS[8] = {
-	vec2(0, -1),
-	vec2(0, 1),
-	vec2(-1, 0),
-	vec2(1, 0), // Cardinal directions
-	vec2(-1, -1),
-	vec2(-1, 1),
-	vec2(1, -1),
-	vec2(1, 1) // Diagonal directions
-};
-
 Engine::Engine(rapidjson::Document& game_config)
 {
 	rapidjson::Document scene_json;
@@ -124,9 +110,7 @@ void Engine::GameLoop()
 			}
 		}
 
-		vector<string> dialogue;
-
-		Render(&dialogue);
+		Render();
 
 		if (game_over_good) {
 			if (!audio.game_over_music_playing) {
@@ -263,19 +247,57 @@ void Engine::HandlePlayerMovement() {
 
 
 
-bool Engine::IsPositionValid(vec2 position)
+bool Engine::IsPositionValid(Actor* actor, vec2 new_position)
 {
-	uint64_t composite_position = EngineUtils::CreateCompositeKey(position);
+	vector<Actor>* actors = GetActors();
+	vec2 old_position = actor->position;
+	actor->position = new_position;
 
-	auto* blocking_map = GetBlockingPositionsToNum(); // Store pointer in a local variable
+	bool position_valid = true;
 
-	auto it = blocking_map->find(composite_position);
+	for (auto& other : *actors) {
+		if (actor->id == other.id) {
+			continue;
+		}
 
-	if (it != blocking_map->end() && it->second > 0) {
-		return false;
+		if (actor->AreBoxesOverlapping(other, false)) {
+			actor->InsertCollidingActor(&other);
+			other.InsertCollidingActor(actor);
+			position_valid = false;
+			actor->position = old_position;
+		}
 	}
 
-	return true;
+	return position_valid;
+}
+
+void Engine::CheckTriggerActors()
+{
+	Actor* player = GetPlayer();
+
+	if (!player->trigger) {
+		return;
+	}
+
+	vector<Actor>* actors = GetActors();
+
+	for (const auto& actor : *actors) {
+		string message = actor.nearby_dialogue;
+		
+		if (player->AreBoxesOverlapping(actor, true) && !message.empty()) {
+			if (next_scene) {
+				next_scene = false;
+				LoadScene(next_scene_name);
+				dialogue.clear();
+				return;
+			}
+
+			if (game_over_good || game_over_bad) {
+				dialogue.clear();
+				return;
+			}
+		}
+	}
 }
 
 void Engine::MoveNPCs()
@@ -309,17 +331,7 @@ void Engine::MoveNPCs()
 			}
 
 			// If actor can move to new location, move them
-			if (IsPositionValid(new_actor_position)) {
-				if (actor.blocking) {
-					uint64_t composite_position = EngineUtils::CreateCompositeKey(new_actor_position);
-					uint64_t old_composite_position = EngineUtils::CreateCompositeKey(actor.position);
-
-					// Add new position and remove old position to blocking map
-					(*GetBlockingPositionsToNum())[composite_position]++;
-					(*GetBlockingPositionsToNum())[old_composite_position]--;
-				}
-
-				actor.position = new_actor_position;
+			if (IsPositionValid(&actor, new_actor_position)) {
 				scene.SortRenderActors(true, &actor);
 			}
 			else {
@@ -356,9 +368,9 @@ SDL_Window* Engine::CreateWindow()
 	return Helper::SDL_CreateWindow(game_title_cstr.data(), 500, 500, x_resolution, y_resolution, SDL_WINDOW_SHOWN);
 }
 
-ivec2 Engine::InvertVelocity(vec2 velocity)
+vec2 Engine::InvertVelocity(vec2 velocity)
 {
-	return vec2(velocity.x * -1, velocity.y * -1);
+	return vec2(velocity.x * -1.0f, velocity.y * -1.0f);
 }
 
 void Engine::Update()
@@ -366,27 +378,17 @@ void Engine::Update()
 	MoveNPCs();
 }
 
-void Engine::Render(vector<string>* dialogue)
+void Engine::Render()
 {
 	//cout << RenderMap();
-	ShowNPCDialogue(dialogue);
+	ShowNPCDialogue();
 }
 
 void Engine::UpdatePlayerPosition(vec2 direction)
 {
 	vec2 new_position = GetPlayer()->position + direction;
 
-	if (IsPositionValid(new_position)) {
-		if (GetPlayer()->blocking) {
-			uint64_t composite_position = EngineUtils::CreateCompositeKey(new_position);
-			uint64_t old_composite_position = EngineUtils::CreateCompositeKey(GetPlayer()->position);
-
-			// Add new position and remove old position to blocking map
-			(*GetBlockingPositionsToNum())[composite_position]++;
-			(*GetBlockingPositionsToNum())[old_composite_position]--;
-		}
-
-		GetPlayer()->position = new_position;
+	if (IsPositionValid(GetPlayer(), new_position)) {
 		scene.SortRenderActors(true, GetPlayer());
 	}
 }
@@ -440,37 +442,7 @@ void Engine::InitResolution(rapidjson::Document& rendering_config)
 	renderer.SetCameraPosition(GetPlayer());
 }
 
-void Engine::ShowScoreAndHealth()
-{
-	cout << "health : " << player_health << ", score : " << score << '\n';
-}
-
-bool Engine::IsNPCAdjacent(vec2 NPC_position)
-{
-	// Check all neighbors
-	Actor* player = GetPlayer();
-
-	for (const auto& offset : ADJACENT_OFFSETS) {
-		vec2 neighbor_position = player->position + offset;
-
-		if (NPC_position == neighbor_position) {
-			return true; // Found an adjacent actor
-		}
-	}
-
-	return false;
-}
-
-bool Engine::IsNPCInSameCell(vec2 NPC_position)
-{
-	if (NPC_position == GetPlayer()->position) {
-		return true;
-	}
-
-	return false;
-}
-
-void Engine::ShowNPCDialogue(vector<string>* dialogue)
+void Engine::ShowNPCDialogue()
 {
 	vector<Actor>* actors = GetActors();
 
@@ -478,54 +450,28 @@ void Engine::ShowNPCDialogue(vector<string>* dialogue)
 		return;
 	}
 
+	std::unordered_set colliding_actors = GetPlayer()->colliding_actors_this_frame;
+
 	bool skip_rendering = false;  // Flag to avoid rendering dialogue on scene transition
 
-	for (const auto& actor : *actors) {
-		std::string message;
-
-		if (IsNPCInSameCell(actor.position) && actor.contact_dialogue != "") {
-			message = actor.contact_dialogue;
-		}
-		else if (IsNPCAdjacent(actor.position) && actor.nearby_dialogue != "") {
-			message = actor.nearby_dialogue;
-		}
+	for (const auto& actor : colliding_actors) {
+		std::string message = actor->contact_dialogue;
 
 		if (!message.empty()) {
-			// Check for "proceed to" before rendering
-			if (message.find("proceed to") != std::string::npos) {
-				CheckNPCDialogue(message, actor.id);
-				skip_rendering = true;  // Don't show dialogue for this frame
-				break;  // Stop processing further to avoid one-frame hitch
-			}
+			dialogue.push_back(message);  // Queue message for rendering
+			CheckNPCDialogue(message, actor->id);
 
-			dialogue->push_back(message);  // Queue message for rendering
-			CheckNPCDialogue(message, actor.id);
-
-			if (game_over_good || game_over_bad) {
-				dialogue->clear();
+			if (next_scene) {
+				next_scene = false;
+				LoadScene(next_scene_name);
+				dialogue.clear();
 				return;
 			}
-		}
-	}
 
-	if (skip_rendering) {
-		next_scene = false;
-		LoadScene(next_scene_name);
-		dialogue->clear();
-		return;  // Skip rendering this frame
-	}
-
-	// Game over rendering
-	if (!is_running) {
-		ShowScoreAndHealth();
-
-		if (game_over_good && !game_over_good_message.empty()) {
-			//renderer.DrawText(game_over_good_message, 16, { 255, 255, 255, 255 }, 25, y_resolution - 100);
-			return;
-		}
-
-		if (!game_over_bad_message.empty()) {
-			//renderer.DrawText(game_over_bad_message, 16, { 255, 0, 0, 255 }, 25, y_resolution - 100);
+			if (game_over_good || game_over_bad) {
+				dialogue.clear();
+				return;
+			}
 		}
 	}
 }
@@ -582,56 +528,6 @@ void Engine::CheckNPCDialogue(std::string& dialogue, int actor_id)
 		next_scene_name = EngineUtils::ObtainWordAfterPhrase(dialogue, proceed_to);
 	}
 }
-
-
-/*
-std::string Engine::RenderMap()
-{
-	// Compute camera bounds directly based on the player's position
-	Actor* player = GetPlayer();
-
-	int camera_x = 0;
-	int camera_y = 0;
-
-	if (player != nullptr) {
-		camera_x = player->position.x - x_resolution / 2;
-		camera_y = player->position.y - y_resolution / 2;
-	}
-
-	// Create an empty visible map filled with spaces
-	std::vector<std::string> visible(y_resolution, std::string(x_resolution, ' '));
-
-	vector<Actor>* actors = GetActors();
-
-	// Overlay actors onto the visible map, including walls
-	for (const Actor& actor : *actors) {
-		int ax = actor.position.x;
-		int ay = actor.position.y;
-
-		// Check if the actor is within the camera's view
-		if (ax >= camera_x && ax < camera_x + x_resolution &&
-			ay >= camera_y && ay < camera_y + y_resolution) {
-
-			int vx = ax - camera_x; // Actor's x position in the visible map
-			int vy = ay - camera_y; // Actor's y position in the visible map
-
-			// Ensure we are within bounds before placing the actor
-			if (vy >= 0 && vy < y_resolution && vx >= 0 && vx < x_resolution) {
-				visible[vy][vx] = actor.view; // Place the actor character in the visible map
-			}
-		}
-	}
-
-	// Convert the visible map to a string
-	std::string rendered_map;
-	for (const std::string& row : visible) {
-		rendered_map += row + '\n';
-	}
-
-	return rendered_map;
-}
-*/
-
 
 Actor* Engine::GetPlayer() {
 	return scene.GetPlayer().get();
