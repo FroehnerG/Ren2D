@@ -81,8 +81,20 @@ void Engine::GameLoop()
 		SDL_Event e;
 		while (Helper::SDL_PollEvent(&e)) {
 			if (e.type == SDL_QUIT) {
-				Update();
-				Helper::SDL_RenderPresent(renderer.GetRenderer());
+				if (game_over_good || game_over_bad) {
+					Helper::SDL_RenderPresent(renderer.GetRenderer());
+				}
+				else {
+					Update();
+					if (GetPlayer() != nullptr) {
+						renderer.Render(scene.GetSortedActors(), &dialogue, GetPlayer(), x_resolution, y_resolution, images.GetHPImage(), player_health, score);
+						//cout << current_frame << '\n';
+					}
+					else {
+						renderer.Render(scene.GetSortedActors(), &dialogue, GetPlayer(), x_resolution, y_resolution, nullptr, std::nullopt, score);
+						//cout << current_frame << '\n';
+					}
+				}
 				exit(0);
 			}
 
