@@ -81,6 +81,7 @@ void Engine::GameLoop()
 		SDL_Event e;
 		while (Helper::SDL_PollEvent(&e)) {
 			if (e.type == SDL_QUIT) {
+				Update();
 				Helper::SDL_RenderPresent(renderer.GetRenderer());
 				exit(0);
 			}
