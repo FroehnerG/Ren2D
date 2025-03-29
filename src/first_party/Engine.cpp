@@ -364,6 +364,7 @@ void Engine::LoadScene(string scene_name)
 	rapidjson::Document scene_json;
 	EngineUtils::ReadJsonFile(scene_path, scene_json);
 
+
 	scene.Reset();
 
 	scene.LoadActors(scene_json, renderer.GetRenderer(), &images);
