@@ -16,6 +16,7 @@ public:
     std::string actor_name = "";
     SDL_Texture* view_image = nullptr;
     SDL_Texture* view_image_back = nullptr;
+    SDL_Texture* view_image_damage = nullptr;
     glm::vec2 position = glm::vec2(0.0f, 0.0f);
     glm::vec2 velocity = glm::vec2(0.0f, 0.0f);
     glm::vec2 transform_scale = glm::vec2(1.0f, 1.0f);
@@ -30,6 +31,7 @@ public:
     bool movement_bounce_enabled = false;
     bool direction_changed = true;
     bool show_view_image_back = false;
+    bool show_view_image_damage = false;
     std::string nearby_dialogue = "";
     std::string contact_dialogue = "";
     std::optional<float> render_order = std::nullopt;

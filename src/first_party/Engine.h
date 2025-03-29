@@ -27,7 +27,7 @@ public:
 	bool IsPositionValid(Actor* actor, vec2 new_position);
 	void CheckTriggerActors();
 	void ShowNPCDialogue();
-	void CheckNPCDialogue(string& dialogue, int actor_id);
+	void CheckNPCDialogue(string& dialogue, Actor* actor);
 	void MoveNPCs();
 	void ClearCollidingActorsSet();
 	void LoadScene(string scene_name);

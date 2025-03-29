@@ -135,6 +135,10 @@ void Renderer::Render(std::multimap<RenderKey, const Actor*>* sorted_actors, vec
             actor_view_image = actor.second->view_image_back;
         }
 
+        if (actor.second->show_view_image_damage) {
+            actor_view_image = actor.second->view_image_damage;
+        }
+
         // Determine Flip State (based on transform_scale)
         SDL_RendererFlip flip = SDL_FLIP_NONE;
         if (actor.second->transform_scale.x < 0) flip = static_cast<SDL_RendererFlip>(flip | SDL_FLIP_HORIZONTAL);

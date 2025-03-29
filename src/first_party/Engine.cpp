@@ -240,9 +240,9 @@ void Engine::HandlePlayerMovement() {
 		else if (direction.y > 0 && player->view_image_back) {
 			player->show_view_image_back = false;
 		}
-
-		UpdatePlayerPosition(direction * player_movement_speed);
 	}
+
+	UpdatePlayerPosition(direction * player_movement_speed);
 }
 
 
@@ -256,6 +256,10 @@ bool Engine::IsPositionValid(Actor* actor, vec2 new_position)
 	for (auto& other : *actors) {
 		if (actor->id == other.id) {
 			continue;
+		}
+
+		if (actor->actor_name == "player" && other.actor_name == "villy" && last_damage_frame > 0) {
+			cout << current_frame;
 		}
 
 		if (actor->AreBoxesOverlapping(other, false)) {
@@ -286,6 +290,7 @@ void Engine::CheckTriggerActors()
 		string message = actor.nearby_dialogue;
 		
 		if (player->AreBoxesOverlapping(actor, true) && !message.empty()) {
+			dialogue.push_back(message);
 			if (next_scene) {
 				next_scene = false;
 				LoadScene(next_scene_name);
@@ -463,7 +468,7 @@ void Engine::ShowNPCDialogue()
 		return;
 	}
 
-	std::unordered_set colliding_actors = GetPlayer()->colliding_actors_this_frame;
+	std::unordered_set<Actor*> colliding_actors = GetPlayer()->colliding_actors_this_frame;
 
 	bool skip_rendering = false;  // Flag to avoid rendering dialogue on scene transition
 
@@ -472,7 +477,7 @@ void Engine::ShowNPCDialogue()
 
 		if (!message.empty()) {
 			dialogue.push_back(message);  // Queue message for rendering
-			CheckNPCDialogue(message, actor->id);
+			CheckNPCDialogue(message, actor);
 
 			if (next_scene) {
 				next_scene = false;
@@ -489,9 +494,10 @@ void Engine::ShowNPCDialogue()
 	}
 }
 
-void Engine::CheckNPCDialogue(std::string& dialogue, int actor_id)
+void Engine::CheckNPCDialogue(std::string& dialogue, Actor* actor)
 {
 	std::unordered_set<int>* score_actors = GetScoreActors();
+	Actor* player = GetPlayer();
 
 	const std::string health_down = "health down";
 	const std::string score_up = "score up";
@@ -502,6 +508,7 @@ void Engine::CheckNPCDialogue(std::string& dialogue, int actor_id)
 	if (dialogue.find(health_down) != std::string::npos) {
 		if (current_frame >= last_damage_frame + 180) {
 			player_health--;
+
 			last_damage_frame = current_frame;
 
 			if (player_health <= 0) {
@@ -513,10 +520,25 @@ void Engine::CheckNPCDialogue(std::string& dialogue, int actor_id)
 				return;
 			}
 		}
+
+		// Only show damage sprite for 30 frames after last_damage_frame
+		if (actor->view_image_damage && current_frame < last_damage_frame + 30) {
+			actor->show_view_image_damage = true;
+		}
+		else {
+			actor->show_view_image_damage = false;
+		}
+
+		if (player->view_image_damage && current_frame < last_damage_frame + 30) {
+			player->show_view_image_damage = true;
+		}
+		else {
+			player->show_view_image_damage = false;
+		}
 	}
-	else if (dialogue.find(score_up) != std::string::npos && score_actors->find(actor_id) == score_actors->end()) {
+	else if (dialogue.find(score_up) != std::string::npos && score_actors->find(actor->id) == score_actors->end()) {
 		score++;
-		score_actors->insert(actor_id);
+		score_actors->insert(actor->id);
 	}
 	else if (dialogue.find(you_win) != std::string::npos) {
 		if (!images.HasGameOverImage(true)) {

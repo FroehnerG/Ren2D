@@ -92,6 +92,23 @@ void Actor::ParseActorFromJson(SDL_Renderer* renderer, ImageDB* imageDB, rapidjs
         view_image_back = imageDB->GetActorTextureById(current_actor_id);
     }
 
+    if (actor_name == "player") {
+        if (actor_json.HasMember("view_image_damage")) {
+            std::string image_name = actor_json["view_image_damage"].GetString();
+            imageDB->LoadImages(actor_json, renderer, false, image_name, current_actor_id);
+
+            view_image_damage = imageDB->GetActorTextureById(current_actor_id);
+        }
+    }
+    else {
+        if (actor_json.HasMember("view_image_attack")) {
+            std::string image_name = actor_json["view_image_attack"].GetString();
+            imageDB->LoadImages(actor_json, renderer, false, image_name, current_actor_id);
+
+            view_image_damage = imageDB->GetActorTextureById(current_actor_id);
+        }
+    }
+
     if (actor_json.HasMember("view_pivot_offset_x")) {
         view_pivot_offset.x = actor_json["view_pivot_offset_x"].GetFloat();
     }
@@ -146,7 +163,7 @@ bool Actor::AreBoxesOverlapping(const Actor& other, bool is_trigger)
     float b_top = other.position.y - b_half_h;
     float b_bottom = other.position.y + b_half_h;
 
-    return !(a_right < b_left || a_left > b_right || a_bottom < b_top || a_top > b_bottom);
+    return !(a_right <= b_left || a_left >= b_right || a_bottom <= b_top || a_top >= b_bottom);
 }
 
 void Actor::InsertCollidingActor(Actor* actor)
