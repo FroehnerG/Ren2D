@@ -468,6 +468,8 @@ void Engine::ShowNPCDialogue()
 		return;
 	}
 
+	Actor* player = GetPlayer();
+
 	std::unordered_set<Actor*> colliding_actors = GetPlayer()->colliding_actors_this_frame;
 
 	bool skip_rendering = false;  // Flag to avoid rendering dialogue on scene transition
@@ -476,7 +478,7 @@ void Engine::ShowNPCDialogue()
 		std::string message = actor->contact_dialogue;
 
 		if (!message.empty()) {
-			dialogue.push_back(message);  // Queue message for rendering
+			//dialogue.push_back(message);  // Queue message for rendering
 			CheckNPCDialogue(message, actor);
 
 			if (next_scene) {
@@ -492,6 +494,13 @@ void Engine::ShowNPCDialogue()
 			}
 		}
 	}
+
+	if (player->view_image_damage && current_frame < last_damage_frame + 30) {
+		player->show_view_image_damage = true;
+	}
+	else {
+		player->show_view_image_damage = false;
+	}
 }
 
 void Engine::CheckNPCDialogue(std::string& dialogue, Actor* actor)
@@ -504,6 +513,14 @@ void Engine::CheckNPCDialogue(std::string& dialogue, Actor* actor)
 	const std::string you_win = "you win";
 	const std::string game_over = "game over";
 	const std::string proceed_to = "proceed to";
+
+	// Only show damage sprite for 30 frames after last_damage_frame
+	if (actor->view_image_damage && current_frame < last_damage_frame + 30) {
+		actor->show_view_image_damage = true;
+	}
+	else {
+		actor->show_view_image_damage = false;
+	}
 
 	if (dialogue.find(health_down) != std::string::npos) {
 		if (current_frame >= last_damage_frame + 180) {
@@ -519,21 +536,13 @@ void Engine::CheckNPCDialogue(std::string& dialogue, Actor* actor)
 				game_over_bad = true;
 				return;
 			}
-		}
-
-		// Only show damage sprite for 30 frames after last_damage_frame
-		if (actor->view_image_damage && current_frame < last_damage_frame + 30) {
-			actor->show_view_image_damage = true;
-		}
-		else {
-			actor->show_view_image_damage = false;
-		}
-
-		if (player->view_image_damage && current_frame < last_damage_frame + 30) {
-			player->show_view_image_damage = true;
-		}
-		else {
-			player->show_view_image_damage = false;
+			// Only show damage sprite for 30 frames after last_damage_frame
+			if (actor->view_image_damage && current_frame < last_damage_frame + 30) {
+				actor->show_view_image_damage = true;
+			}
+			else {
+				actor->show_view_image_damage = false;
+			}
 		}
 	}
 	else if (dialogue.find(score_up) != std::string::npos && score_actors->find(actor->id) == score_actors->end()) {
