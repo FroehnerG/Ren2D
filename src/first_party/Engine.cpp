@@ -315,6 +315,11 @@ void Engine::MoveNPCs()
 			continue;
 		}
 
+		// Only show damage sprite for 30 frames after last_damage_frame
+		if (current_frame >= last_damage_frame + 30) {
+			actor.show_view_image_damage = false;
+		}
+
 		if (actor.velocity != vec2(0.0f, 0.0f)) {
 			vec2 new_actor_position = actor.position + actor.velocity;
 
@@ -478,7 +483,6 @@ void Engine::ShowNPCDialogue()
 		std::string message = actor->contact_dialogue;
 
 		if (!message.empty()) {
-			//dialogue.push_back(message);  // Queue message for rendering
 			CheckNPCDialogue(message, actor);
 
 			if (next_scene) {
@@ -513,14 +517,6 @@ void Engine::CheckNPCDialogue(std::string& dialogue, Actor* actor)
 	const std::string you_win = "you win";
 	const std::string game_over = "game over";
 	const std::string proceed_to = "proceed to";
-
-	// Only show damage sprite for 30 frames after last_damage_frame
-	if (actor->view_image_damage && current_frame < last_damage_frame + 30) {
-		actor->show_view_image_damage = true;
-	}
-	else {
-		actor->show_view_image_damage = false;
-	}
 
 	if (dialogue.find(health_down) != std::string::npos) {
 		if (current_frame >= last_damage_frame + 180) {

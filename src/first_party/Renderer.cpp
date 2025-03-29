@@ -102,9 +102,19 @@ void Renderer::Render(std::multimap<RenderKey, const Actor*>* sorted_actors, vec
             continue;
         }
 
+        SDL_Texture* actor_view_image = actor.second->view_image;
+
+        if (actor.second->show_view_image_back) {
+            actor_view_image = actor.second->view_image_back;
+        }
+
+        if (actor.second->show_view_image_damage) {
+            actor_view_image = actor.second->view_image_damage;
+        }
+
         // Get image width and height
         float img_width = 0, img_height = 0;
-        Helper::SDL_QueryTexture(actor.second->view_image, &img_width, &img_height);
+        Helper::SDL_QueryTexture(actor_view_image, &img_width, &img_height);
 
         glm::vec2 extra_view_offset(0.0f);
 
@@ -128,16 +138,6 @@ void Renderer::Render(std::multimap<RenderKey, const Actor*>* sorted_actors, vec
         dstrect.y = screen_y - pivot.y * glm::abs(actor.second->transform_scale.y);
         dstrect.w = img_width * glm::abs(actor.second->transform_scale.x);
         dstrect.h = img_height * glm::abs(actor.second->transform_scale.y);
-
-        SDL_Texture* actor_view_image = actor.second->view_image;
-
-        if (actor.second->show_view_image_back) {
-            actor_view_image = actor.second->view_image_back;
-        }
-
-        if (actor.second->show_view_image_damage) {
-            actor_view_image = actor.second->view_image_damage;
-        }
 
         // Determine Flip State (based on transform_scale)
         SDL_RendererFlip flip = SDL_FLIP_NONE;
