@@ -259,7 +259,7 @@ bool Engine::IsPositionValid(Actor* actor, vec2 new_position)
 		}
 
 		if (actor->actor_name == "player" && other.actor_name == "villy" && last_damage_frame > 0) {
-			cout << current_frame;
+			//cout << current_frame;
 		}
 
 		if (actor->AreBoxesOverlapping(other, false)) {
