@@ -253,8 +253,6 @@ bool Engine::IsPositionValid(Actor* actor, vec2 new_position)
 	vec2 old_position = actor->position;
 	actor->position = new_position;
 
-	bool position_valid = true;
-
 	for (auto& other : *actors) {
 		if (actor->id == other.id) {
 			continue;
@@ -263,12 +261,15 @@ bool Engine::IsPositionValid(Actor* actor, vec2 new_position)
 		if (actor->AreBoxesOverlapping(other, false)) {
 			actor->InsertCollidingActor(&other);
 			other.InsertCollidingActor(actor);
-			position_valid = false;
 			actor->position = old_position;
 		}
 	}
 
-	return position_valid;
+	if (actor->colliding_actors_this_frame.empty()) {
+		return true;
+	}
+
+	return false;
 }
 
 void Engine::CheckTriggerActors()
@@ -342,6 +343,15 @@ void Engine::MoveNPCs()
 	}
 }
 
+void Engine::ClearCollidingActorsSet()
+{
+	vector<Actor>* actors = GetActors();
+
+	for (auto& actor : *actors) {
+		actor.colliding_actors_this_frame.clear();
+	}
+}
+
 void Engine::LoadScene(string scene_name)
 {
 	string scene_path = "resources/scenes/" + scene_name + ".scene";
@@ -376,6 +386,8 @@ vec2 Engine::InvertVelocity(vec2 velocity)
 void Engine::Update()
 {
 	MoveNPCs();
+	CheckTriggerActors();
+	ClearCollidingActorsSet();
 }
 
 void Engine::Render()

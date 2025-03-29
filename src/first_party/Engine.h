@@ -29,6 +29,7 @@ public:
 	void ShowNPCDialogue();
 	void CheckNPCDialogue(string& dialogue, int actor_id);
 	void MoveNPCs();
+	void ClearCollidingActorsSet();
 	void LoadScene(string scene_name);
 	SDL_Window* CreateWindow();
 	vec2 InvertVelocity(vec2 velocity);
