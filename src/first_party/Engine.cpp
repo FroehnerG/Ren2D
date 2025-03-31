@@ -267,7 +267,7 @@ bool Engine::IsPositionValid(Actor* actor, vec2 new_position)
 	actor->position = new_position;
 
 	if (current_frame == 50) {
-		cout << "test";
+		//cout << "test";
 	}
 
 	for (auto& other : *actors) {
