@@ -118,7 +118,7 @@ void Engine::GameLoop()
 			}
 
 			if (!game_over_bad && !game_over_good) {
-				HandlePlayerMovement();
+				//HandlePlayerMovement();
 				Update();
 			}
 		}
@@ -266,13 +266,13 @@ bool Engine::IsPositionValid(Actor* actor, vec2 new_position)
 	vec2 old_position = actor->position;
 	actor->position = new_position;
 
+	if (current_frame == 50) {
+		cout << "test";
+	}
+
 	for (auto& other : *actors) {
 		if (actor->id == other.id) {
 			continue;
-		}
-
-		if (actor->actor_name == "player" && other.actor_name == "villy" && last_damage_frame > 0) {
-			//cout << current_frame;
 		}
 
 		if (actor->AreBoxesOverlapping(other, false)) {
@@ -325,6 +325,7 @@ void Engine::MoveNPCs()
 	// Go through each actor in actor vector and move them
 	for (auto& actor : *actors) {
 		if (actor.actor_name == "player") {
+			HandlePlayerMovement();
 			continue;
 		}
 

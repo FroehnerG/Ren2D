@@ -163,7 +163,7 @@ bool Actor::AreBoxesOverlapping(const Actor& other, bool is_trigger)
     float b_top = other.position.y - b_half_h;
     float b_bottom = other.position.y + b_half_h;
 
-    return !(a_right < b_left || a_left > b_right || a_bottom < b_top || a_top > b_bottom);
+    return !(a_right <= b_left || a_left >= b_right || a_bottom <= b_top || a_top >= b_bottom);
 }
 
 void Actor::InsertCollidingActor(Actor* actor)
