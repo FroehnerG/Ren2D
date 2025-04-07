@@ -28,8 +28,8 @@ struct RenderKey {
 
 class SceneDB {
 public:
-	void LoadActors(rapidjson::Document& scene_json, SDL_Renderer* renderer, ImageDB* imageDB);
-	void LoadTemplate(string template_name, SDL_Renderer* renderer, ImageDB* imageDB, int current_actor_id);
+	void LoadActors(rapidjson::Document& scene_json, SDL_Renderer* renderer, ImageDB* imageDB, AudioDB* audioDB);
+	void LoadTemplate(string template_name, SDL_Renderer* renderer, ImageDB* imageDB, AudioDB* audioDB, int current_actor_id);
 	void SortRenderActors(bool is_map_created, Actor* moved_actor);
 	void Reset();
 	std::multimap<RenderKey, const Actor*>* GetSortedActors();

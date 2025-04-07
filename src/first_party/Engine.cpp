@@ -62,8 +62,9 @@ Engine::Engine(rapidjson::Document& game_config)
 	audio.LoadAudio(game_config, "gameplay_audio", false);
 	audio.LoadAudio(game_config, "game_over_good_audio", false);
 	audio.LoadAudio(game_config, "game_over_bad_audio", false);
+	audio.LoadAudio(game_config, "score_sfx", false);
 
-	scene.LoadActors(scene_json, renderer.GetRenderer(), &images);
+	scene.LoadActors(scene_json, renderer.GetRenderer(), &images, &audio);
 	scene.SortRenderActors(false, nullptr);
 
 	if (GetPlayer() != nullptr) {
@@ -240,6 +241,10 @@ void Engine::HandlePlayerMovement() {
 	if (direction.x != 0.0f || direction.y != 0.0f) {
 		direction = glm::normalize(direction); // Normalize to maintain consistent speed
 
+		if (current_frame % 20 == 0) {
+			audio.PlayActorSFX(-1, "step_sfx", current_frame % 48 + 2);
+		}
+
 		if (direction.x > 0 && renderer.GetXFlipOnMovement()) {
 			player->transform_scale.x = glm::abs(player->transform_scale.x);
 		}
@@ -258,21 +263,19 @@ void Engine::HandlePlayerMovement() {
 	UpdatePlayerPosition(direction * player_movement_speed);
 }
 
-
-
 bool Engine::IsPositionValid(Actor* actor, vec2 new_position)
 {
 	vector<Actor>* actors = GetActors();
 	vec2 old_position = actor->position;
 	actor->position = new_position;
 
-	if (current_frame == 50) {
-		//cout << "test";
-	}
-
 	for (auto& other : *actors) {
 		if (actor->id == other.id) {
 			continue;
+		}
+
+		if (current_frame == 50 && other.actor_name == "player") {
+			//cout << "test2";
 		}
 
 		if (actor->AreBoxesOverlapping(other, false)) {
@@ -289,52 +292,23 @@ bool Engine::IsPositionValid(Actor* actor, vec2 new_position)
 	return false;
 }
 
-void Engine::CheckTriggerActors()
-{
-	Actor* player = GetPlayer();
-
-	if (!player->trigger) {
-		return;
-	}
-
-	vector<Actor>* actors = GetActors();
-
-	for (const auto& actor : *actors) {
-		string message = actor.nearby_dialogue;
-		
-		if (player->AreBoxesOverlapping(actor, true) && !message.empty()) {
-			dialogue.push_back(message);
-			if (next_scene) {
-				next_scene = false;
-				LoadScene(next_scene_name);
-				dialogue.clear();
-				return;
-			}
-
-			if (game_over_good || game_over_bad) {
-				dialogue.clear();
-				return;
-			}
-		}
-	}
-}
-
 void Engine::MoveNPCs()
 {
 	vector<Actor>* actors = GetActors();
 	// Go through each actor in actor vector and move them
 	for (auto& actor : *actors) {
-		if (actor.actor_name == "player") {
-			HandlePlayerMovement();
-			continue;
-		}
-
 		// Only show damage sprite for 30 frames after last_damage_frame
 		if (current_frame >= last_damage_frame + 30) {
 			actor.show_view_image_damage = false;
 		}
 
+		if (actor.actor_name == "player") {
+			HandlePlayerMovement();
+			continue;
+		}
+
 		if (actor.velocity != vec2(0.0f, 0.0f)) {
+
 			vec2 new_actor_position = actor.position + actor.velocity;
 
 			if (actor.direction_changed) {
@@ -388,10 +362,9 @@ void Engine::LoadScene(string scene_name)
 	rapidjson::Document scene_json;
 	EngineUtils::ReadJsonFile(scene_path, scene_json);
 
-
 	scene.Reset();
 
-	scene.LoadActors(scene_json, renderer.GetRenderer(), &images);
+	scene.LoadActors(scene_json, renderer.GetRenderer(), &images, &audio);
 	scene.SortRenderActors(false, nullptr);
 }
 
@@ -427,6 +400,38 @@ void Engine::UpdatePlayerPosition(vec2 direction)
 
 	if (IsPositionValid(GetPlayer(), new_position)) {
 		scene.SortRenderActors(true, GetPlayer());
+	}
+}
+
+void Engine::CheckTriggerActors()
+{
+	Actor* player = GetPlayer();
+
+	if (!player->trigger) {
+		return;
+	}
+
+	vector<Actor>* actors = GetActors();
+
+	for (auto& actor : *actors) {
+		string message = actor.nearby_dialogue;
+
+		if (player->AreBoxesOverlapping(actor, true) && !message.empty()) {
+			dialogue.push_back(message);
+			CheckNPCDialogue(message, &actor);
+			audio.PlayActorSFX(actor.id, "nearby", current_frame % 48 + 2);
+			if (next_scene) {
+				next_scene = false;
+				LoadScene(next_scene_name);
+				dialogue.clear();
+				return;
+			}
+
+			if (game_over_good || game_over_bad) {
+				dialogue.clear();
+				return;
+			}
+		}
 	}
 }
 
@@ -536,6 +541,8 @@ void Engine::CheckNPCDialogue(std::string& dialogue, Actor* actor)
 		if (current_frame >= last_damage_frame + 180) {
 			player_health--;
 
+			audio.PlayActorSFX(-1, "damage_sfx", current_frame % 48 + 2);
+
 			last_damage_frame = current_frame;
 
 			if (player_health <= 0) {
@@ -558,6 +565,9 @@ void Engine::CheckNPCDialogue(std::string& dialogue, Actor* actor)
 	else if (dialogue.find(score_up) != std::string::npos && score_actors->find(actor->id) == score_actors->end()) {
 		score++;
 		score_actors->insert(actor->id);
+
+		audio.PlayActorSFX(-1, "score_sfx", 1);
+		
 	}
 	else if (dialogue.find(you_win) != std::string::npos) {
 		if (!images.HasGameOverImage(true)) {

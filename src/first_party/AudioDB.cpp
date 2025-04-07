@@ -6,6 +6,11 @@
 
 namespace fs = std::filesystem;
 
+AudioDB::AudioDB()
+{
+	Mix_AllocateChannels(50);
+}
+
 void AudioDB::LoadAudio(rapidjson::Document& game_config, std::string audio_type, bool is_intro)
 {
 	if (is_intro && !game_config.HasMember(audio_type.c_str())) {
@@ -25,6 +30,10 @@ void AudioDB::LoadAudio(rapidjson::Document& game_config, std::string audio_type
 
 	if (audio_type == "game_over_bad_audio" && !game_config.HasMember("game_over_bad_audio")) {
 		has_game_over_bad_audio = false;
+		return;
+	}
+
+	if (audio_type == "score_sfx" && !game_config.HasMember("score_sfx")) {
 		return;
 	}
 
@@ -49,6 +58,15 @@ void AudioDB::LoadAudio(rapidjson::Document& game_config, std::string audio_type
 		else {
 			intro_music = AudioHelper::Mix_LoadWAV(audio_path_ogg.c_str());
 		}
+	}
+	else if (audio_type == "score_sfx") {
+		if (fs::exists(audio_path_wav)) {
+			score_sfx = AudioHelper::Mix_LoadWAV(audio_path_wav.c_str());
+		}
+		else {
+			score_sfx = AudioHelper::Mix_LoadWAV(audio_path_ogg.c_str());
+		}
+		has_score_sfx = true;
 	}
 	else if (audio_type == "game_over_good_audio") {
 		if (fs::exists(audio_path_wav)) {
@@ -112,6 +130,82 @@ void AudioDB::PlayGameOverMusic(bool is_good)
 		exit(0);
 	}
 	
+}
+
+void AudioDB::SetNearbyDialogueSFXByID(int actor_id, std::string sfx_name)
+{
+	std::string sfx_path_wav = "resources/audio/" + sfx_name + ".wav";
+	std::string sfx_path_ogg = "resources/audio/" + sfx_name + ".ogg";
+
+	if (fs::exists(sfx_path_wav)) {
+		nearby_dialogue_sfx_by_id[actor_id].first = AudioHelper::Mix_LoadWAV(sfx_path_wav.c_str());
+		nearby_dialogue_sfx_by_id[actor_id].second = false;
+	}
+	else {
+		nearby_dialogue_sfx_by_id[actor_id].first = AudioHelper::Mix_LoadWAV(sfx_path_ogg.c_str());
+		nearby_dialogue_sfx_by_id[actor_id].second = false;
+	}
+}
+
+std::pair<Mix_Chunk*, bool> AudioDB::GetNearbyDialogueSFXByID(int actor_id)
+{
+	return nearby_dialogue_sfx_by_id[actor_id];
+}
+
+void AudioDB::LoadPlayerSFX(std::string sfx_type, std::string sfx_name)
+{
+	std::string sfx_path_wav = "resources/audio/" + sfx_name + ".wav";
+	std::string sfx_path_ogg = "resources/audio/" + sfx_name + ".ogg";
+
+	if (sfx_type == "step_sfx") {
+		if (fs::exists(sfx_path_wav)) {
+			step_sfx = AudioHelper::Mix_LoadWAV(sfx_path_wav.c_str());
+		}
+		else {
+			step_sfx = AudioHelper::Mix_LoadWAV(sfx_path_ogg.c_str());
+		}
+
+		has_step_sfx = true;
+	}
+	else if (sfx_type == "damage_sfx") {
+		if (fs::exists(sfx_path_wav)) {
+			damage_sfx = AudioHelper::Mix_LoadWAV(sfx_path_wav.c_str());
+		}
+		else {
+			damage_sfx = AudioHelper::Mix_LoadWAV(sfx_path_ogg.c_str());
+		}
+
+		has_damage_sfx = true;
+	}
+}
+
+void AudioDB::PlayActorSFX(int actor_id, std::string sfx_name, int channel)
+{
+	if (sfx_name == "score_sfx") {
+		if (has_score_sfx) {
+			AudioHelper::Mix_PlayChannel(channel, score_sfx, 0);
+		}
+	}
+	else if (sfx_name == "step_sfx") {
+		if (has_step_sfx) {
+			AudioHelper::Mix_PlayChannel(channel, step_sfx, 0);
+		}
+	}
+	else if (sfx_name == "damage_sfx") {
+		if (has_damage_sfx) {
+			AudioHelper::Mix_PlayChannel(channel, damage_sfx, 0);
+		}
+	}
+	else {
+		if (nearby_dialogue_sfx_by_id.find(actor_id) == nearby_dialogue_sfx_by_id.end()) {
+			return;
+		}
+
+		if (!nearby_dialogue_sfx_by_id[actor_id].second) {
+			AudioHelper::Mix_PlayChannel(channel, nearby_dialogue_sfx_by_id[actor_id].first, 0);
+			nearby_dialogue_sfx_by_id[actor_id].second = true;
+		}
+	}
 }
 
 bool AudioDB::CheckIfHasMusic(bool is_intro) {

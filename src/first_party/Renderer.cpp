@@ -158,6 +158,7 @@ void Renderer::Render(std::multimap<RenderKey, const Actor*>* sorted_actors, vec
         );
     }
 
+    RenderDebugColliders(sorted_actors, x_resolution, y_resolution, false); // true = also render triggers
     SDL_RenderSetScale(sdl_renderer, 1.0f, 1.0f);
 
     if (health.has_value()) {
@@ -172,6 +173,58 @@ void Renderer::Render(std::multimap<RenderKey, const Actor*>* sorted_actors, vec
     Helper::SDL_RenderPresent(sdl_renderer);
     dialogue->clear();
 }
+
+void Renderer::RenderDebugColliders(std::multimap<RenderKey, const Actor*>* sorted_actors, int& x_resolution, int& y_resolution, bool show_triggers)
+{
+    SDL_SetRenderDrawBlendMode(sdl_renderer, SDL_BLENDMODE_BLEND);
+
+    for (const auto& actor : *sorted_actors) {
+        // Choose which box to draw
+        bool draw_collider = actor.second->box_collider_width > 0 && actor.second->box_collider_height > 0;
+        bool draw_trigger = show_triggers && actor.second->box_trigger_width > 0 && actor.second->box_trigger_height > 0;
+
+        if (!draw_collider && !draw_trigger) continue;
+
+        float scale_units = 100.0f;
+
+        // Convert world position to screen
+        float screen_x = (x_resolution / 2.0f / zoom_factor) + ((actor.second->position.x - camera_position.x) * scale_units);
+        float screen_y = (y_resolution / 2.0f / zoom_factor) + ((actor.second->position.y - camera_position.y) * scale_units);
+
+        // Draw collider (red)
+        if (draw_collider) {
+            float w = actor.second->box_collider_width * glm::abs(actor.second->transform_scale.x) * scale_units;
+            float h = actor.second->box_collider_height * glm::abs(actor.second->transform_scale.y) * scale_units;
+
+            SDL_FRect rect;
+            rect.x = screen_x - w / 2.0f;
+            rect.y = screen_y - h / 2.0f;
+            rect.w = w;
+            rect.h = h;
+
+            SDL_SetRenderDrawColor(sdl_renderer, 255, 0, 0, 180);  // Red box
+            SDL_RenderDrawRectF(sdl_renderer, &rect);
+        }
+
+        // Draw trigger (green)
+        if (draw_trigger) {
+            float w = actor.second->box_trigger_width * glm::abs(actor.second->transform_scale.x) * scale_units;
+            float h = actor.second->box_trigger_height * glm::abs(actor.second->transform_scale.y) * scale_units;
+
+            SDL_FRect rect;
+            rect.x = screen_x - w / 2.0f;
+            rect.y = screen_y - h / 2.0f;
+            rect.w = w;
+            rect.h = h;
+
+            SDL_SetRenderDrawColor(sdl_renderer, 0, 255, 0, 180);  // Green box
+            SDL_RenderDrawRectF(sdl_renderer, &rect);
+        }
+    }
+
+    SDL_SetRenderDrawBlendMode(sdl_renderer, SDL_BLENDMODE_NONE);
+}
+
 
 void Renderer::RenderDialogue(vector<string>* dialogue, int y_resolution)
 {

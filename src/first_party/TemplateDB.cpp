@@ -2,7 +2,7 @@
 #include <iostream>
 #include "TemplateDB.h"
 
-void TemplateDB::LoadTemplate(std::string template_name, SDL_Renderer* renderer, ImageDB* imageDB, rapidjson::Document& template_json, int current_actor_id)
+void TemplateDB::LoadTemplate(std::string template_name, SDL_Renderer* renderer, ImageDB* imageDB, AudioDB* audioDB, rapidjson::Document& template_json, int current_actor_id)
 {
 	uint64_t actor_template_hash = EngineUtils::HashString(template_name);
 
@@ -13,7 +13,7 @@ void TemplateDB::LoadTemplate(std::string template_name, SDL_Renderer* renderer,
 
 	Actor actor_template;
 
-	actor_template.ParseActorFromJson(renderer, imageDB, template_json, current_actor_id);
+	actor_template.ParseActorFromJson(renderer, imageDB, audioDB, template_json, current_actor_id);
 
 	actor_templates[actor_template_hash] = actor_template;
 }

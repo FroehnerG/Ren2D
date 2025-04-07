@@ -19,7 +19,7 @@ public:
         return instance;
     }
 
-    void LoadTemplate(std::string template_name, SDL_Renderer* renderer, ImageDB* imageDB, rapidjson::Document& template_json, int current_actor_id);
+    void LoadTemplate(std::string template_name, SDL_Renderer* renderer, ImageDB* imageDB, AudioDB* audioDB, rapidjson::Document& template_json, int current_actor_id);
     Actor UseTemplate(std::string template_name);
 
 private:

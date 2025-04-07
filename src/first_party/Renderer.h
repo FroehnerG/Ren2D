@@ -27,6 +27,7 @@ public:
     bool GetXFlipOnMovement();
 	void Render(std::multimap<RenderKey, const Actor*>* sorted_actors, vector<string>* dialogue, Actor* player, 
         int& x_resolution, int& y_resolution, SDL_Texture* hp_image, std::optional<int> health, int& score);
+    void RenderDebugColliders(std::multimap<RenderKey, const Actor*>* sorted_actors, int& x_resolution, int& y_resolution, bool show_triggers);
     void RenderDialogue(vector<string>* dialogue, int y_resolution);
     void RenderEnd(SDL_Texture* game_over_image);
     // New methods for rendering images

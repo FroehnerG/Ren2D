@@ -8,7 +8,7 @@
 using std::cout;
 namespace fs = std::filesystem;
 
-void SceneDB::LoadActors(rapidjson::Document& scene_json, SDL_Renderer* renderer, ImageDB* imageDB)
+void SceneDB::LoadActors(rapidjson::Document& scene_json, SDL_Renderer* renderer, ImageDB* imageDB, AudioDB* audioDB)
 {
 	TemplateDB& templateDB = TemplateDB::GetInstance();
 	actors.reserve(10000);
@@ -22,12 +22,12 @@ void SceneDB::LoadActors(rapidjson::Document& scene_json, SDL_Renderer* renderer
 			string template_name = actor_json["template"].GetString();
 
 			// Will exit program if template file does not exist
-			LoadTemplate(template_name, renderer, imageDB, current_actor_id);
+			LoadTemplate(template_name, renderer, imageDB, audioDB, current_actor_id);
 
 			actor = templateDB.UseTemplate(template_name);
 		}
 
-		actor.ParseActorFromJson(renderer, imageDB, actor_json, current_actor_id);
+		actor.ParseActorFromJson(renderer, imageDB, audioDB, actor_json, current_actor_id);
 
 		if (actor.blocking) {
 			uint64_t composite_position = EngineUtils::CreateCompositeKey(actor.position);
@@ -45,7 +45,7 @@ void SceneDB::LoadActors(rapidjson::Document& scene_json, SDL_Renderer* renderer
 	}
 }
 
-void SceneDB::LoadTemplate(string template_name, SDL_Renderer* renderer, ImageDB* imageDB, int current_actor_id)
+void SceneDB::LoadTemplate(string template_name, SDL_Renderer* renderer, ImageDB* imageDB, AudioDB* audioDB, int current_actor_id)
 {
 	TemplateDB& templateDB = TemplateDB::GetInstance();
 	string template_path = "resources/actor_templates/" + template_name + ".template";
@@ -58,7 +58,7 @@ void SceneDB::LoadTemplate(string template_name, SDL_Renderer* renderer, ImageDB
 	rapidjson::Document template_json;
 	EngineUtils::ReadJsonFile(template_path, template_json);
 
-	templateDB.LoadTemplate(template_name, renderer, imageDB, template_json, current_actor_id);
+	templateDB.LoadTemplate(template_name, renderer, imageDB, audioDB, template_json, current_actor_id);
 }
 
 void SceneDB::SortRenderActors(bool is_map_created, Actor* moved_actor)

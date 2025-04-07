@@ -7,6 +7,7 @@
 #include "SDL2/SDL.h"
 #include "rapidjson/document.h"
 #include "ImageDB.h"
+#include "AudioDB.h"
 
 class Actor {
 public:
@@ -37,7 +38,7 @@ public:
     std::optional<float> render_order = std::nullopt;
     std::unordered_set<Actor*> colliding_actors_this_frame;
 
-    void ParseActorFromJson(SDL_Renderer* renderer, ImageDB* imageDB, rapidjson::Value& actor_json, int current_actor_id);
+    void ParseActorFromJson(SDL_Renderer* renderer, ImageDB* imageDB, AudioDB* audioDB, rapidjson::Value& actor_json, int current_actor_id);
     bool AreBoxesOverlapping(const Actor& other, bool is_trigger);
     void InsertCollidingActor(Actor* actor);
     void ClearCollidingActors();

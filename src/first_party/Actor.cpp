@@ -1,7 +1,7 @@
 #include "Actor.h"
 #include "Helper.h"
 
-void Actor::ParseActorFromJson(SDL_Renderer* renderer, ImageDB* imageDB, rapidjson::Value& actor_json, int current_actor_id)
+void Actor::ParseActorFromJson(SDL_Renderer* renderer, ImageDB* imageDB, AudioDB* audioDB, rapidjson::Value& actor_json, int current_actor_id)
 {
     if (actor_json.HasMember("name")) {
         actor_name = actor_json["name"].GetString();
@@ -99,6 +99,16 @@ void Actor::ParseActorFromJson(SDL_Renderer* renderer, ImageDB* imageDB, rapidjs
 
             view_image_damage = imageDB->GetActorTextureById(current_actor_id);
         }
+
+        if (actor_json.HasMember("damage_sfx")) {
+            std::string sfx_name = actor_json["damage_sfx"].GetString();
+            audioDB->LoadPlayerSFX("damage_sfx", sfx_name);
+        }
+
+        if (actor_json.HasMember("step_sfx")) {
+            std::string sfx_name = actor_json["step_sfx"].GetString();
+            audioDB->LoadPlayerSFX("step_sfx", sfx_name);
+        }
     }
     else {
         if (actor_json.HasMember("view_image_attack")) {
@@ -106,6 +116,11 @@ void Actor::ParseActorFromJson(SDL_Renderer* renderer, ImageDB* imageDB, rapidjs
             imageDB->LoadImages(actor_json, renderer, false, image_name, current_actor_id);
 
             view_image_damage = imageDB->GetActorTextureById(current_actor_id);
+        }
+
+        if (actor_json.HasMember("nearby_dialogue_sfx")) {
+            std::string sfx_name = actor_json["nearby_dialogue_sfx"].GetString();
+            audioDB->SetNearbyDialogueSFXByID(current_actor_id, sfx_name);
         }
     }
 
@@ -163,7 +178,14 @@ bool Actor::AreBoxesOverlapping(const Actor& other, bool is_trigger)
     float b_top = other.position.y - b_half_h;
     float b_bottom = other.position.y + b_half_h;
 
-    return !(a_right <= b_left || a_left >= b_right || a_bottom <= b_top || a_top >= b_bottom);
+    const float epsilon = 0.0001f;
+
+    if (a_right <= b_left + epsilon) return false;
+    if (a_left >= b_right - epsilon) return false;
+    if (a_bottom <= b_top + epsilon) return false;
+    if (a_top >= b_bottom - epsilon) return false;
+
+    return true;  // All axes overlap
 }
 
 void Actor::InsertCollidingActor(Actor* actor)
