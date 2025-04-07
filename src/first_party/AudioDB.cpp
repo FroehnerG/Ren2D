@@ -8,7 +8,7 @@ namespace fs = std::filesystem;
 
 AudioDB::AudioDB()
 {
-	Mix_AllocateChannels(50);
+	AudioHelper::Mix_AllocateChannels(50);
 }
 
 void AudioDB::LoadAudio(rapidjson::Document& game_config, std::string audio_type, bool is_intro)

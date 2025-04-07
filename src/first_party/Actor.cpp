@@ -178,12 +178,10 @@ bool Actor::AreBoxesOverlapping(const Actor& other, bool is_trigger)
     float b_top = other.position.y - b_half_h;
     float b_bottom = other.position.y + b_half_h;
 
-    const float epsilon = 0.0001f;
-
-    if (a_right <= b_left + epsilon) return false;
-    if (a_left >= b_right - epsilon) return false;
-    if (a_bottom <= b_top + epsilon) return false;
-    if (a_top >= b_bottom - epsilon) return false;
+    if (a_right <= b_left) return false;
+    if (a_left >= b_right) return false;
+    if (a_bottom <= b_top) return false;
+    if (a_top >= b_bottom) return false;
 
     return true;  // All axes overlap
 }
