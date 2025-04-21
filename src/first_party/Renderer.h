@@ -1,5 +1,6 @@
 #pragma once
 #include <string>
+#include <utility>
 #include <optional>
 #include "EngineUtils.h"
 #include "SDL2/SDL.h"
@@ -25,10 +26,10 @@ public:
     void SetCameraPosition(Actor* player);
     void SetXFlipOnMovement(bool x_flip_on_movement);
     bool GetXFlipOnMovement();
-	void Render(std::multimap<RenderKey, const Actor*>* sorted_actors, vector<string>* dialogue, Actor* player, 
+	void Render(std::multimap<RenderKey, const Actor*>* sorted_actors, std::pair<Actor*, std::string>* dialogue, Actor* player,
         int& x_resolution, int& y_resolution, SDL_Texture* hp_image, std::optional<int> health, int& score);
     void RenderDebugColliders(std::multimap<RenderKey, const Actor*>* sorted_actors, int& x_resolution, int& y_resolution, bool show_triggers);
-    void RenderDialogue(vector<string>* dialogue, int y_resolution);
+    void RenderDialogue(std::pair<Actor*, std::string>* dialogue, int x_resolution, int y_resolution);
     void RenderEnd(SDL_Texture* game_over_image);
     // New methods for rendering images
     void RenderIntro(ImageDB* imageDB, TextDB* textDB, int& y_resolution);

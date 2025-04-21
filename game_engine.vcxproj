@@ -127,7 +127,7 @@
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;_SILENCE_ALL_CXX17_DEPRECATION_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <Optimization>MaxSpeed</Optimization>
+      <Optimization>Disabled</Optimization>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -144,6 +144,7 @@
   <ItemGroup>
     <ClInclude Include="src\first_party\Actor.h" />
     <ClInclude Include="src\first_party\AudioDB.h" />
+    <ClInclude Include="src\first_party\EventListener.h" />
     <ClInclude Include="src\first_party\Engine.h" />
     <ClInclude Include="src\first_party\ImageDB.h" />
     <ClInclude Include="src\first_party\Input.h" />
@@ -1275,6 +1276,7 @@
   <ItemGroup>
     <ClCompile Include="src\first_party\Actor.cpp" />
     <ClCompile Include="src\first_party\AudioDB.cpp" />
+    <ClCompile Include="src\first_party\EventListener.cpp" />
     <ClCompile Include="src\first_party\Engine.cpp" />
     <ClCompile Include="src\first_party\ImageDB.cpp" />
     <ClCompile Include="src\first_party\Input.cpp" />

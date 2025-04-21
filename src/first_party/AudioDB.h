@@ -11,6 +11,7 @@ public:
 	AudioDB();
 	void LoadAudio(rapidjson::Document& game_config, std::string audio_name, bool is_intro);
 	void PlayMusic(bool is_intro);
+	void PlayMusic(std::string song_name);
 	void PlayGameOverMusic(bool is_good);
 	void SetNearbyDialogueSFXByID(int actor_id, std::string sfx_name);
 	std::pair<Mix_Chunk*, bool> GetNearbyDialogueSFXByID(int actor_id);

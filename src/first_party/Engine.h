@@ -9,6 +9,7 @@
 #include "ImageDB.h"
 #include "TextDB.h"
 #include "AudioDB.h"
+#include "EventListener.h"
 
 using std::string, glm::vec2, std::pair;
 
@@ -30,6 +31,7 @@ public:
 	void CheckNPCDialogue(string& dialogue, Actor* actor);
 	void MoveNPCs();
 	void ClearCollidingActorsSet();
+	void DetectPlayerExit();
 	void LoadScene(string scene_name);
 	SDL_Window* CreateWindow();
 	vec2 InvertVelocity(vec2 velocity);
@@ -56,7 +58,9 @@ private:
 	string game_over_bad_message = "";
 	string game_over_good_message = "";
 	string next_scene_name = "";
-	vector<string> dialogue;
+	pair<Actor*, string> speaking_actor;
+	std::unordered_set<Actor*> previous_colliding_actors;
+	std::unordered_set<Actor*> previous_trigger_actors;
 	ivec2 new_position = ivec2(0, 0);
 	SceneDB scene;
 	SDL_Window* window = nullptr;
@@ -64,4 +68,5 @@ private:
 	ImageDB images;
 	TextDB text;
 	AudioDB audio;
+	EventListener eventListener;
 };

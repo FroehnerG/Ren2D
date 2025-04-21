@@ -117,6 +117,23 @@ __declspec(noinline) void AudioDB::PlayMusic(bool is_intro)
 	}
 }
 
+void AudioDB::PlayMusic(std::string song_name) {
+	Mix_Chunk* new_song;
+	std::string audio_path_wav = "resources/audio/" + song_name + ".wav";
+	std::string audio_path_ogg = "resources/audio/" + song_name + ".ogg";
+
+	if (fs::exists(audio_path_wav)) {
+		new_song = AudioHelper::Mix_LoadWAV(audio_path_wav.c_str());
+	}
+	else {
+		new_song = AudioHelper::Mix_LoadWAV(audio_path_ogg.c_str());
+	}
+
+	if (AudioHelper::Mix_PlayChannel(0, new_song, -1) < 0) {
+		exit(0);
+	}
+}
+
 void AudioDB::PlayGameOverMusic(bool is_good)
 {
 	if (is_good) {
@@ -224,10 +241,6 @@ bool AudioDB::CheckIfHasMusic(bool is_intro) {
 
 void AudioDB::HaltMusic()
 {
-	if (!CheckIfHasMusic(true || false)) {
-		return;
-	}
-
 	if (AudioHelper::Mix_HaltChannel(0) < 0) {
 		exit(0);
 	}

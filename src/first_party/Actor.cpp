@@ -1,7 +1,8 @@
+#include <regex>
 #include "Actor.h"
 #include "Helper.h"
 
-void Actor::ParseActorFromJson(SDL_Renderer* renderer, ImageDB* imageDB, AudioDB* audioDB, rapidjson::Value& actor_json, int current_actor_id)
+void Actor::ParseActorFromJson(SDL_Renderer* renderer, ImageDB* imageDB, AudioDB* audioDB, EventListener* eventListener, rapidjson::Value& actor_json, int current_actor_id)
 {
     if (actor_json.HasMember("name")) {
         actor_name = actor_json["name"].GetString();
@@ -63,12 +64,37 @@ void Actor::ParseActorFromJson(SDL_Renderer* renderer, ImageDB* imageDB, AudioDB
         movement_bounce_enabled = actor_json["movement_bounce_enabled"].GetBool();
     }
 
-    if (actor_json.HasMember("nearby_dialogue")) {
-        nearby_dialogue = actor_json["nearby_dialogue"].GetString();
+    if (actor_json.HasMember("default_portrait")) {
+        std::string portrait_name = actor_json["default_portrait"].GetString();
+        imageDB->LoadImages(actor_json, renderer, false, portrait_name, current_actor_id);
+
+        default_portrait = imageDB->GetActorTextureById(current_actor_id);
     }
 
     if (actor_json.HasMember("contact_dialogue")) {
         contact_dialogue = actor_json["contact_dialogue"].GetString();
+    }
+
+    if (actor_json.HasMember("nearby_dialogue")) {
+        for (auto& dlg : actor_json["nearby_dialogue"].GetArray()) {
+            std::string event_name = dlg["event_name"].GetString();
+            std::string dsl = dlg["dial"].GetString();
+            eventListener->ParseAndLoadDialogueDSL(dsl, event_name);
+
+            // save association
+            dialogue.event_names.push_back(event_name);
+            std::string clean_text = dsl;
+            clean_text = regex_replace(clean_text, regex(R"(\[if [^\]]+\])"), "");
+            clean_text = regex_replace(clean_text, regex(R"(\[flag [^\]]+\])"), "");
+            dialogue.event_to_text[event_name] = clean_text;
+
+            if (dlg.HasMember("portrait")) {
+                std::string portrait_name = dlg["portrait"].GetString();
+                imageDB->LoadImages(actor_json, renderer, false, portrait_name, current_actor_id);
+
+                dialogue.event_to_portrait_texture[event_name] = imageDB->GetActorTextureById(current_actor_id);
+            }
+        }
     }
 
     if (actor_json.HasMember("view_image")) {
@@ -178,10 +204,10 @@ bool Actor::AreBoxesOverlapping(const Actor& other, bool is_trigger)
     float b_top = other.position.y - b_half_h;
     float b_bottom = other.position.y + b_half_h;
 
-    if (a_right <= b_left) return false;
-    if (a_left >= b_right) return false;
-    if (a_bottom <= b_top) return false;
-    if (a_top >= b_bottom) return false;
+    if (a_right < b_left) return false;
+    if (a_left > b_right) return false;
+    if (a_bottom < b_top) return false;
+    if (a_top > b_bottom) return false;
 
     return true;  // All axes overlap
 }

@@ -8,6 +8,13 @@
 #include "rapidjson/document.h"
 #include "ImageDB.h"
 #include "AudioDB.h"
+#include "EventListener.h"
+
+struct DialogueComponent {
+    std::vector<std::string> event_names;
+    std::unordered_map<std::string, std::string> event_to_text;
+    std::unordered_map<std::string, SDL_Texture*> event_to_portrait_texture;
+};
 
 class Actor {
 public:
@@ -18,6 +25,8 @@ public:
     SDL_Texture* view_image = nullptr;
     SDL_Texture* view_image_back = nullptr;
     SDL_Texture* view_image_damage = nullptr;
+    SDL_Texture* default_portrait = nullptr;
+    SDL_Texture* current_portrait = nullptr;
     glm::vec2 position = glm::vec2(0.0f, 0.0f);
     glm::vec2 velocity = glm::vec2(0.0f, 0.0f);
     glm::vec2 transform_scale = glm::vec2(1.0f, 1.0f);
@@ -33,12 +42,15 @@ public:
     bool direction_changed = true;
     bool show_view_image_back = false;
     bool show_view_image_damage = false;
-    std::string nearby_dialogue = "";
+    bool dialogue_cooldown = false;
     std::string contact_dialogue = "";
+    std::string active_dialogue = "";
     std::optional<float> render_order = std::nullopt;
     std::unordered_set<Actor*> colliding_actors_this_frame;
+    DialogueComponent dialogue;
 
-    void ParseActorFromJson(SDL_Renderer* renderer, ImageDB* imageDB, AudioDB* audioDB, rapidjson::Value& actor_json, int current_actor_id);
+    void ParseActorFromJson(SDL_Renderer* renderer, ImageDB* imageDB, AudioDB* audioDB, EventListener* eventListener,
+        rapidjson::Value& actor_json, int current_actor_id);
     bool AreBoxesOverlapping(const Actor& other, bool is_trigger);
     void InsertCollidingActor(Actor* actor);
     void ClearCollidingActors();

@@ -82,7 +82,7 @@ bool Renderer::GetXFlipOnMovement()
     return x_scale_actor_flipping_on_movement;
 }
 
-void Renderer::Render(std::multimap<RenderKey, const Actor*>* sorted_actors, vector<string>* dialogue, Actor* player, int& x_resolution, 
+void Renderer::Render(std::multimap<RenderKey, const Actor*>* sorted_actors, std::pair<Actor*, std::string>* dialogue, Actor* player, int& x_resolution, 
     int& y_resolution, SDL_Texture* hp_image, std::optional<int> health, int& score)
 {
     SDL_RenderSetScale(sdl_renderer, zoom_factor, zoom_factor);
@@ -158,7 +158,7 @@ void Renderer::Render(std::multimap<RenderKey, const Actor*>* sorted_actors, vec
         );
     }
 
-    RenderDebugColliders(sorted_actors, x_resolution, y_resolution, false); // true = also render triggers
+    //RenderDebugColliders(sorted_actors, x_resolution, y_resolution, false); // true = also render triggers
     SDL_RenderSetScale(sdl_renderer, 1.0f, 1.0f);
 
     if (health.has_value()) {
@@ -166,12 +166,12 @@ void Renderer::Render(std::multimap<RenderKey, const Actor*>* sorted_actors, vec
 
         RenderHealth(hp_image, *health, x_resolution, y_resolution);
         DrawText(score_text, 16, { 255, 255, 255, 255 }, 5, 5);
-        RenderDialogue(dialogue, y_resolution);
+        RenderDialogue(dialogue, x_resolution, y_resolution);
     }
 
     // Present the frame (finish rendering)
     Helper::SDL_RenderPresent(sdl_renderer);
-    dialogue->clear();
+    dialogue->second.clear();
 }
 
 void Renderer::RenderDebugColliders(std::multimap<RenderKey, const Actor*>* sorted_actors, int& x_resolution, int& y_resolution, bool show_triggers)
@@ -225,18 +225,72 @@ void Renderer::RenderDebugColliders(std::multimap<RenderKey, const Actor*>* sort
     SDL_SetRenderDrawBlendMode(sdl_renderer, SDL_BLENDMODE_NONE);
 }
 
-
-void Renderer::RenderDialogue(vector<string>* dialogue, int y_resolution)
+void Renderer::RenderDialogue(std::pair<Actor*, std::string>* dialogue, int x_resolution, int y_resolution)
 {
-    // Render dialogue messages to screen (bottom-left)
-    int m = dialogue->size();
-    for (int i = 0; i < m; ++i) {
-        int x = 25;
-        int y = y_resolution - 50 - (m - 1 - i) * 50;
+    if (!dialogue || !dialogue->first || dialogue->second.empty()) return;
 
-        DrawText(dialogue->at(i), 16, { 255, 255, 255, 255 }, x, y);  // white text, size 24
+    const Actor* speaker = dialogue->first;
+    const std::string& text = dialogue->second;
+
+    const int box_height = 120;
+    const int box_padding = 20;
+    const int portrait_size = 96;
+    const float vertical_offset = 40.0f;
+
+    const float box_width = static_cast<float>(x_resolution);
+
+    // Draw translucent black box
+    SDL_SetRenderDrawBlendMode(sdl_renderer, SDL_BLENDMODE_BLEND);
+    SDL_SetRenderDrawColor(sdl_renderer, 0, 0, 0, 200);
+
+    SDL_FRect background_box = {
+        0.5f * (x_resolution - box_width),                                // Centered horizontally
+        static_cast<float>(y_resolution - box_height - vertical_offset), // Slightly above bottom
+        box_width,
+        static_cast<float>(box_height)
+    };
+    SDL_RenderFillRectF(sdl_renderer, &background_box);
+
+    // Determine portrait texture (event-specific or default)
+    SDL_Texture* portrait = nullptr;
+    for (const auto& [event_name, message] : speaker->dialogue.event_to_text) {
+        if (message == text) {
+            auto it = speaker->dialogue.event_to_portrait_texture.find(event_name);
+            if (it != speaker->dialogue.event_to_portrait_texture.end()) {
+                portrait = it->second;
+            }
+            break;
+        }
     }
+    if (!portrait) {
+        portrait = speaker->current_portrait;
+    }
+
+    float box_top = background_box.y;
+
+    // Draw portrait if available
+    if (portrait) {
+        SDL_FRect portrait_rect = {
+            static_cast<float>(box_padding),
+            box_top + (box_height - portrait_size) / 2.0f,
+            static_cast<float>(portrait_size),
+            static_cast<float>(portrait_size)
+        };
+        SDL_RenderCopyF(sdl_renderer, portrait, nullptr, &portrait_rect);
+    }
+
+    // Draw text to the right of the portrait
+    int text_x = box_padding + portrait_size + 20;
+    int text_y = static_cast<int>(box_top + box_padding);
+
+    DrawText(text, 20, { 255, 255, 255, 255 }, text_x, text_y);
+
+    SDL_SetRenderDrawBlendMode(sdl_renderer, SDL_BLENDMODE_NONE);
+
+    dialogue->second.clear();  // Clear string content after displaying
 }
+
+
 
 void Renderer::RenderEnd(SDL_Texture* game_over_image)
 {

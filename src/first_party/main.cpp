@@ -29,13 +29,6 @@ int main(int argc, char* argv[]) {
 
 	Engine engine(game_config);
 
-	if (fs::exists("resources/rendering.config")) {
-		rapidjson::Document rendering_config;
-		EngineUtils::ReadJsonFile("resources/rendering.config", rendering_config);
-
-		engine.InitResolution(rendering_config);
-	}
-
 	engine.GameLoop();
 
 	return 0;

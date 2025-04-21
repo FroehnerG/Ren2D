@@ -1,4 +1,4 @@
-#include <iostream>
+﻿#include <iostream>
 #include <filesystem>
 #include "rapidjson/document.h"
 #include "EngineUtils.h"
@@ -49,6 +49,19 @@ Engine::Engine(rapidjson::Document& game_config)
 		exit(0);
 	}
 
+	if (fs::exists("resources/flags.config")) {
+		rapidjson::Document flags_json;
+		EngineUtils::ReadJsonFile("resources/flags.config", flags_json);
+		eventListener.LoadFlags(flags_json);
+	}
+
+	if (fs::exists("resources/rendering.config")) {
+		rapidjson::Document rendering_config;
+		EngineUtils::ReadJsonFile("resources/rendering.config", rendering_config);
+
+		InitResolution(rendering_config);
+	}
+
 	window = CreateWindow();
 	renderer.SetRenderer(window);
 	SDL_SetRenderDrawColor(renderer.GetRenderer(), renderer.GetColor("red"), renderer.GetColor("green"), renderer.GetColor("blue"), 255);
@@ -64,7 +77,9 @@ Engine::Engine(rapidjson::Document& game_config)
 	audio.LoadAudio(game_config, "game_over_bad_audio", false);
 	audio.LoadAudio(game_config, "score_sfx", false);
 
-	scene.LoadActors(scene_json, renderer.GetRenderer(), &images, &audio);
+	eventListener.LoadScoreAndHealth(&score, &player_health);
+
+	scene.LoadActors(scene_json, renderer.GetRenderer(), &images, &audio, &eventListener);
 	scene.SortRenderActors(false, nullptr);
 
 	if (GetPlayer() != nullptr) {
@@ -74,8 +89,6 @@ Engine::Engine(rapidjson::Document& game_config)
 
 void Engine::GameLoop()
 {
-	if (game_start_message != "")
-		cout << game_start_message << '\n';
 
 	while (is_running) {
 		current_frame = Helper::GetFrameNumber();  // Call this every frame
@@ -88,11 +101,11 @@ void Engine::GameLoop()
 				else {
 					Update();
 					if (GetPlayer() != nullptr) {
-						renderer.Render(scene.GetSortedActors(), &dialogue, GetPlayer(), x_resolution, y_resolution, images.GetHPImage(), player_health, score);
+						renderer.Render(scene.GetSortedActors(), &speaking_actor, GetPlayer(), x_resolution, y_resolution, images.GetHPImage(), player_health, score);
 						//cout << current_frame << '\n';
 					}
 					else {
-						renderer.Render(scene.GetSortedActors(), &dialogue, GetPlayer(), x_resolution, y_resolution, nullptr, std::nullopt, score);
+						renderer.Render(scene.GetSortedActors(), &speaking_actor, GetPlayer(), x_resolution, y_resolution, nullptr, std::nullopt, score);
 						//cout << current_frame << '\n';
 					}
 				}
@@ -119,7 +132,6 @@ void Engine::GameLoop()
 			}
 
 			if (!game_over_bad && !game_over_good) {
-				//HandlePlayerMovement();
 				Update();
 			}
 		}
@@ -149,11 +161,11 @@ void Engine::GameLoop()
 			renderer.RenderEnd(images.GetGameOverImage(false));
 		}
 		else if (GetPlayer() != nullptr) {
-			renderer.Render(scene.GetSortedActors(), &dialogue, GetPlayer(), x_resolution, y_resolution, images.GetHPImage(), player_health, score);
+			renderer.Render(scene.GetSortedActors(), &speaking_actor, GetPlayer(), x_resolution, y_resolution, images.GetHPImage(), player_health, score);
 			//cout << current_frame << '\n';
 		}
 		else {
-			renderer.Render(scene.GetSortedActors(), &dialogue, GetPlayer(), x_resolution, y_resolution, nullptr, std::nullopt, score);
+			renderer.Render(scene.GetSortedActors(), &speaking_actor, GetPlayer(), x_resolution, y_resolution, nullptr, std::nullopt, score);
 			//cout << current_frame << '\n';
 		}
 	}
@@ -339,6 +351,8 @@ void Engine::MoveNPCs()
 			}
 		}
 	}
+
+
 }
 
 void Engine::ClearCollidingActorsSet()
@@ -348,6 +362,26 @@ void Engine::ClearCollidingActorsSet()
 	for (auto& actor : *actors) {
 		actor.colliding_actors_this_frame.clear();
 	}
+}
+
+void Engine::DetectPlayerExit()
+{
+	Actor* player = GetPlayer();
+
+	if (!player) {
+		return;
+	}
+
+	std::unordered_set<Actor*>& current = player->colliding_actors_this_frame;
+
+	for (Actor* actor : previous_colliding_actors) {
+		if (player->colliding_actors_this_frame.find(actor) == player->colliding_actors_this_frame.end()) {
+			actor->dialogue_cooldown = false;
+		}
+	}
+
+	// update for next frame
+	previous_colliding_actors = current;
 }
 
 void Engine::LoadScene(string scene_name)
@@ -364,7 +398,7 @@ void Engine::LoadScene(string scene_name)
 
 	scene.Reset();
 
-	scene.LoadActors(scene_json, renderer.GetRenderer(), &images, &audio);
+	scene.LoadActors(scene_json, renderer.GetRenderer(), &images, &audio, &eventListener);
 	scene.SortRenderActors(false, nullptr);
 }
 
@@ -373,7 +407,7 @@ SDL_Window* Engine::CreateWindow()
 	std::vector<char> game_title_cstr(game_title.begin(), game_title.end());
 	game_title_cstr.push_back('\0'); // Ensure null termination
 
-	return Helper::SDL_CreateWindow(game_title_cstr.data(), 500, 500, x_resolution, y_resolution, SDL_WINDOW_SHOWN);
+	return Helper::SDL_CreateWindow(game_title_cstr.data(), 100, 100, x_resolution, y_resolution, SDL_WINDOW_SHOWN);
 }
 
 vec2 Engine::InvertVelocity(vec2 velocity)
@@ -391,6 +425,7 @@ void Engine::Render()
 {
 	//cout << RenderMap();
 	ShowNPCDialogue();
+	DetectPlayerExit();
 	ClearCollidingActorsSet();
 }
 
@@ -403,37 +438,83 @@ void Engine::UpdatePlayerPosition(vec2 direction)
 	}
 }
 
-void Engine::CheckTriggerActors()
-{
+void Engine::CheckTriggerActors() {
 	Actor* player = GetPlayer();
-
-	if (!player->trigger) {
-		return;
-	}
+	if (!player || !player->trigger) return;
 
 	vector<Actor>* actors = GetActors();
+	std::unordered_set<Actor*> currently_nearby_actors;
 
 	for (auto& actor : *actors) {
-		string message = actor.nearby_dialogue;
+		if (&actor == player) continue;
 
-		if (player->AreBoxesOverlapping(actor, true) && !message.empty()) {
-			dialogue.push_back(message);
-			CheckNPCDialogue(message, &actor);
+		if (player->AreBoxesOverlapping(actor, true)) {
+			currently_nearby_actors.insert(&actor);
+
 			audio.PlayActorSFX(actor.id, "nearby", current_frame % 48 + 2);
-			if (next_scene) {
-				next_scene = false;
-				LoadScene(next_scene_name);
-				dialogue.clear();
-				return;
+
+			if (actor.dialogue_cooldown && speaking_actor.second.empty()) {
+				if (!actor.active_dialogue.empty()) {
+					speaking_actor.first = &actor;
+					speaking_actor.second = actor.active_dialogue;
+				}
+				continue;
 			}
 
-			if (game_over_good || game_over_bad) {
-				dialogue.clear();
-				return;
+			DialogueComponent& dlg = actor.dialogue;
+
+			for (const std::string& event_name : dlg.event_names) {
+				if (eventListener.EventCheck(event_name)) {
+					std::string& message = dlg.event_to_text.at(event_name);
+					actor.active_dialogue = message;
+					actor.dialogue_cooldown = true;  // prevent retrigger
+					CheckNPCDialogue(message, &actor);
+					speaking_actor.first = &actor;
+					speaking_actor.second = message;
+
+					// get portrait for dialogue
+					if (actor.dialogue.event_to_portrait_texture.find(event_name) != 
+						actor.dialogue.event_to_portrait_texture.end()) {
+						actor.current_portrait = actor.dialogue.event_to_portrait_texture[event_name];
+					}
+					else if (actor.default_portrait) {
+						actor.current_portrait = actor.default_portrait;
+					}
+
+					if (next_scene) {
+						next_scene = false;
+						LoadScene(next_scene_name);
+						speaking_actor.second.clear();
+						return;
+					}
+					if (game_over_good || game_over_bad) {
+						speaking_actor.second.clear();
+						return;
+					}
+
+					break;
+				}
 			}
 		}
 	}
+
+	// Actors exited range: reset cooldown
+	for (Actor* actor : previous_trigger_actors) {
+		if (currently_nearby_actors.find(actor) == currently_nearby_actors.end()) {
+			actor->dialogue_cooldown = false;
+		}
+	}
+
+	previous_trigger_actors = std::move(currently_nearby_actors);
+
+	if (player->view_image_damage && current_frame < last_damage_frame + 30) {
+		player->show_view_image_damage = true;
+	}
+	else {
+		player->show_view_image_damage = false;
+	}
 }
+
 
 void Engine::InitResolution(rapidjson::Document& rendering_config)
 {
@@ -498,22 +579,41 @@ void Engine::ShowNPCDialogue()
 
 	bool skip_rendering = false;  // Flag to avoid rendering dialogue on scene transition
 
+	/*
 	for (const auto& actor : colliding_actors) {
-		std::string message = actor->contact_dialogue;
-
-		if (!message.empty()) {
-			CheckNPCDialogue(message, actor);
-
-			if (next_scene) {
-				next_scene = false;
-				LoadScene(next_scene_name);
-				dialogue.clear();
-				return;
+		// If already in cooldown, just reuse their active_dialogue
+		if (actor->dialogue_cooldown) {
+			if (!actor->active_dialogue.empty()) {
+				dialogue.first = actor;
+				dialogue.second = actor->active_dialogue; // reuse cached line
 			}
+			continue;
+		}
 
-			if (game_over_good || game_over_bad) {
-				dialogue.clear();
-				return;
+		DialogueComponent& dlg = actor->dialogue;
+
+		for (const std::string& event_name : dlg.event_names) {
+			if (eventListener.EventCheck(event_name)) {
+				std::string& message = dlg.event_to_text.at(event_name);
+				actor->active_dialogue = message;     
+				actor->dialogue_cooldown = true; 
+				CheckNPCDialogue(message, actor);
+				dialogue.second = message;
+
+				// Handle scene transitions
+				if (next_scene) {
+					next_scene = false;
+					LoadScene(next_scene_name);
+					dialogue.second.clear();
+					return;
+				}
+
+				if (game_over_good || game_over_bad) {
+					dialogue.second.clear();
+					return;
+				}
+
+				break; // Only trigger one dialogue per actor
 			}
 		}
 	}
@@ -524,7 +624,9 @@ void Engine::ShowNPCDialogue()
 	else {
 		player->show_view_image_damage = false;
 	}
+	*/
 }
+
 
 void Engine::CheckNPCDialogue(std::string& dialogue, Actor* actor)
 {
@@ -536,6 +638,13 @@ void Engine::CheckNPCDialogue(std::string& dialogue, Actor* actor)
 	const std::string you_win = "you win";
 	const std::string game_over = "game over";
 	const std::string proceed_to = "proceed to";
+	const std::string switch_song = "switch song";
+
+	if (dialogue.find(switch_song) != std::string::npos) {
+		string new_song = EngineUtils::ObtainWordAfterPhrase(dialogue, switch_song);
+		audio.HaltMusic();
+		audio.PlayMusic(new_song);
+	}
 
 	if (dialogue.find(health_down) != std::string::npos) {
 		if (current_frame >= last_damage_frame + 180) {
